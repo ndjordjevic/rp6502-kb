@@ -4,4 +4,5 @@ raw/pdfs/Programming The Raspberry Pi Pico_W In C, Third Edition_nodrm.pdf
 
 # Local-only editor / assistant state
 .claude/settings.local.json
+.claude/.openrouter-settings.json
 .obsidian/workspace.json
