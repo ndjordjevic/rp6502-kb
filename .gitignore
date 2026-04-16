@@ -1,6 +1,5 @@
-# Large / copyrighted source PDFs — keep locally, not in git
-raw/pdfs/Knowing the RP2040 (Quadros).pdf
-raw/pdfs/Programming The Raspberry Pi Pico_W In C, Third Edition_nodrm.pdf
+# Large / copyrighted PDF sources — keep locally, not in git
+raw/pdfs/
 
 # Local-only editor / assistant state
 .claude/settings.local.json
