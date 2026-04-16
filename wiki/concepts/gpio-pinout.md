@@ -85,7 +85,7 @@ Every GPIO can be assigned to one of up to 9 functions. Key functions used in th
 
 | Function constant | Peripheral | Notes |
 |---|---|---|
-| `GPIO_FUNC_SPI` | SPI0 or SPI1 | SD card on RIA |
+| `GPIO_FUNC_SPI` | SPI0 or SPI1 | Not used by current RIA firmware (storage is USB MSC) |
 | `GPIO_FUNC_UART` | UART0 or UART1 | Console on GPIO 4–5 |
 | `GPIO_FUNC_SIO` | SIO (software control) | Default CPU-controlled GPIO |
 | `GPIO_FUNC_PIO0` | PIO block 0 | Bus signals on RIA (GPIO 0–3, 6–21) |

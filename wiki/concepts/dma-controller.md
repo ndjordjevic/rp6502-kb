@@ -4,7 +4,7 @@ tags: [rp2040, dma, xram, pio, peripheral]
 related: [[rp2040-memory]], [[pio-architecture]], [[xram]], [[rp6502-ria]]
 sources: [[quadros-rp2040]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-16 (audit: corrected DREQ_PWM_WRAP8→WRAP7 book typo)
 ---
 
 # DMA Controller (RP2040)
@@ -113,7 +113,7 @@ Transfers are paced by **Transfer Requests (TREQ)**. Options per channel:
 | 8 | `DREQ_PIO1_TX0` | 28 | `DREQ_PWM_WRAP4` |
 | 9 | `DREQ_PIO1_TX1` | 29 | `DREQ_PWM_WRAP5` |
 | 10 | `DREQ_PIO1_TX2` | 30 | `DREQ_PWM_WRAP6` |
-| 11 | `DREQ_PIO1_TX3` | 31 | `DREQ_PWM_WRAP8` |
+| 11 | `DREQ_PIO1_TX3` | 31 | `DREQ_PWM_WRAP7` |
 | 12 | `DREQ_PIO1_RX0` | 32 | `DREQ_I2C0_TX` |
 | 13 | `DREQ_PIO1_RX1` | 33 | `DREQ_I2C0_RX` |
 | 14 | `DREQ_PIO1_RX2` | 34 | `DREQ_I2C1_TX` |
@@ -123,7 +123,9 @@ Transfers are paced by **Transfer Requests (TREQ)**. Options per channel:
 | 18 | `DREQ_SPI1_TX` | 38 | `DREQ_XIP_SSITX` |
 | 19 | `DREQ_SPI1_RX` | 39 | `DREQ_XIP_SSIRX` |
 
-**RIA-relevant DREQs**: `DREQ_PIO0_RX*` and `DREQ_PIO1_RX*` pace XRAM-fill DMA; `DREQ_SPI0_TX` / `DREQ_SPI0_RX` pace SD card transfers.
+> **Conflict:** The Quadros book (page 44) lists DREQ 31 as `DREQ_PWM_WRAP8`, skipping WRAP7. The RP2040 has 8 PWM slices numbered 0–7, and the RP2040 datasheet and SDK headers (`dreq.h`) confirm DREQ 31 = `DREQ_PWM_WRAP7`. Corrected here.
+
+**RIA-relevant DREQs**: `DREQ_PIO0_RX*` and `DREQ_PIO1_RX*` pace XRAM-fill DMA from PIO bus capture FIFOs.
 
 ---
 
@@ -260,7 +262,6 @@ The DMA controller is the backbone of XRAM throughput in [[rp6502-ria]] firmware
 |---|---|
 | **XRAM fill (bus write)** | PIO state machine captures 65C02 data bus byte → RX FIFO → DMA (DREQ_PIOx_RX) → SRAM (XRAM region) |
 | **XRAM drain (bus read)** | DMA reads XRAM → PIO TX FIFO → state machine drives 65C02 data bus |
-| **SD card** | SPI DMA with `DREQ_SPI0_TX` / `DREQ_SPI0_RX` for SD card block transfers |
 | **XRAM broadcast** | XRAM writes replicated to PIX bus devices (VGA); DMA may assist with high-bandwidth frames |
 
 The two-core design (Core 0: bus loop; Core 1: OS task dispatcher) means DMA transfers can be set up from either core and will proceed independently — the bus loop core doesn't have to poll for completion.

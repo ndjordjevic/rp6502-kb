@@ -4,7 +4,7 @@ tags: [rp6502, ria, registers, abi, hardware]
 related: [[rp6502-ria]], [[rp6502-abi]], [[api-opcodes]], [[memory-map]]
 sources: [[rp6502-ria-docs]], [[rp6502-github-repo]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-16 (audit: filled register map $FFE0–$FFEB from source, fixed XSTACK register name)
 ---
 
 # RIA Registers
@@ -25,8 +25,17 @@ Internally, any register address is accessed as `REGS(addr)` = `regs[(addr) & 0x
 
 | Address | Name | Direction | Description |
 | --- | --- | --- | --- |
-| `$FFE0–$FFEB` | — | — | *(not assigned in current firmware; 12 bytes available for future use)* |
-| `$FFEC` | `RIA_STACK` | R | Top byte of the XSTACK — used to read the first pushed arg back after a call |
+| `$FFE0` | UART status | R | bit 7 = TX ready, bit 6 = RX data available |
+| `$FFE1` | UART TX | W | Write a byte to transmit on the console UART |
+| `$FFE2` | UART RX | R | Read a received byte from the console UART |
+| `$FFE3` | — | — | *(unassigned)* |
+| `$FFE4` | `RIA_RW0` | R/W | XRAM read/write window 0 — reads/writes `xram[RIA_ADDR0]`; auto-increments `RIA_ADDR0` by `RIA_STEP0` |
+| `$FFE5` | `RIA_STEP0` | R/W | Signed int8 auto-increment for window 0 (default 1; set to 0 for no increment, negative for decrement) |
+| `$FFE6–$FFE7` | `RIA_ADDR0` | R/W | 16-bit XRAM address for window 0 (little-endian) |
+| `$FFE8` | `RIA_RW1` | R/W | XRAM read/write window 1 — same behavior as RW0 but independent |
+| `$FFE9` | `RIA_STEP1` | R/W | Signed int8 auto-increment for window 1 |
+| `$FFEA–$FFEB` | `RIA_ADDR1` | R/W | 16-bit XRAM address for window 1 (little-endian) |
+| `$FFEC` | `RIA_XSTACK` | R/W | Write = push byte onto XSTACK; Read = pop byte from XSTACK. Also reflects top-of-stack after each operation |
 | `$FFED–$FFEE` | `RIA_ERRNO` | R (16-bit) | Error code from last failed OS call; platform-mapped (cc65 or llvm-mos encoding) |
 | `$FFEF` | `RIA_OP` | W | Write an op-code here to trigger an OS call; the RIA sees this and dispatches |
 | `$FFF0` | — | R | `$EA` (NOP) — first byte of the return stub |
@@ -64,7 +73,7 @@ So `JSR RIA_SPIN` ($FFF0) both waits *and* collects the return value in a single
 
 ## Making an OS call — step by step
 
-1. Push all arguments except the last onto XSTACK via `RIA_RW0` or `RIA_RW1` (see [[rp6502-abi]]).
+1. Push all arguments except the last onto XSTACK by writing to `RIA_XSTACK` (`$FFEC`) (see [[rp6502-abi]]).
 2. Load the last argument into `A` (and `X`/`RIA_SREG` if wider than 8 bits).
 3. `STA $FFEF` — write the op-code to `RIA_OP`. This releases the BRA-self spin and starts the RIA handler.
 4. Either:
@@ -103,10 +112,6 @@ The internal `api_errno` enum (from `src/ria/api/api.h`) has 19 entries. They ar
 > `API_EDOM` and `API_EILSEQ` are required by ISO C but cc65 doesn't have them — they map to cc65's internal `EUNKNOWN`.
 
 ---
-
-## Data gap
-
-`RIA_RW0` and `RIA_RW1` (auto-incrementing XRAM read/write windows) are mentioned in [[memory-map]], [[xram]], and [[rp6502-abi]] but their exact addresses are not yet confirmed — they require reading `src/ria/sys/ria.h`. They are the primary mechanism for the 6502 to access XRAM byte-by-byte and for pushing data onto the XSTACK.
 
 ## Related pages
 

@@ -1,7 +1,7 @@
 ---
 type: topic
 tags: [rp6502, overview]
-updated: 2026-04-16 (Quadros book fully ingested)
+updated: 2026-04-16 (lint pass 2 — stale questions removed, hub lists updated)
 ---
 
 # RP6502 Wiki — Overview
@@ -62,13 +62,11 @@ There are three Pico firmwares, all from the same monorepo:
 2. **Maximum stable PHI2 margin** — the firmware sets 8 MHz as the max (`CPU_PHI2_MAX_KHZ 8000`). PIO timing comments say "good range narrows as PHI2 increases" — the exact electrical limit isn't documented.
 3. **`cc65` vs. `llvm-mos` entity pages** — both toolchains have first-class support (separate `lseek` op-codes 0x1A vs 0x1D, separate errno-opt) but no wiki pages yet.
 4. **VIA pinout / J1 GPIO header** — not in web docs or repo source; needs the schematic PDF.
-5. **`tel.c` / telnet scope** — **resolved**: v0.12 release notes confirm "modem supports raw TCP only — full Telnet layer is still in the works." `tel.c` is the WIP implementation. Not yet user-facing.
-6. **VGA GPIO full pinout** — only GPIO 11 (PHI2 in) and GPIO 0–3 (PIX in) confirmed from VGA source. DAC output pins, sync signals not yet read.
-7. **Release notes** — not yet ingested. Release notes document behavioral changes and new OS calls added per version.
+5. **VGA GPIO full pinout** — only GPIO 11 (PHI2 in) and GPIO 0–3 (PIX in) confirmed from VGA source. DAC output pins, sync signals not yet read.
 
 ## Hub pages
 
-- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]]
+- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]]
 - **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]]
-- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[gpio-pinout]] · [[usb-controller]]
+- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[gpio-pinout]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]]
 - **Topics**: [[version-history]] · [[known-issues]]

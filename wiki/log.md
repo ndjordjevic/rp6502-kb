@@ -7,15 +7,66 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
-## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Communication Using SPI (PDF 184–193) — FINAL CHAPTER | new page: [[rp2040-spi]] (SPI basics, CPOL/CPHA modes, 8-entry FIFOs, two-stage clock divider from clk_peri, manual SS in master mode, GPIO pin tables, full SDK API, correction: RIA uses USB MSC not SPI for storage); updated: [[quadros-rp2040]] scope + SPI facts section, [[index]] (all chapters ingested), [[overview]]; deleted ingest plan from wiki/inbox (all chapters complete)
+## [2026-04-16] lint | full audit against all raw sources | 4 fixes
 
-## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Asynchronous Serial Communication: the UARTs (PDF 172–183) | new page: [[rp2040-uart]] (framing, TX/RX FIFOs + error flags, fractional baud rate from clk_peri, 5 interrupt sources, RTS/CTS flow control, GPIO pin options, full SDK API, RIA UART1/GPIO4-5/115200 8N1); updated: [[quadros-rp2040]] scope + UART facts section, [[index]] (9/10 chapters done), ingest plan
+Cross-checked all wiki pages against 3 raw source types (6 web docs, github repo at v0.23, Quadros PDF).
 
-## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Clock Generation, Timer, Watchdog and RTC (PDF 68–88) | new page: [[rp2040-clocks]] (ROSC/XOSC/PLLs, 10 clock domains, mux architecture, 256 MHz System PLL overclock, 64-bit Timer + alarm pools + pico_time, Watchdog + scratch registers, RTC + repeating alarm); updated: [[quadros-rp2040]] scope + clock facts section, [[index]], ingest plan (8/10 chapters done)
+Fixes:
+- [[ria-registers]]: filled in register map `$FFE0–$FFEB` (UART TX/RX/status, RIA_RW0/RW1, STEP0/STEP1, ADDR0/ADDR1) — previously marked "not assigned". Removed stale "Data gap" section. Fixed XSTACK push instruction (was `RIA_RW0` → now `RIA_XSTACK` at `$FFEC`).
+- [[rp6502-abi]]: corrected "7-byte stub" → "8-byte stub" (`$FFF0–$FFF7` = 8 bytes).
+- [[dma-controller]]: corrected `DREQ_PWM_WRAP8` → `DREQ_PWM_WRAP7` (Quadros book typo on page 44; RP2040 has PWM slices 0–7). Added `> **Conflict:**` note citing the book error.
 
-## [2026-04-16] ingest | Quadros "Knowing the RP2040" — USB Controller (PDF 200–232) | new pages: [[usb-controller]] (USB 1.1 PHY, TinyUSB host/device API, HID boot protocol keyboard/mouse/gamepad, CDC VCP, RP6502-RIA USB host usage table); updated: [[quadros-rp2040]] scope + USB key facts section, [[rp6502-ria]] related links, [[index]], [[overview]]
+Everything else verified correct: op-code table, PIX bus protocol, memory map, VGA modes, ABI rules, PIO layout, GPIO pinout, reset model, all Quadros-derived concept pages.
 
-## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Memory, Addresses and DMA (PDF 42–67) | new pages: [[rp2040-memory]] (ROM/SRAM banking/Flash/XIP/full address map), [[dma-controller]] (12 channels, DREQ table, control blocks, chaining, CRC sniffing, SDK API); updated: [[xram]] (DMA section added), [[quadros-rp2040]] scope, [[index]]
+## [2026-04-16] lint | full wiki | second lint pass (9 sources, 40 pages)
+
+Scope: all 40 wiki pages (9 sources, 7 entities, 18 concepts, 2 topics, 1 inbox, overview, index, log).
+
+**Contradictions fixed (2):**
+- `dma-controller.md`: removed false claim that SPI DMA paces SD card transfers (RIA uses USB MSC, not SPI).
+- `gpio-pinout.md`: corrected `GPIO_FUNC_SPI` note from "SD card on RIA" to "not used by current RIA firmware."
+
+**Stale content fixed (3):**
+- `overview.md`: removed resolved open question #5 (tel.c/telnet — resolved in first lint) and stale #7 (release notes — already ingested).
+- `quadros-rp2040.md`: updated frontmatter from "clock chapter ingest" to "all chapters ingested."
+
+**Typos fixed (1):**
+- `usb-controller.md` frontmatter: `[[pia-registers]]` → `[[ria-registers]]`.
+
+**Wrong link target fixed (1):**
+- `dual-core-sio.md`: "see [[reset-model]] for NVIC IRQ table" → [[quadros-rp2040]] (where the table actually lives).
+
+**Missing cross-references fixed (2):**
+- `quadros-rp2040.md`: added [[rp2040-clocks]], [[rp2040-uart]], [[rp2040-spi]] to frontmatter and related pages.
+- `overview.md` hub: added 6 missing concept pages and [[quadros-rp2040]] source to hub lists.
+
+**Data gaps (2, carried forward):**
+- `[[cc65]]` entity page still missing — referenced in 6+ pages. Deferred until toolchain source available.
+- `[[llvm-mos]]` entity page still missing — referenced in 4+ pages. Deferred.
+
+Pages modified (6): dma-controller.md, gpio-pinout.md, overview.md, quadros-rp2040.md, usb-controller.md, dual-core-sio.md.
+
+Also fixed: log.md formatting — 5 recent entries reformatted from single-line headings to heading + body style.
+
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Communication Using SPI (PDF 184–193) — FINAL CHAPTER
+
+New page: [[rp2040-spi]] (SPI basics, CPOL/CPHA modes, 8-entry FIFOs, two-stage clock divider from clk_peri, manual SS in master mode, GPIO pin tables, full SDK API; correction: RIA uses USB MSC not SPI for storage). Updated: [[quadros-rp2040]] scope + SPI facts section, [[index]] (all chapters ingested), [[overview]]. Deleted ingest plan from wiki/inbox — all chapters complete.
+
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Asynchronous Serial Communication: the UARTs (PDF 172–183)
+
+New page: [[rp2040-uart]] (framing, TX/RX FIFOs + error flags, fractional baud rate from clk_peri, 5 interrupt sources, RTS/CTS flow control, GPIO pin options, full SDK API, RIA UART1/GPIO4-5/115200 8N1). Updated: [[quadros-rp2040]] scope + UART facts section, [[index]] (9/10 chapters done), ingest plan.
+
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Clock Generation, Timer, Watchdog and RTC (PDF 68–88)
+
+New page: [[rp2040-clocks]] (ROSC/XOSC/PLLs, 10 clock domains, mux architecture, 256 MHz System PLL overclock, 64-bit Timer + alarm pools + pico_time, Watchdog + scratch registers, RTC + repeating alarm). Updated: [[quadros-rp2040]] scope + clock facts section, [[index]], ingest plan (8/10 chapters done).
+
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — USB Controller (PDF 200–232)
+
+New pages: [[usb-controller]] (USB 1.1 PHY, TinyUSB host/device API, HID boot protocol keyboard/mouse/gamepad, CDC VCP, RP6502-RIA USB host usage table). Updated: [[quadros-rp2040]] scope + USB key facts section, [[rp6502-ria]] related links, [[index]], [[overview]].
+
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Memory, Addresses and DMA (PDF 42–67)
+
+New pages: [[rp2040-memory]] (ROM/SRAM banking/Flash/XIP/full address map), [[dma-controller]] (12 channels, DREQ table, control blocks, chaining, CRC sniffing, SDK API). Updated: [[xram]] (DMA section added), [[quadros-rp2040]] scope, [[index]].
 
 ## [2026-04-16] setup | Git: `picocomputer/rp6502` as submodule | vendored tree → submodule at v0.23
 

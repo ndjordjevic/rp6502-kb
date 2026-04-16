@@ -4,7 +4,7 @@ tags: [rp6502, abi, os, fastcall, assembly]
 related: [[rp6502-os]], [[rp6502-ria]], [[xram]], [[memory-map]]
 sources: [[rp6502-os-docs]], [[rp6502-github-repo]]
 created: 2026-04-15
-updated: 2026-04-16
+updated: 2026-04-16 (audit: fixed 7→8-byte stub)
 ---
 
 # RP6502 ABI
@@ -51,7 +51,7 @@ wait:
 JSR $FFF0         ; RIA_SPIN — unblocks and falls through to LDA/LDX/RTS
 ```
 
-`RIA_SPIN` (`$FFF0`) is a 7-byte stub the RIA overwrites in-place:
+`RIA_SPIN` (`$FFF0`) is an 8-byte stub the RIA overwrites in-place:
 
 ```
 $FFF0  EA        NOP

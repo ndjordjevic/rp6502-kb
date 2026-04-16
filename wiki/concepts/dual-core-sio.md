@@ -63,7 +63,7 @@ Data availability triggers an interrupt on the *reading* core:
 - `SIO_IRQ_PROC0` (IRQ 15) — fires on core 0 when FIFO 1→0 has data
 - `SIO_IRQ_PROC1` (IRQ 16) — fires on core 1 when FIFO 0→1 has data
 
-This enables zero-polling communication: the sending core pushes a word; the receiving core wakes via interrupt and processes it. See [[pio-architecture]] for how PIO IRQ flags combine with this mechanism in the RIA, and [[reset-model]] for the full NVIC IRQ table.
+This enables zero-polling communication: the sending core pushes a word; the receiving core wakes via interrupt and processes it. See [[pio-architecture]] for how PIO IRQ flags combine with this mechanism in the RIA, and [[quadros-rp2040]] for the full NVIC IRQ table.
 
 SDK functions (`pico_multicore`):
 
