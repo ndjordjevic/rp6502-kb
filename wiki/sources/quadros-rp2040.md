@@ -1,10 +1,10 @@
 ---
 type: source
 tags: [rp2040, rp2350, pio, gpio, dma, usb, uart, spi, interrupts, multicore]
-related: [[pio-architecture]], [[gpio-pinout]], [[dual-core-sio]], [[rp6502-ria]], [[rp6502-os]]
+related: [[pio-architecture]], [[gpio-pinout]], [[dual-core-sio]], [[rp2040-clocks]], [[rp6502-ria]], [[rp6502-os]]
 sources: []
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-16 (clock chapter ingest)
 ---
 
 # Source: "Knowing the RP2040" (Quadros, 2022)
@@ -127,6 +127,41 @@ Every instruction is **16 bits**, executes in **1 clock cycle**, plus optional d
 - `pio_sm_exec(pio, sm, instr)` — inject instruction into running SM
 - `pio_gpio_init(pio, pin)` — connect GPIO pin to PIO (required for output; recommended for all)
 
+### SPI
+
+- Two SPI peripherals (SPI0, SPI1). 4–16-bit words, 8-entry TX/RX FIFOs, all four modes (CPOL×CPHA), interrupt + DMA support.
+- Clock from `clk_peri`: two-stage divisor (÷2–254, then ÷1–256).
+- **SS/CS pin is NOT automatically controlled in master mode** — must be driven manually as a GPIO.
+- GPIO options: SPI0 SCLK=2/6/18/22, MISO=0/4/16/20, MOSI=3/7/19/23; SPI1 SCLK=10/14/26, MISO=8/12/24/28, MOSI=11/15/27.
+- **RIA does not use SPI** — storage is via USB MSC + FatFS, not an SD card over SPI.
+
+See [[rp2040-spi]] for full SDK API.
+
+### UARTs
+
+- Two UARTs (UART0, UART1) based on ARM PL011. Base addresses: UART0=`0x40034000`, UART1=`0x40038000`. IRQs: UART0=20, UART1=21.
+- TX FIFO: 32×8-bit. RX FIFO: 32×12-bit — upper 4 bits are error flags: bit 11=OE (overrun), 10=BE (break), 9=PE (parity), 8=FE (framing).
+- Baud rate from `clk_peri`: 22-bit fractional divisor (16-bit integer + 6-bit fraction/64). Constraint: `clk_peri` ≥ 16×baud.
+- 5 interrupt sources merged into one IRQ: RX level, TX level, RX timeout (32-bit-times silence), error, modem status (CTS).
+- Hardware flow control: RTS (receiver-ready) + CTS (gated TX) — non-standard vs. classic RS-232.
+- **RIA uses UART1, GPIO 4 (Tx) / GPIO 5 (Rx), 115200 8N1.** UART0 left free.
+- GPIO options: UART0 Tx=0/12/16/28, Rx=1/13/17/29; UART1 Tx=4/8/20/24, Rx=5/9/21/25.
+
+See [[rp2040-uart]] for full SDK API and interrupt usage.
+
+### Clock generation
+
+- **ROSC** (Ring Oscillator): on-chip, no external component, ~6 MHz typical but guaranteed only 1.8–12 MHz. Used at boot; imprecise.
+- **XOSC** (Crystal Oscillator): requires external 1–15 MHz crystal (12 MHz in reference design). Preferred source for stable clocks. Drives `clk_ref` (timer/watchdog) and `clk_rtc`.
+- **Two PLLs**: USB PLL → 48 MHz (USB + ADC); System PLL → 125 MHz default (processors). System PLL is overclocked to **256 MHz** in the RIA firmware. See [[pio-architecture]].
+- **Clock domains**: `clk_sys` (processors) from System PLL; `clk_peri` (UART + SPI) from System PLL or XOSC; `clk_ref` (timer + watchdog) from XOSC; `clk_rtc` from XOSC; `clk_usb`/`clk_adc` from USB PLL.
+- **Mux architecture**: aux mux (glitchy) for all generators; glitchless mux added for `clk_sys` and `clk_ref` (cannot be stopped). `clock_configure()` handles safe sequencing.
+- **Timer**: 64-bit monotonic µs counter. 4 alarms (IRQs 0–3) matching lower 32 bits; good for 10 µs–1 hr. `pico_time` adds alarm pools + repeating timers on top.
+- **Watchdog**: 24-bit counter, 1 µs tick from `clk_ref`. Hardware bug: decrements twice per tick (SDK compensates). Max timeout: 8388 ms. 8 scratch registers preserved through watchdog reset (used by Bootrom). No `watchdog_disable()` in SDK.
+- **RTC**: Keeps date/time (year/month/day/dotw/hour/min/sec) while powered. `clk_rtc` from XOSC (46875 Hz). Simplified leap years (÷4 rule only). Field `-1` in alarm → don't care (repeating).
+
+See [[rp2040-clocks]] for full detail.
+
 ### Reset and interrupt model
 
 #### Chip reset
@@ -228,6 +263,32 @@ multicore_launch_core1(entry_fn);  // entry_fn(void) runs on core 1
 
 See [[dual-core-sio]] for the full SDK API and RIA usage breakdown.
 
+### USB controller
+
+- RP2040 supports **USB 1.x** (1.0 and 1.1 features) documented in USB 2.0 spec — **low speed** (1.5 Mbps) and **full speed** (12 Mbps)
+- Can operate as a **host** (talk to keyboards, drives) or a **device** (appear as keyboard, serial port) — not simultaneously
+- Integrated **USB 1.1 PHY** on DP (D+) and DM (D−) pins; USB 2.0 controller in silicon; **4 KB internal RAM** for descriptors and data
+- Mapped at `0x50000000`; interrupt `USBCTRL_IRQ` (IRQ 5)
+- **Transfer types**: Control (enumeration/config), **Interrupt** (HID: small periodic), Bulk (MSC: large error-free), Isochronous (audio/video)
+- **Enumeration**: host reads Device → Configuration → Interface → Endpoint descriptor hierarchy; assigns device address; selects configuration
+- **VID** (Vendor ID) from USB-IF; **PID** (Product ID) from vendor. Windows uses VID/PID to find drivers except for classes like HID and MSC
+
+**HID keyboard boot protocol** (most relevant to RP6502):
+- 8-byte report: byte 0 = modifier bitmap (Shift/Ctrl/Alt/GUI L+R), byte 1 = reserved, bytes 2–7 = up to 6 non-modifier keycodes (6-key rollover)
+- Output report (host → device) controls keyboard LEDs (Caps Lock, Num Lock, etc.)
+- TinyUSB HID host selects boot protocol + zero idle rate on mount
+
+**TinyUSB** (official RP2040 USB stack):
+- Callback-driven; firmware calls `tud_task()` (device) or `tuh_task()` (host) in main loop
+- Device classes: HID, CDC, MSC, MIDI. Host classes: HID, CDC, MSC
+- Host API: `tuh_hid_mount_cb()` → `tuh_hid_receive_report()` → `tuh_hid_report_received_cb()` → repeat
+- `tuh_hid_parse_report_descriptor()` identifies report type (keyboard, mouse, etc.) from descriptor
+
+**CDC (Communication Device Class)** — RS232 serial replacement:
+- RP2040 as CDC device bridges UART0 ↔ USB; `tud_cdc_connected()` checks DTR bit
+- `tud_cdc_line_coding_cb()` reconfigures UART when PC changes baud/format
+- Linux + Windows 10 have generic CDC drivers; older Windows requires INF file keyed by VID/PID
+
 ---
 
 ## RIA firmware connections
@@ -257,12 +318,12 @@ Chapters marked `[x]` have been ingested; `[-]` are skipped.
 | [x] | The Cortex-M0+ Processor Cores | 13–26 | Dual-core model, SIO inter-processor FIFOs, hardware spinlocks, atomic GPIO, `pico_multicore` / `pico_sync` SDK |
 | [x] | Reset, Interrupts and Power Control | 27–41 | Reset causes, NVIC IRQ table (26 IRQs), PIO→ARM interrupt wiring, SDK irq_* functions |
 | [x] | Memory, Addresses and DMA | 42–67 | DMA for XRAM transfers; SRAM banking; address map; DREQ table |
-| [ ] | Clock Generation, Timer, Watchdog and RTC | 68–88 | Overclock context |
+| [x] | Clock Generation, Timer, Watchdog and RTC | 68–88 | Overclock context, clock domains, timer/watchdog/RTC |
 | [x] | GPIO, Pad and PWM | 89–131 | Function select, PAD config (drive strength, slew, Schmitt trigger), interrupt model |
 | [x] | The Programmable I/O (PIO) | 132–158 | Full ISA, programmer's model, SDK API |
-| [ ] | Asynchronous Serial Communication: the UARTs | 172–183 | Console UART |
-| [ ] | Communication Using SPI | 184–193 | SD card |
-| [ ] | A Brief Introduction to the USB Controller | 200–232 | HID, VCP |
+| [x] | Asynchronous Serial Communication: the UARTs | 172–183 | Console UART |
+| [x] | Communication Using SPI | 184–193 | SPI peripheral; RIA uses USB MSC for storage, not SPI |
+| [x] | A Brief Introduction to the USB Controller | 200–232 | USB 1.1 PHY, TinyUSB, HID boot protocol (keyboard/mouse/gamepad), CDC VCP |
 | [-] | Communication Using I²C | 159–171 | Not used in RP6502 — skipped |
 | [-] | Analog Input: the ADC | 194–199 | No analog use case — skipped |
 | [-] | Conclusion | 233 | Wrap-up — skipped |
@@ -276,5 +337,9 @@ Chapters marked `[x]` have been ingested; `[-]` are skipped.
 
 - [[pio-architecture]]
 - [[gpio-pinout]]
+- [[dual-core-sio]]
+- [[rp2040-memory]]
+- [[dma-controller]]
+- [[usb-controller]]
 - [[rp6502-ria]]
 - [[rp6502-os]]

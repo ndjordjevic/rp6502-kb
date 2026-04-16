@@ -17,7 +17,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp6502-os-docs]] | Protected OS: memory map, ABI, full POSIX-flavored API surface |
 | [[rp6502-github-repo]] | Monorepo source at commit 368ed8e: complete API op-codes, register map, GPIO pinout, PIO layout |
 | [[release-notes]] | All 23 releases v0.1–v0.23: feature introduction dates, breaking changes, known issues |
-| [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO, DMA (6/10 chapters ingested) |
+| [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO, DMA, USB, clocks, UART, SPI (all planned chapters ingested) |
 
 ## Entities
 
@@ -54,6 +54,10 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[dual-core-sio]] | Two-core ARM model, SIO FIFOs, hardware spinlocks, atomic GPIO, `pico_multicore`/`pico_sync` SDK |
 | [[rp2040-memory]] | RP2040 memory types (ROM/SRAM/Flash), SRAM banking, XIP, full APB/AHB address map |
 | [[dma-controller]] | 12-channel DMA: DREQ table, control blocks, chaining, CRC sniffing, SDK API |
+| [[usb-controller]] | RP2040 USB 1.1 controller: host/device modes, HID boot protocol (keyboard/gamepad), CDC VCP, TinyUSB API, RIA host usage |
+| [[rp2040-clocks]] | RP2040 clock subsystem: ROSC/XOSC/PLLs, 10 clock domains, 256 MHz overclock; Timer (64-bit µs, alarm pools), Watchdog, RTC |
+| [[rp2040-uart]] | RP2040 UARTs: framing, 32-entry FIFOs + error flags, fractional baud rate, interrupts, hardware flow control, SDK API; RIA uses UART1/GPIO4-5/115200 |
+| [[rp2040-spi]] | RP2040 SPI: master/slave, 4–16-bit words, CPOL/CPHA modes, manual SS in master mode, DMA, SDK API; RIA uses USB MSC (not SPI) for storage |
 
 ## Inbox
 
@@ -61,7 +65,6 @@ When answering a query, read this file first to find relevant pages, then drill 
 
 | Page | Description |
 | --- | --- |
-| [[quadros-rp2040-ingest-plan]] | Chapter-by-chapter relevance map for "Knowing the RP2040" (Quadros) — which chapters to ingest |
 | [[fairhead-pico-c-ingest-plan]] | Chapter-by-chapter relevance map for "Programming the Raspberry Pi Pico/W in C" (Fairhead, 3rd ed.) |
 
 ## Syntheses

@@ -1,7 +1,7 @@
 ---
 type: topic
 tags: [rp6502, overview]
-updated: 2026-04-16 (release notes ingest)
+updated: 2026-04-16 (Quadros book fully ingested)
 ---
 
 # RP6502 Wiki — Overview
@@ -70,5 +70,5 @@ There are three Pico firmwares, all from the same monorepo:
 
 - **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]]
 - **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]]
-- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[gpio-pinout]]
+- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[gpio-pinout]] · [[usb-controller]]
 - **Topics**: [[version-history]] · [[known-issues]]

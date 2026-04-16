@@ -172,4 +172,4 @@ Inter-core related:
 
 ## Related pages
 
-- [[gpio-pinout]] · [[pix-bus]] · [[rp6502-ria]] · [[rp6502-vga]] · [[reset-model]] · [[quadros-rp2040]]
+- [[gpio-pinout]] · [[pix-bus]] · [[rp6502-ria]] · [[rp6502-vga]] · [[reset-model]] · [[rp2040-clocks]] · [[quadros-rp2040]]

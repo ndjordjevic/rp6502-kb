@@ -64,4 +64,7 @@ Full YM3812 register set (256 bytes). **Timers / interrupts / status register ar
 - [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[gpio-pinout]]
 - [[pix-bus]] · [[xram]] · [[xreg]]
 - [[reset-model]] · [[rom-file-format]]
+- [[usb-controller]] — USB 1.1 controller; RIA uses it in host mode for HID + VCP + NFC
+- [[rp2040-clocks]] — clock subsystem: 256 MHz System PLL overclock, clk_peri (UART/SPI), timer, watchdog
+- [[rp2040-uart]] — UART1 console on GPIO 4–5, 115200 8N1; SDK API and interrupt model
 - [[rp6502-ria-w]] — wireless superset

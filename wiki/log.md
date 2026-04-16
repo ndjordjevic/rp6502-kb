@@ -7,6 +7,14 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Communication Using SPI (PDF 184–193) — FINAL CHAPTER | new page: [[rp2040-spi]] (SPI basics, CPOL/CPHA modes, 8-entry FIFOs, two-stage clock divider from clk_peri, manual SS in master mode, GPIO pin tables, full SDK API, correction: RIA uses USB MSC not SPI for storage); updated: [[quadros-rp2040]] scope + SPI facts section, [[index]] (all chapters ingested), [[overview]]; deleted ingest plan from wiki/inbox (all chapters complete)
+
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Asynchronous Serial Communication: the UARTs (PDF 172–183) | new page: [[rp2040-uart]] (framing, TX/RX FIFOs + error flags, fractional baud rate from clk_peri, 5 interrupt sources, RTS/CTS flow control, GPIO pin options, full SDK API, RIA UART1/GPIO4-5/115200 8N1); updated: [[quadros-rp2040]] scope + UART facts section, [[index]] (9/10 chapters done), ingest plan
+
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Clock Generation, Timer, Watchdog and RTC (PDF 68–88) | new page: [[rp2040-clocks]] (ROSC/XOSC/PLLs, 10 clock domains, mux architecture, 256 MHz System PLL overclock, 64-bit Timer + alarm pools + pico_time, Watchdog + scratch registers, RTC + repeating alarm); updated: [[quadros-rp2040]] scope + clock facts section, [[index]], ingest plan (8/10 chapters done)
+
+## [2026-04-16] ingest | Quadros "Knowing the RP2040" — USB Controller (PDF 200–232) | new pages: [[usb-controller]] (USB 1.1 PHY, TinyUSB host/device API, HID boot protocol keyboard/mouse/gamepad, CDC VCP, RP6502-RIA USB host usage table); updated: [[quadros-rp2040]] scope + USB key facts section, [[rp6502-ria]] related links, [[index]], [[overview]]
+
 ## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Memory, Addresses and DMA (PDF 42–67) | new pages: [[rp2040-memory]] (ROM/SRAM banking/Flash/XIP/full address map), [[dma-controller]] (12 channels, DREQ table, control blocks, chaining, CRC sniffing, SDK API); updated: [[xram]] (DMA section added), [[quadros-rp2040]] scope, [[index]]
 
 ## [2026-04-16] setup | Git: `picocomputer/rp6502` as submodule | vendored tree → submodule at v0.23
