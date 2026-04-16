@@ -171,11 +171,13 @@ Ingest in this order — each page grounds the next (matches the six clipped fil
 - In schema: "for `src/` files, prefer `.h` headers and top-level `.c` files over low-level firmware internals; ingest any file whose header comment block describes an API."
 - Because the repo is C-heavy and doesn't follow a "docs/" convention, you'll need to actually read some source. Headers that expose OS calls and register maps are the highest-value files — these define the API surface a 6502 program sees.
 
+> **Implemented:** A git submodule was used instead of a shallow clone. The repo lives at `raw/github/picocomputer/rp6502/` (flat path, no SHA suffix), pinned to a release tag (`v0.23` at commit `368ed8e`). Nested submodules (`src/littlefs`, `src/tinyusb`) are initialized via `--recurse-submodules`. See `raw/README.md` for the current bump workflow.
+
 ### Updating the repo snapshot
 
 **When to update:** After each new GitHub release. The release notes page is the trigger signal — when a new tag appears, update both the repo snapshot and the release notes folder together.
 
-**How to update:**
+**How to update (original shallow-clone approach — superseded):**
 
 ```bash
 # 1. Advance the shallow clone to the new commit
@@ -189,6 +191,8 @@ gh release view v0.24 --repo picocomputer/rp6502 > v0.24.md
 
 # 3. Update raw/README.md with the new commit SHA and date
 ```
+
+> **Implemented differently:** The actual bump workflow uses submodule tag checkout — see `raw/README.md` for the current commands.
 
 **What to ingest after an update:**
 
@@ -256,10 +260,7 @@ rp6502-kb/
       picocomputer.github.io/         # one .md per URL, mirroring path structure
     github/
       picocomputer/
-        rp6502/
-          main-<sha>/                 # or v1.2.3/
-        rp6502-sdk/
-          main-<sha>/
+        rp6502/                       # git submodule, pinned to release tag (e.g. v0.23)
     youtube/
       VIDEO_INDEX.md                  # human-written, one row per video
       <video-id>-<title>.md           # auto-caption → markdown
@@ -430,6 +431,8 @@ Before the first ingest, stub out these pages so the agent has clear filing targ
 3. **License and redistribution:** PDFs and Discord exports are personal use only. Wiki text should **summarize and cite**, not republish verbatim. For Discord: name the author in citations (community norm), but don't publish the raw export. For PDFs: keep `raw/pdfs/` out of any public git remote.
 
 4. **Wiki scope:** Full stack — Hardware + OS API + cc65/llvm-mos toolchain + 6502 CPU. Rationale: RP6502 is only useful as a target if you can actually program it; the toolchain docs are as important as the hardware reference. Excludes: generic Pico material not specific to RP6502 (covered better by existing resources); treat **RP2040 / Pico 1** as peripheral unless you are debugging old posts.
+
+5. **GitHub repo capture method:** Git submodule (not shallow clone). `raw/github/picocomputer/rp6502/` is a submodule pinned to a release tag. Rationale: submodules track a pinned commit cleanly in version control, support nested submodules (`littlefs`, `tinyusb`), and allow reproducible re-cloning with `--recurse-submodules`. The SHA-in-foldername convention from §3 was dropped — the pinned commit is recorded in `.gitmodules` and `git submodule status` instead. Bump workflow in `raw/README.md`.
 
 ---
 
