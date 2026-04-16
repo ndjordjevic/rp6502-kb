@@ -7,6 +7,10 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-16] setup | Git: `picocomputer/rp6502` as submodule | vendored tree → submodule at v0.23
+
+Replaced the vendored copy under `raw/github/picocomputer/rp6502/` with a **Git submodule** pointing at [picocomputer/rp6502](https://github.com/picocomputer/rp6502), checked out at tag **v0.23** (commit `368ed8e`, same pin as before). Added root `.gitmodules`; nested upstream submodules (`src/littlefs`, `src/tinyusb`) initialized locally. Updated `raw/README.md` with clone (`--recurse-submodules` / `git submodule update --init --recursive`) and bump instructions for future releases.
+
 ## [2026-04-16] ingest | Knowing the RP2040 (Quadros) — session 4 | Cortex-M0+ Processor Cores chapter
 
 Chapter ingested: The Cortex-M0+ Processor Cores (PDF 13–26).
