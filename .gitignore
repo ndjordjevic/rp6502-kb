@@ -1,6 +1,3 @@
-# Large / copyrighted PDF sources — keep locally, not in git
-raw/pdfs/
-
 # Local-only editor / assistant state
 .claude/settings.local.json
 .claude/.openrouter-settings.json
