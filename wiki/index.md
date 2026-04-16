@@ -17,7 +17,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp6502-os-docs]] | Protected OS: memory map, ABI, full POSIX-flavored API surface |
 | [[rp6502-github-repo]] | Monorepo source at commit 368ed8e: complete API op-codes, register map, GPIO pinout, PIO layout |
 | [[release-notes]] | All 23 releases v0.1–v0.23: feature introduction dates, breaking changes, known issues |
-| [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO (5/10 chapters ingested) |
+| [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO, DMA (6/10 chapters ingested) |
 
 ## Entities
 
@@ -52,6 +52,8 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[pio-architecture]] | PIO state machine layout for 65C02 bus interface and PIX; RP2350 overclock |
 | [[gpio-pinout]] | GPIO pin assignments for RIA Pico and VGA Pico confirmed from source |
 | [[dual-core-sio]] | Two-core ARM model, SIO FIFOs, hardware spinlocks, atomic GPIO, `pico_multicore`/`pico_sync` SDK |
+| [[rp2040-memory]] | RP2040 memory types (ROM/SRAM/Flash), SRAM banking, XIP, full APB/AHB address map |
+| [[dma-controller]] | 12-channel DMA: DREQ table, control blocks, chaining, CRC sniffing, SDK API |
 
 ## Inbox
 

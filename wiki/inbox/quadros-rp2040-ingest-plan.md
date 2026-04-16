@@ -74,7 +74,7 @@ PDF pages use a +5 offset from the book's printed page numbers (5 pages of front
 - [x] **GPIO, Pad and PWM** (PDF 89–131) — fills gaps in [[gpio-pinout]]
 - [x] **Reset, Interrupts and Power Control** (PDF 27–41) — fills gaps in OS call dispatch
 - [x] **The Cortex-M0+ Processor Cores** (PDF 13–26) — dual-core / SIO context
-- [ ] **Memory, Addresses and DMA** (PDF 42–67) — DMA details for XRAM
+- [x] **Memory, Addresses and DMA** (PDF 42–67) — DMA details for XRAM
 - [ ] **A Brief Introduction to the USB Controller** (PDF 200–232) — USB HID/VCP details
 - [ ] **Clock Generation, Timer, Watchdog and RTC** (PDF 68–88) — overclock context
 - [ ] **Asynchronous Serial Communication: the UARTs** (PDF 172–183) — console UART

@@ -256,7 +256,7 @@ Chapters marked `[x]` have been ingested; `[-]` are skipped.
 | [-] | (session 1 ends here; remaining chapters below) | | |
 | [x] | The Cortex-M0+ Processor Cores | 13–26 | Dual-core model, SIO inter-processor FIFOs, hardware spinlocks, atomic GPIO, `pico_multicore` / `pico_sync` SDK |
 | [x] | Reset, Interrupts and Power Control | 27–41 | Reset causes, NVIC IRQ table (26 IRQs), PIO→ARM interrupt wiring, SDK irq_* functions |
-| [ ] | Memory, Addresses and DMA | 42–67 | DMA for XRAM transfers |
+| [x] | Memory, Addresses and DMA | 42–67 | DMA for XRAM transfers; SRAM banking; address map; DREQ table |
 | [ ] | Clock Generation, Timer, Watchdog and RTC | 68–88 | Overclock context |
 | [x] | GPIO, Pad and PWM | 89–131 | Function select, PAD config (drive strength, slew, Schmitt trigger), interrupt model |
 | [x] | The Programmable I/O (PIO) | 132–158 | Full ISA, programmer's model, SDK API |

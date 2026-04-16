@@ -1,8 +1,8 @@
 ---
 type: concept
 tags: [rp6502, xram, memory]
-related: [[memory-map]], [[pix-bus]], [[xreg]], [[rp6502-ria]], [[rp6502-vga]]
-sources: [[rp6502-ria-docs]], [[rp6502-os-docs]]
+related: [[memory-map]], [[pix-bus]], [[xreg]], [[rp6502-ria]], [[rp6502-vga]], [[dma-controller]]
+sources: [[rp6502-ria-docs]], [[rp6502-os-docs]], [[quadros-rp2040]]
 created: 2026-04-15
 updated: 2026-04-15
 ---
@@ -48,6 +48,10 @@ After this the RIA continuously updates the 32 bytes at `$4000` with a HID-keyco
 
 If you put more than one [[rp6502-vga]] on the same PIX bus, they all see the same 64 K of XRAM — but **only the first** one generates frame numbers and vsync interrupts. (Source: [[rp6502-vga-docs]].)
 
+## DMA and XRAM
+
+XRAM lives in one of the RP2040's six SRAM banks. The RIA firmware uses [[dma-controller]] channels paced by PIO DREQ signals (`DREQ_PIOx_RX`, `DREQ_PIOx_TX`) to move data between the 65C02 bus capture FIFOs and XRAM. This is what gives XRAM its ~512 KB/s bandwidth without tying up either CPU core.
+
 ## Related pages
 
-- [[memory-map]] · [[pix-bus]] · [[xreg]] · [[rp6502-ria]] · [[rp6502-vga]]
+- [[memory-map]] · [[pix-bus]] · [[xreg]] · [[rp6502-ria]] · [[rp6502-vga]] · [[dma-controller]]
