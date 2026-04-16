@@ -1,0 +1,129 @@
+/*
+ * Copyright (c) 2025 Rumbledethumps
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+
+; PIX sends 4 bits per PHI2 transition.
+; rx samples on clock transition so tx hangs back ~20%.
+.program pix_tx
+
+pull ifempty noblock
+wait 1 gpio 21 [6]
+out pins 4
+wait 0 gpio 21 [6]
+out pins 4
+
+
+; Action sends a FIFO message for every write.
+; It also sends a message for (addr&3)==0 reads and one variable.
+; Pushing new address to out FIFO changes variable read address.
+.program ria_action
+
+.wrap_target
+start:
+wait 0 gpio 21
+pull noblock
+mov x osr
+; The good range for this doesn't change much
+; with PHI2 increases. We just need to wait long
+; enough for the address to arrive on fast speeds.
+wait 1 gpio 21 [11] ; good range 4-15
+mov osr pins
+out y 1
+jmp !y start
+out y 1
+mov isr osr
+jmp !y write
+out y 8
+out y 5
+jmp x!=y notvaraddr
+set y 0
+jmp read
+notvaraddr:
+mov osr y
+out y 2
+jmp !y read
+jmp start
+write:
+set y 1
+read:
+in isr 13
+in y 1
+in null 18
+.wrap
+
+
+; 6502 reading from RIA
+; Synced with PHI2
+.program ria_read
+
+.wrap_target
+out pins 8
+wait 1 gpio 21
+mov isr y ; cortex base address
+; The good range for this timing narrows as
+; PHI2 increases. We need to wait long enough
+; for the address to arrive but not so long
+; the DMA doesn't finish in time. Pushing the
+; number down is against the electrical limits,
+; up is against the RP2350 limits. So find the
+; biggest safe number.
+wait 0 gpio 21 [6] ; good range 4-8
+in pins 5
+.wrap
+
+
+; Handle 6502 writing to RIA
+; This also generates PHI2 on the side set
+.program ria_write
+.side_set 1
+
+nowrite:
+nop             side 0 [10]
+.wrap_target
+nop             side 1 [15]
+mov x pins      side 0
+mov osr x       side 0 ; writing is select==1 and write==0
+out x 2         side 0
+jmp x-- jmpsub  side 0 ; subtract 1
+jmpsub:
+jmp x-- nowrite side 0
+out x 8         side 0
+mov isr y       side 0 ; cortex base address
+in osr 5        side 0 ; bus address
+push noblock    side 0
+mov isr x       side 0 ; bus data
+push noblock    side 0 [5]
+.wrap
+
+
+; Handle chip select and read/write logic
+.program ria_cs_rwb
+
+.wrap_target
+mov pindirs y ; hi-z data bus
+start:
+mov osr !pins
+out x 2
+jmp !x reading ; select==1 and rwb==1
+.wrap
+reading:
+jmp pin pindirs_set ; only when PHI2 high
+jmp start
+pindirs_set:
+mov pindirs !y ; drive data bus
+jmp start
+
+
+; Minimum 8N1 UART receiver.
+.program vga_backchannel_rx
+
+.wrap_target
+wait 0 pin 0        ; Wait for start bit
+set x, 7 [10]       ; Delay until eye of first data bit
+bitloop:
+in pins, 1
+jmp x-- bitloop [6]
+.wrap

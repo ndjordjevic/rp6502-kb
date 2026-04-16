@@ -1,0 +1,73 @@
+---
+title: "RP6502-RIA-W — Picocomputer  documentation"
+source: "https://picocomputer.github.io/ria_w.html"
+author:
+published:
+created: 2026-04-15
+description:
+tags:
+  - "clippings"
+---
+## RP6502-RIA-W
+
+RP6502 - RP6502 Interface Adapter W
+
+## Introduction
+
+The **RP6502 Interface Adapter W** is a Raspberry Pi Pico 2 W running the RP6502-RIA-W firmware. It provides all the features of the [RP6502-RIA](https://picocomputer.github.io/ria.html) plus wireless services, as described below.
+
+## WiFi Setup
+
+The RP6502-RIA-W supports Wi-Fi 4 (802.11n). Configure it through the console interface.
+
+- **Enable/Disable Radio:** Use `SET RF (0|1)` to enable (1, default) or disable (0) all radios without affecting other settings.
+- **Set Country Code:** `SET RFCC (cc|-)` sets the WiFi country code for optimal performance (e.g., `US`, `GB`). Use `help set rfcc` to list supported codes. Use `-` to reset to the worldwide default.
+- **Set Network Name (SSID):** `SET SSID (ssid|-)` sets your WiFi network name (Service Set Identifier). Use `-` to clear.
+- **Set Network Password:** `SET PASS (pass|-)` sets your WiFi password. Use `-` to clear.
+- **Check WiFi Status:** Use the `status` command to view current WiFi connection and settings.
+
+## Network Time Protocol (NTP)
+
+The real-time clock (RTC) automatically synchronizes with internet time servers when connected to WiFi. Check NTP status with the `status` command.
+
+- **Set Time Zone:** To use local time instead of UTC, set your time zone with `SET TZ`. Use `HELP SET TZ` for guidance. Daylight saving adjustments are automatic if your locale observes them. The [RP6502-OS](https://picocomputer.github.io/os.html) provides programmatic access to the clock and time zone.
+
+Once WiFi and time zone are configured, timekeeping is automatic.
+
+## Modem Emulation
+
+The RP6502-RIA-W can emulate a Hayes modem for BBS access. Raw TCP and telnet connections are unencrypted in transit.
+
+- **AT Commands:** The modem interface supports standard AT commands for dialing, answering, and configuration.
+
+Example AT commands:
+
+- `ATDexample.com:23` — Dial a BBS
+- `+++` — Escape back to command mode
+- `ATE1` — Set echo
+- `ATH` — Hang up
+- `ATO` — Return to call
+- `ATQ0` — Set quieting
+- `ATSxxx?` — Query register number xxx
+- `ATSxxx=yyy` — Set register number xxx with value yyy
+- `ATV1` — Set verbosity
+- `ATX0` — Set progress messaging
+- `ATZ` — Load profile from NVRAM
+- `AT&F` — Load factory profile
+- `AT&V` — View profile
+- `AT&W` — Write profile to NVRAM
+- `AT&Z0=example.com:23` — Save “telephone number” to NVRAM
+- `AT+RF=0` or `AT+RF=1` and `AT+RF?` — Access RIA setting RF
+- `AT+RFCC=your_ssid` and `AT+RFCC?` — Access RIA setting RFCC
+- `AT+SSID=your_ssid` and `AT+SSID?` — Access RIA setting SSID
+- `AT+PASS=your_pass` and `AT+PASS?` — Access RIA setting PASS
+
+A full telnet stack is not yet implemented, so all connections are raw TCP.
+
+“Telephone Numbers” are saved immediately and are not linked to profiles.
+
+## Bluetooth
+
+The RP6502-RIA-W supports Bluetooth LE (BLE) keyboards, mice, and gamepads. Bluetooth Classic (BR/EDR) is not supported. BLE has been widely available since Bluetooth 4.0 (June 2010), so compatible devices are easy to find, though the occasional oddball exists.
+
+To add a new device, use monitor command `set ble 2` to enable pairing mode. The LED on the RP6502-RIA-W will blink when in pairing mode. See your device’s manual to enable its pairing mode - probably a button and more blinking. When the blinking stops, the device is connected and will be remembered (bonded) so it reconnects automatically in the future.

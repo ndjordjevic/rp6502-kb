@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) 2025 Rumbledethumps
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef _TUSB_CONFIG_H
+#define _TUSB_CONFIG_H
+
+// #undef CFG_TUSB_DEBUG
+// #define CFG_TUSB_DEBUG 2
+
+#define CFG_TUSB_RHPORT0_MODE OPT_MODE_HOST
+
+#ifndef CFG_TUSB_MCU
+#define CFG_TUSB_MCU OPT_MCU_RP2040
+#endif
+
+#ifndef CFG_TUSB_OS
+#define CFG_TUSB_OS OPT_OS_PICO
+#endif
+
+#ifndef CFG_TUH_MEM_SECTION
+#define CFG_TUH_MEM_SECTION
+#endif
+
+#ifndef CFG_TUH_MEM_ALIGN
+#define CFG_TUH_MEM_ALIGN __attribute__((aligned(4)))
+#endif
+
+#define CFG_TUH_ENABLED (1)
+
+#define CFG_TUH_ENUMERATION_BUFSIZE (1024)
+
+// One root hub and four more
+#define CFG_TUH_HUB (5)
+// Limited by free eps, want more
+#define CFG_TUH_HID (8)
+// Enabled, usb/msc driver defines quantity
+#define CFG_TUH_MSC (1)
+// CDC host (serial adapters), enable all drivers
+#define CFG_TUH_CDC (4)
+#define CFG_TUH_CDC_FTDI (1)
+#define CFG_TUH_CDC_CP210X (1)
+#define CFG_TUH_CDC_CH34X (1)
+#define CFG_TUH_CDC_PL2303 (1)
+
+// Limited by free eps, want more
+#define CFG_TUH_DEVICE_MAX (16)
+
+#endif

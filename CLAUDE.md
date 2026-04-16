@@ -1,0 +1,158 @@
+# rp6502-kb
+
+A personal knowledge base about the RP6502 Picocomputer — hardware, firmware, OS API, and toolchain.
+Maintained by Claude Code following Karpathy's LLM Wiki pattern.
+
+Claude maintains the wiki. The human curates sources, asks questions, and guides the analysis.
+
+---
+
+## Folder structure
+
+```
+raw/          -- source documents (immutable — never modify these)
+wiki/         -- markdown pages maintained by Claude
+wiki/index.md    -- table of contents for the entire wiki
+wiki/log.md      -- append-only record of all operations
+wiki/overview.md -- living synthesis across all sources
+```
+
+Sub-folders under `wiki/` grow as the wiki grows:
+
+```
+wiki/sources/    -- one summary page per raw source
+wiki/entities/   -- named things: boards, chips, signals, buses
+wiki/concepts/   -- mechanisms and ideas: protocols, instruction sets, modes
+wiki/syntheses/  -- filed answers to queries worth keeping
+wiki/topics/     -- operational: getting-started, known-issues, comparisons
+wiki/inbox/      -- rough notes awaiting organization
+```
+
+---
+
+## Directory rules
+
+- `raw/` is **immutable**: read-only. Never edit, delete, or create files here.
+- `wiki/` is **LLM-owned**: create, update, and link pages freely.
+- Always update `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` at the end of every session.
+
+---
+
+## Page format
+
+Every wiki page must begin with YAML frontmatter followed by a summary line:
+
+```markdown
+---
+type: source | entity | concept | synthesis | topic
+tags: [rp6502, ria, hardware, ...]
+related: [[page-name]], [[other-page]]
+sources: [[source-name]], [[other-source]]
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+---
+
+# Page Title
+
+**Summary**: One to two sentences describing this page.
+
+---
+
+Main content here. Use clear headings and short paragraphs.
+Link to related pages using [[wikilinks]] throughout.
+
+## Related pages
+
+- [[related-concept-1]]
+- [[related-concept-2]]
+```
+
+- Keep page names lowercase with hyphens: `ria-protocol.md`, `memory-map.md`.
+- Use `[[wikilinks]]` for all cross-references inside the wiki.
+- Use `[text](../raw/path/file.md)` only when pointing at a `raw/` file.
+
+---
+
+## Ingest workflow
+
+When the user adds a source to `raw/` and asks you to ingest it:
+
+0. **Check `wiki/inbox/` for a pre-existing ingestion plan** (e.g. `*-ingest-plan.md`) matching the source. If one exists, read it and follow its chapter list and suggested order instead of reading the whole source. As each chapter is completed, mark it with `[x]` in the plan. Once **all** planned chapters are ingested, **delete the plan file** from `wiki/inbox/` — it is superseded by the `wiki/sources/` page and `wiki/log.md` entries.
+1. Read the full source (or the assigned chapter/section for large PDFs — ~25 pages max per session).
+2. Discuss key takeaways with the user before writing anything.
+3. Create or update `wiki/sources/<short-name>.md` with a summary + key facts + frontmatter. For multi-chapter sources (books, large PDFs), include a **## Scope** section listing every chapter with its status: `[x] ingested` or `[-] skipped — <reason>`. This is the permanent record the linter uses to verify coverage.
+4. Extract named things → create or update pages in `wiki/entities/`.
+5. Extract mechanisms and ideas → create or update pages in `wiki/concepts/`.
+6. Revise `wiki/overview.md` to reflect any new synthesis.
+7. Update `wiki/index.md` with new pages and one-line descriptions.
+8. Append to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <source name> | <what changed>`.
+9. If the new source contradicts an existing page, flag with a `> **Conflict:**` block citing both sources.
+
+A single source may touch 10–15 wiki pages. That is normal.
+
+---
+
+## Query workflow
+
+When the user asks a question:
+
+1. Read `wiki/index.md` first to identify relevant pages.
+2. Drill into those pages; follow `[[wikilinks]]`.
+3. Answer with citations — wiki page names and raw source references.
+4. If the answer is not in the wiki, say so clearly.
+5. If the answer is non-trivial, offer to file it to `wiki/syntheses/<short-name>.md`.
+
+Good answers filed back into the wiki compound over time.
+
+---
+
+## Lint workflow
+
+When the user asks for a lint or health check, scan the entire wiki for:
+
+1. **Contradictions** — pages with directly conflicting claims. Rank the likely-correct claim by: source recency, source authority (official docs > repo > community chat), number of supporting observations.
+2. **Orphans** — pages with no inbound `[[wikilinks]]`. Link them from a relevant hub page or move to `wiki/inbox/`.
+3. **Data gaps** — concepts or OS calls mentioned in passing but lacking their own page.
+4. **Missing cross-references** — pages that mention related entities/concepts without linking to them.
+5. **Incomplete ingestion** — for each `wiki/sources/` page that has a `## Scope` section, check whether all `[x] ingested` chapters have corresponding wiki pages covering their key topics. Flag any chapter marked `[x]` with no evident wiki coverage.
+
+Report findings as a numbered list with suggested fixes. Optionally use web search to fill data gaps and propose new questions to investigate.
+
+---
+
+## Citation format
+
+- Raw source file: `([hardware.html](../raw/web/picocomputer.github.io/hardware.html.md))`
+- Wiki page: `[[ria-protocol]]`
+- Discord message: `(@username, YYYY-MM-DD, #channel-name)`
+- Source authority: official docs > repo source > YouTube > Discord.
+
+---
+
+## Domain vocabulary
+
+Always use these spellings exactly:
+
+`RP6502`, `RP6502-RIA`, `RP6502-RIA-W`, `RP6502-VGA`, `RP6502-OS`, `RIA`, `PHI2`, `PIX bus`,
+`65C02`, `W65C02S`, `cc65`, `llvm-mos`, `RP2040`, `RP2350`, `Pi Pico 2`, `PIO`, `VGA`, `VSYNC`, `HSYNC`
+
+---
+
+## What this wiki covers
+
+- **Hardware:** RP6502 board, RIA firmware (RP2040), VGA firmware (RP2350/Pi Pico 2), PIX bus.
+- **Software:** 65C02 assembly, cc65 C toolchain, llvm-mos, RP6502-OS API.
+- **Community:** Discord tips, known bugs, workarounds, recommended resources.
+
+Out of scope: general Pico/RP2040 topics not specific to RP6502 (covered better by upstream docs).
+
+---
+
+## Source priority
+
+When facts conflict, trust sources in this order:
+
+1. Official Picocomputer docs (`picocomputer.github.io`)
+2. `picocomputer/rp6502` source and release notes
+3. YouTube (official channel)
+4. Discord community chat

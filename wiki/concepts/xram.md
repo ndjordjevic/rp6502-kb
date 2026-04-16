@@ -1,0 +1,53 @@
+---
+type: concept
+tags: [rp6502, xram, memory]
+related: [[memory-map]], [[pix-bus]], [[xreg]], [[rp6502-ria]], [[rp6502-vga]]
+sources: [[rp6502-ria-docs]], [[rp6502-os-docs]]
+created: 2026-04-15
+updated: 2026-04-15
+---
+
+# XRAM (Extended RAM)
+
+**Summary**: 64 KB of RAM that lives **inside** the [[rp6502-ria]] (not on the 6502 bus), accessed indirectly by the 6502 and broadcast to every [[pix-bus]] device.
+
+---
+
+## Address space
+
+`$10000-$1FFFF` (64 K). **Not** part of the 6502's 16-bit address space — the 6502 reaches XRAM through register windows on the RIA, not absolute addressing.
+
+## Why it exists
+
+Two reasons:
+
+1. **Bandwidth**. XRAM lets you stage video/audio/asset data faster than the 6502 could load it through normal MMIO.
+2. **Sharing**. Every [[pix-bus]] device receives every XRAM write as a broadcast frame and keeps a local replica. That's how [[rp6502-vga]] sees what the 6502 wants drawn — there's no separate "send to GPU" path, just an XRAM write.
+
+This is why the Picocomputer **has no paged memory**: bulk-XRAM operations transfer at ~512 KB/s, so a full 64 K page loads in ~150 ms with zero seek time. Disk effectively *is* RAM.
+
+## How the 6502 reads/writes XRAM
+
+- **Streaming**: `RIA_RW0` / `RIA_RW1` are auto-incrementing read/write windows. Set the address, then read or write a byte at a time.
+- **Bulk OS calls**: [[rp6502-os]] provides `read_xram(buf, count, fildes)` / `write_xram(...)` that move file data straight into XRAM without touching 6502 RAM. Useful for loading assets the moment a ROM starts.
+- **Bulk XSTACK** (≤512 B): for smaller blobs, pass over the OS xstack instead.
+
+## The replica model
+
+- The RIA owns the canonical XRAM.
+- Every write is broadcast as a device-0 PIX frame (bits 15-0 = address, bits 23-16 = data).
+- PIX devices maintain a local replica of whatever portion of XRAM they care about. Typically the whole 64 K is mirrored, and applications then install **virtual hardware** at chosen XRAM addresses by writing an [[xreg]] that points the device at that range.
+
+Example: enabling the keyboard.
+```c
+xreg(0, 0, 0x00, 0x4000); // enable; keyboard data lives at $4000 in XRAM
+```
+After this the RIA continuously updates the 32 bytes at `$4000` with a HID-keycode bitfield, and the 6502 reads them via `RIA_RW0`.
+
+## Multiple VGA modules
+
+If you put more than one [[rp6502-vga]] on the same PIX bus, they all see the same 64 K of XRAM — but **only the first** one generates frame numbers and vsync interrupts. (Source: [[rp6502-vga-docs]].)
+
+## Related pages
+
+- [[memory-map]] · [[pix-bus]] · [[xreg]] · [[rp6502-ria]] · [[rp6502-vga]]
