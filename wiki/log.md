@@ -7,6 +7,68 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-17] lint | full wiki audit | 8 fixes across 5 files
+
+Full lint pass across all 40 wiki pages, cross-checked against raw firmware source (api.h, cpu.h, ria.h, mem.h, main.c, sys.c, ria.c). Findings and fixes:
+
+1. **gpio-pinout.md**: corrected total GPIO current budget from 30 mA to **50 mA** (RP2040 datasheet value; wiki log from Quadros ingest already noted 50 mA).
+2. **rp2040-clocks.md**: removed erroneous "(SD card)" from SPI reference — RIA uses USB MSC for storage, not SPI. Same error was caught in other pages in prior lint passes but missed here.
+3. **rp2040-clocks.md**: changed watchdog from speculative "Likely used" to **confirmed** — grep found `RIA_WATCHDOG_MS=250` in ria.c, `watchdog_reboot()` in sys.c, VGA watchdog timers in vga.c.
+4. **fairhead-pico-c.md**: added `[[rp2040-spi]]`, `[[rp2040-uart]]`, `[[rp2040-clocks]]` to frontmatter `related:` field (concept pages already cited Fairhead as source but source page didn't backlink).
+5. **fairhead-pico-c.md**: added missing Key facts sections for Ch.17 (SIO, NVIC, hardware divider, interpolator) and Ch.18 (multicore launch, FIFOs, spinlocks, FreeRTOS). Updated Related pages list.
+6. **pio-architecture.md**: removed duplicate `---` separators (2 instances).
+7. **gpio-pinout.md**: removed duplicate `---` separator.
+8. **xram.md**: updated stale date from 2026-04-15 to 2026-04-16.
+
+**Data gaps carried forward** (unresolvable without new sources):
+- cc65 / llvm-mos entity pages — both toolchains referenced but no dedicated wiki pages yet.
+- VGA full GPIO pinout — only GPIO 0–3 (PIX in) and GPIO 11 (PHI2 in) confirmed; DAC/sync pins need VGA source or schematic.
+- VIA pinout / J1 GPIO header — needs schematic PDF.
+
+**Confirmed correct** (spot-checked against raw source):
+- All register addresses ($FFE0–$FFFF), GPIO pin assignments, API op-code dispatch table (0x01–0x2E), XSTACK_SIZE=512, MBUF_SIZE=1024, overclock settings (256 MHz / 1.15V), PIO state machine assignments — all match wiki.
+
+---
+
+## [2026-04-16] ingest | Fairhead Ch.15 – The Serial Port | stdio layer and small-buffer stall warning added to rp2040-uart
+
+- Updated `wiki/concepts/rp2040-uart.md` — added "## stdio Layer" section (stdio_init_all, stdio_uart_init_full, defaults, printf/snprintf), "## Small Buffer Warning" section with char-by-char relay pattern.
+- Updated `wiki/sources/fairhead-pico-c.md` — marked Ch.15 `[x]`, added key facts section.
+- Updated `wiki/inbox/fairhead-pico-c-ingest-plan.md` — marked Ch.15 `[x]` (final chapter; plan file then deleted).
+- Deleted `wiki/inbox/fairhead-pico-c-ingest-plan.md` — all chapters ingested.
+- Updated `wiki/index.md` — removed ingest-plan entry; updated fairhead-pico-c description to "all planned chapters ingested".
+- Updated `wiki/overview.md` — added `[[fairhead-pico-c]]` to sources hub.
+
+## [2026-04-16] ingest | Fairhead Ch.9 – Getting Started With The SPI Bus | CS timing quirk added to rp2040-spi
+
+- Updated `wiki/concepts/rp2040-spi.md` — added "## CS Timing Quirk" section (0.7 µs pre-deassert hazard, half-period delay fix); added `[[fairhead-pico-c]]` to sources.
+- Updated `wiki/sources/fairhead-pico-c.md` — marked Ch.9 `[x]`, added key facts section (note: RIA uses USB MSC, not SPI, for storage).
+
+## [2026-04-16] ingest | Fairhead Ch.18 – Multicore and FreeRTOS | race conditions and FreeRTOS model added to dual-core-sio
+
+- Updated `wiki/concepts/dual-core-sio.md` — added "Race conditions and memory atomicity" section (tearing, update loss, 32-bit atomicity table), "FreeRTOS SMP overview" section (task model, why RIA avoids RTOS, WiFi+FreeRTOS integration notes, synchronization comparison table, xQueue producer-consumer pattern).
+- Updated `wiki/sources/fairhead-pico-c.md` — marked Ch.18 `[x]`.
+
+## [2026-04-16] ingest | Fairhead Ch.17 – Direct To The Hardware | SIO GPIO registers and GPIO coprocessor added to dual-core-sio
+
+- Updated `wiki/concepts/dual-core-sio.md` — added SIO GPIO register offset table (Pico vs Pico 2 diff), SIO speed benchmark (4 ns at 50 MHz), GPIO coprocessor (RP2350 inline asm), GPIO event register format (4 bits per GPIO), per-core IRQ control register.
+- Updated `wiki/sources/fairhead-pico-c.md` — marked Ch.17 `[x]`.
+
+## [2026-04-16] ingest | Fairhead Ch.13 – DHT22 Custom Protocol | PIO design patterns added to pio-architecture
+
+- Updated `wiki/concepts/pio-architecture.md` — added "Custom protocol design patterns" subsection: sampling vs counting, parameterized PIO startup via TX FIFO, bidirectional/open-collector pin pattern, `jmp pin` usage.
+- Updated `wiki/sources/fairhead-pico-c.md` — added Ch.13 key facts section; marked `[x]` ingested.
+- Marked Ch.13 `[x]` in ingestion plan.
+
+## [2026-04-16] ingest | Fairhead "Programming the Raspberry Pi Pico/W in C" Ch.12 | new source page + SDK patterns added to pio-architecture
+
+- Created `wiki/sources/fairhead-pico-c.md` — source summary for the Fairhead book (417 pages, 11 chapters planned for ingest).
+- Updated `wiki/concepts/pio-architecture.md` — added "SDK Programming Patterns" section: standard setup sequence, GPIO group config functions, clock divider (with jitter warning), TX/RX FIFO and OSR/ISR API, edge detection pattern (45 ns latency at max clock), SIDESET directive, CMake integration.
+- Updated `wiki/index.md` — added `[[fairhead-pico-c]]` to Sources table.
+- Marked Ch.12 `[x]` in ingestion plan.
+
+---
+
 ## [2026-04-16] lint | full audit against all raw sources | 4 fixes
 
 Cross-checked all wiki pages against 3 raw source types (6 web docs, github repo at v0.23, Quadros PDF).

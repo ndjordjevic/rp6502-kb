@@ -2,7 +2,7 @@
 type: concept
 tags: [rp2040, rp2350, uart, serial, rp6502-ria]
 related: [[gpio-pinout]], [[rp6502-ria]], [[rp2040-clocks]], [[dma-controller]]
-sources: [[quadros-rp2040]]
+sources: [[quadros-rp2040]], [[fairhead-pico-c]]
 created: 2026-04-16
 updated: 2026-04-16
 ---
@@ -143,6 +143,58 @@ TX interrupt pattern: start with TX interrupt disabled → fill FIFO directly; i
 | `uart_get_dreq(uart, is_tx)` | Return DMA DREQ for TX (`is_tx=true`) or RX |
 
 Note: `uart_putc` / `uart_puts` return when the character enters the FIFO, not when it is actually transmitted. If flow control is in use, the call may block.
+
+Additional functions from Fairhead:
+
+| Function | Description |
+|---|---|
+| `uart_is_readable_within_us(uart, us)` | Wait up to `us` µs; returns bool but also encodes count of chars waiting |
+| `uart_tx_wait_blocking(uart)` | Wait until TX FIFO and shift register fully empty |
+| `uart_default_tx_wait_blocking()` | Same for default UART (UART0 by default) |
+
+---
+
+## stdio Layer (Fairhead)
+
+The Pico SDK includes a `stdio` layer that routes `printf` to UART or USB. It sits above the raw `hardware_uart` API.
+
+```c
+stdio_init_all();                                     // init all configured stdio devices (UART + USB)
+stdio_uart_init();                                    // init default UART as stdin + stdout
+stdout_uart_init();                                   // stdout only
+stdin_uart_init();                                    // stdin only
+stdio_uart_init_full(uart1, 115200, 4, 5);            // custom UART, baud, TX pin, RX pin
+stdio_flush();                                        // flush all stdio output buffers
+```
+
+Default UART configuration (defined in SDK headers, overridable):
+```c
+#define PICO_DEFAULT_UART            0
+#define PICO_DEFAULT_UART_TX_PIN     0
+#define PICO_DEFAULT_UART_RX_PIN     1
+```
+
+`printf` in the SDK is a simplified implementation — safe for embedded use. `sprintf`/`snprintf`/`vsnprintf` are also available. Prefer `snprintf` over `sprintf` to avoid buffer overflows.
+
+**Default UART conflict**: `stdio_init_all()` routes `printf` to UART0 (GPIO0/1). If UART1 is used for application data (e.g. RIA console), ensure application code does not inadvertently call `printf` on the same UART.
+
+---
+
+## Small Buffer Warning (Fairhead)
+
+The UART FIFO is only 32 elements. Sending `printf` output while simultaneously receiving on another UART can cause data loss:
+
+**Problematic pattern**: collect characters into a buffer, then call `printf` → the `printf` stalls waiting for TX FIFO space; during the stall, incoming RX data fills and overflows the 32-entry RX FIFO.
+
+**Safe pattern** for relay/echo: send each received character immediately before buffering the next:
+```c
+while (true) {
+    buf[count] = uart_getc(uart1);        // receive one char
+    uart_putc(uart0, buf[count++]);       // forward immediately
+}
+```
+
+Rule: keep transactions smaller than the 32-element FIFO capacity, or use interrupts to decouple RX and TX.
 
 ---
 

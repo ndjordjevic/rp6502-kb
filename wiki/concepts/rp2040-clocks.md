@@ -44,7 +44,7 @@ Ten clock generators each select one of the sources (via muxes) and apply a divi
 | Timer, Watchdog | `clk_ref` | XOSC |
 | GPIO clock output | `clk_gpout0`–`clk_gpout3` | Any source + divisor |
 
-**RIA-relevant**: `clk_sys` runs at **256 MHz** (see [[pio-architecture]] — overclock required for PIO to handle 8 MHz PHI2). `clk_peri` drives the UART console (GPIO 4–5, 115200 8N1) and SPI (SD card). `clk_ref` from XOSC provides the precise timebase for the timer and watchdog.
+**RIA-relevant**: `clk_sys` runs at **256 MHz** (see [[pio-architecture]] — overclock required for PIO to handle 8 MHz PHI2). `clk_peri` drives the UART console (GPIO 4–5, 115200 8N1) and the SPI peripheral. `clk_ref` from XOSC provides the precise timebase for the timer and watchdog.
 
 ---
 
@@ -227,7 +227,7 @@ IRQ: `RTC_IRQ` (IRQ 25).
 | **`clk_peri`** | Drives UART console (GPIO 4–5, 115200 8N1) and SPI peripheral (SD card). |
 | **`clk_ref` / Timer** | Provides the precise microsecond timebase for OS call timing and `sleep_ms()` / `sleep_us()` in the task loop. |
 | **TIMER_IRQ_0–3** (IRQ 0–3) | Available for alarm-based scheduling within the RIA OS task dispatcher. |
-| **Watchdog** | Likely used in RIA firmware for fault recovery — a hung OS task loop or USB stack would trigger a reset. |
+| **Watchdog** | Confirmed in RIA firmware: `RIA_WATCHDOG_MS=250` action watchdog in `ria.c`; `watchdog_reboot()` in `sys.c` for fault recovery; VGA firmware also uses watchdog timers. |
 | **XOSC 12 MHz** | Feeds `clk_ref` (timer/watchdog timebase) and `clk_rtc`; stable even when System PLL is overclocked. |
 
 ---

@@ -4,7 +4,7 @@ tags: [rp6502, xram, memory]
 related: [[memory-map]], [[pix-bus]], [[xreg]], [[rp6502-ria]], [[rp6502-vga]], [[dma-controller]]
 sources: [[rp6502-ria-docs]], [[rp6502-os-docs]], [[quadros-rp2040]]
 created: 2026-04-15
-updated: 2026-04-15
+updated: 2026-04-16
 ---
 
 # XRAM (Extended RAM)

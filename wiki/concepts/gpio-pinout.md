@@ -2,7 +2,7 @@
 type: concept
 tags: [rp6502, ria, vga, hardware, gpio, pinout]
 related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[pio-architecture]], [[rp6502-board]]
-sources: [[rp6502-github-repo]], [[quadros-rp2040]]
+sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]]
 created: 2026-04-16
 updated: 2026-04-16
 ---
@@ -110,10 +110,37 @@ Each GPIO has a **PAD** — the electrical interface between internal logic and 
 **Total GPIO current budget: 50 mA maximum** across all pins. With 8 data bus pins potentially driving simultaneously, drive strength selection matters.
 
 SDK functions (library `hardware_gpio`):
-- `gpio_set_slew_rate(gpio, GPIO_SLEW_RATE_FAST)`
-- `gpio_set_drive_strength(gpio, GPIO_DRIVE_STRENGTH_8MA)`
-- `gpio_set_input_hysteresis_enabled(gpio, true)` — Schmitt trigger
-- `gpio_set_pulls(gpio, up, down)` / `gpio_disable_pulls(gpio)`
+- `gpio_set_slew_rate(gpio, GPIO_SLEW_RATE_FAST)` / `gpio_get_slew_rate(gpio)`
+- `gpio_set_drive_strength(gpio, GPIO_DRIVE_STRENGTH_8MA)` / `gpio_get_drive_strength(gpio)`
+- `gpio_set_input_hysteresis_enabled(gpio, true)` — Schmitt trigger; `gpio_is_input_hysteresis_enabled(gpio)`
+- `gpio_set_pulls(gpio, up, down)` / `gpio_disable_pulls(gpio)` / `gpio_pull_up(gpio)` / `gpio_pull_down(gpio)`
+
+**Drive strength detail**: Internal resistance ~130Ω at 2mA setting. If load draws more current than the drive strength rating, output voltage falls below 2.7V — not reliable as logic 1 for 3.3V devices. Use 8mA or 12mA for bus signals with capacitive load.
+
+**Schmitt trigger thresholds** (at 3.3V supply): input must rise above 2.0V to read as 1; must fall below 1.8V to read back as 0 (0.2V hysteresis). Prevents false transitions from slow-rising bus signals.
+
+### RP2350 Erratum E9 — Pull-down latch bug
+
+> **Critical for RIA firmware**: This affects all user GPIO lines in all modes including PIO.
+
+**Problem**: The RP2350 GPIO input stage draws leakage current (up to ~140 µA) that creates multiple equilibrium points in the pull-down circuit. When a line is driven high (3.3V) and then released, it should return to 0V via the pull-down resistor. Instead it stabilizes at ~2V — a state read as logic 1. The line is permanently latched until externally driven low again.
+
+**Root cause**: The I-V curve of the input leakage has negative differential resistance in the 1.5V–2.5V range. The internal pull-down resistors (50–80kΩ) have load lines that intersect this curve at three points: 0V (stable), ~1.5V (unstable), ~2V (stable latch).
+
+**Workarounds**:
+1. **External pull-down ≤8kΩ**: At 8kΩ or less the load line misses the negative differential resistance region entirely — only one stable point at 0V. Documentation recommends ≤8kΩ external. Internal pull-downs cannot be relied on.
+2. **Software toggle input buffer**: Disable input while driving output, re-enable before reading:
+   ```c
+   // In padsbank0_hw->io[gpio], bit 6 = IE (input enable)
+   hw_clear_bits(&padsbank0_hw->io[gpio], 1ul << 6);  // disable input
+   // ... drive the output ...
+   hw_set_bits(&padsbank0_hw->io[gpio], 1ul << 6);    // re-enable input
+   ```
+3. **Use pull-up instead**: Pull-up is not affected — it sources leakage current rather than sinking it.
+
+**Scope**: All 30 user GPIO (GPIO0–GPIO29) in ALL modes (SIO, PIO, UART, etc.). QSPI bank and USB pins are NOT affected.
+
+**RIA firmware implication**: The 65C02 data bus (D0–D7, GPIO8–15) is bidirectional — the RIA switches direction each clock cycle. If any pull-down is configured on these pins, Erratum E9 would cause stuck-at-1 reads. The RIA's bus configuration should avoid internal pull-downs on bidirectional bus pins; this likely explains why the RIA drives the bus explicitly and does not rely on passive pull-down states.
 
 ### Digital I/O registers (SIO)
 
@@ -138,6 +165,233 @@ Two callback styles:
 
 ---
 
+## GPIO interrupt and event SDK API
+
+*Based on [[fairhead-pico-c]] Ch.6.*
+
+### Hardware events
+
+Each GPIO pin latches four event bits in `iobank0_hw->intr[gpio/8]`:
+
+| Constant | Type | Description |
+|---|---|---|
+| `GPIO_IRQ_LEVEL_LOW` | RO (not latched) | Pin is currently low |
+| `GPIO_IRQ_LEVEL_HIGH` | RO (not latched) | Pin is currently high |
+| `GPIO_IRQ_EDGE_FALL` | WC (latched) | A falling edge occurred |
+| `GPIO_IRQ_EDGE_RISE` | WC (latched) | A rising edge occurred |
+
+Edge events stay set until cleared — they survive between polling loops. Level events are not latched and reflect the live pin state.
+
+The SDK has no built-in event read function; implement helpers directly:
+
+```c
+// Read all 4 event bits for a pin
+uint32_t gpio_get_events(uint gpio) {
+    int32_t mask = 0xF << 4 * (gpio % 8);
+    return (iobank0_hw->intr[gpio / 8] & mask) >> 4 * (gpio % 8);
+}
+
+// Clear latched edge events
+void gpio_clear_events(uint gpio, uint32_t events) {
+    gpio_acknowledge_irq(gpio, events);
+}
+```
+
+Alternatively, `gpio_get_irq_event_mask(gpio)` returns the event mask without requiring a custom helper.
+
+**Event polling workflow**:
+1. Set pin as input (`gpio_set_function`, `gpio_set_dir`)
+2. `gpio_clear_events(pin, GPIO_IRQ_EDGE_RISE)` — arm the latch
+3. Do other work
+4. `gpio_get_events(pin)` — check if event occurred in the intervening time
+5. `gpio_clear_events(pin, ...)` — re-arm for next event
+
+Events detect that *something* happened, but not *when* or *how many times*. For multiple presses during one polling window, events are insufficient — use interrupts or a FIFO.
+
+### GPIO interrupt API
+
+All user-bank GPIO lines share a single interrupt: **IO_IRQ_BANK0**. Unique feature: GPIO interrupts can be enabled independently on each core (`proc0_irq_ctrl` / `proc1_irq_ctrl`); all other Pico interrupts are single-core only.
+
+```c
+// Register callback and enable interrupt (one callback for ALL GPIO lines)
+gpio_set_irq_enabled_with_callback(
+    uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback);
+
+// Callback signature — gpio and events tell you which pin/event fired
+void my_callback(uint gpio, uint32_t events);
+
+// Enable/disable without changing callback
+gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled);
+
+// Clear a latched edge event (required in handlers for edge events)
+gpio_acknowledge_irq(uint gpio, uint32_t events);
+```
+
+> **One callback limit**: despite the API suggesting per-pin callbacks, only one callback is active at a time — each new `gpio_set_irq_enabled_with_callback()` replaces the previous. The SDK's internal handler scans all GPIO lines and dispatches to this single function.
+
+**SDK default handler behavior** — `gpio_default_irq_handler` runs before user callback:
+1. Identifies which GPIO lines triggered
+2. Calls `gpio_acknowledge_irq()` for each
+3. Calls user callback with `(gpio, events)`
+
+This means the user callback does not need to clear the IRQ manually — but it also adds latency because the handler scans all 30 GPIO lines.
+
+### Raw GPIO interrupts (maximum performance)
+
+Bypass the default handler to register your own with zero overhead:
+
+```c
+gpio_add_raw_irq_handler_masked(uint32_t gpio_mask, irq_handler_t handler);
+```
+
+With a raw handler, you must manage everything manually:
+```c
+// Setup
+gpio_add_raw_irq_handler_masked(1u << pin, MyIRQHandler);
+gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true);
+irq_set_enabled(IO_IRQ_BANK0, true);  // must enable the bank interrupt too
+
+// In handler — must clear or it will re-fire immediately
+void MyIRQHandler() {
+    gpio_acknowledge_irq(pin, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL);
+    // ... handle event ...
+}
+```
+
+Raw handlers can detect pulses ≥ ~4 µs accurately (vs polling at ~1 µs). Prefer raw handlers over the default SDK handler when interrupt latency matters.
+
+### Race conditions and starvation
+
+**Starvation**: if interrupt frequency exceeds roughly 200 Hz with a slow handler (e.g. one calling `printf`), the main program is starved — the interrupt handler re-fires before the main loop runs. Solutions: keep handlers short; use a fast handler to push data to a queue processed by the main loop.
+
+**Race conditions**: interrupts can fire mid-function, even mid-`printf`. Output corruption is visible, not hypothetical. Design interrupt handlers to be side-effect-free where possible.
+
+**`gpio_set_irq_enabled()` silently discards pending events**: calling this to re-enable after a disable window clears any events that occurred while disabled. To disable interrupts while preserving latched events, bypass the SDK:
+
+```c
+void gpio_set_irq_active(uint gpio, uint32_t events, bool enabled) {
+    io_bank0_irq_ctrl_hw_t *irq_ctrl_base = get_core_num()
+        ? &iobank0_hw->proc1_irq_ctrl
+        : &iobank0_hw->proc0_irq_ctrl;
+    io_rw_32 *en_reg = &irq_ctrl_base->inte[gpio / 8];
+    events <<= 4 * (gpio % 8);
+    if (enabled) hw_set_bits(en_reg, events);
+    else         hw_clear_bits(en_reg, events);
+}
+```
+
+`hw_set_bits` / `hw_clear_bits` toggle only the enable bit; they do not touch the event status registers.
+
+### RIA firmware relevance
+
+The RIA does not use GPIO interrupts for 65C02 bus capture — PIO handles that entirely in hardware. GPIO interrupts would be appropriate only for low-frequency signals like detecting `RESB` assertion from an external source. The starvation analysis confirms the RIA design choice: a polling loop (`api_task()`) on core 1 provides more predictable throughput than an interrupt-driven architecture for high-frequency bus events.
+
+---
+
+## GPIO SDK API
+
+*Based on [[fairhead-pico-c]] Ch.3. All functions from `hardware_gpio` library.*
+
+### Function select constants (complete list)
+
+| Constant | Peripheral | Notes |
+|---|---|---|
+| `GPIO_FUNC_XIP` | Flash execute-in-place | QSPI bank only; not for user GPIO |
+| `GPIO_FUNC_SPI` | SPI0 or SPI1 | — |
+| `GPIO_FUNC_UART` | UART0 or UART1 | RIA console on GPIO 4–5 |
+| `GPIO_FUNC_I2C` | I2C0 or I2C1 | — |
+| `GPIO_FUNC_PWM` | PWM channels | — |
+| `GPIO_FUNC_SIO` | CPU-controlled (SIO) | Default; use for `gpio_put`/`gpio_get` |
+| `GPIO_FUNC_PIO0` | PIO block 0 | Bus signal capture in RIA |
+| `GPIO_FUNC_PIO1` | PIO block 1 | Bus signal capture in RIA |
+| `GPIO_FUNC_GPCK` | Clock output | GPIO 20–25; not available on all pins |
+| `GPIO_FUNC_USB` | USB controller | — |
+| `GPIO_FUNC_NULL` | Disabled (high-Z) | Disconnects pin from all peripherals |
+
+### Basic GPIO API
+
+```c
+gpio_init(n);                        // Reset to SIO, input, no pulls
+gpio_set_function(n, GPIO_FUNC_SIO); // Select peripheral for this pin
+gpio_set_dir(n, GPIO_OUT);           // true = output, false = input
+gpio_get_dir(n);                     // Returns direction
+gpio_is_dir_out(n);                  // True if output
+gpio_set_input_enabled(n, enabled);  // Enable/disable input buffer
+
+gpio_get(n);                         // Read single pin
+gpio_put(n, val);                    // Write single pin (val: 0 or 1)
+```
+
+### Mask API (act on multiple pins simultaneously)
+
+```c
+gpio_init_mask(mask);                // Reset multiple pins (bitmask)
+gpio_set_dir_out_masked(mask);       // Set all masked pins as output
+gpio_set_dir_in_masked(mask);        // Set all masked pins as input
+gpio_set_dir_masked(mask, val);      // Set direction per bit (1=out, 0=in)
+gpio_set_dir_all_bits(vals);         // Set direction of all 30 user GPIO pins
+
+gpio_set_mask(mask);                 // Set all masked output pins high
+gpio_clr_mask(mask);                 // Clear all masked output pins low
+gpio_xor_mask(mask);                 // Toggle all masked output pins
+gpio_put_masked(mask, val);          // Set masked pins to corresponding bits in val
+
+gpio_get_all();                      // Read all 30 user GPIO inputs at once (single cycle)
+gpio_put_all(val);                   // Write all 30 user GPIO outputs at once
+```
+
+> **Performance note**: `gpio_put_masked()` is a read-modify-write — not atomic and slower than `gpio_set_mask()`/`gpio_clr_mask()`. For race-free multi-core GPIO, use `sio_hw->gpio_set` / `sio_hw->gpio_clr` (see [[dual-core-sio]]).
+
+### Speed benchmarks (Release build, 150 MHz)
+
+| Operation | Time |
+|---|---|
+| `gpio_put(n, v)` | ~6 ns per call |
+| Direct `sio_hw->gpio_set` | ~4 ns per call |
+| `gpio_put_masked(mask, v)` | slower (read-modify-write) |
+| `gpio_get_all()` | single cycle (~6 ns) |
+
+### GPIO overrides
+
+Override the signal path without changing function select — useful for testing or forced states:
+
+```c
+gpio_set_outover(n, GPIO_OVERRIDE_NORMAL); // normal output
+gpio_set_outover(n, GPIO_OVERRIDE_INVERT); // invert output signal
+gpio_set_outover(n, GPIO_OVERRIDE_LOW);    // force output low regardless of driver
+gpio_set_outover(n, GPIO_OVERRIDE_HIGH);   // force output high regardless of driver
+
+gpio_set_inover(n, val);   // override input signal seen by peripherals
+gpio_set_oeover(n, val);   // override output-enable signal
+```
+
+### Pause / timing functions
+
+| Function | Characteristics |
+|---|---|
+| `sleep_us(us)` | Power-saving; backs off CPU if possible; ±1 µs accuracy |
+| `busy_wait_us(us)` | Spins CPU; ~1 µs accuracy; `us` must be ≤ 2³²/6 (~715 s) |
+| `busy_wait_us_32(us)` | Same but takes `uint32_t` |
+| `sleep_ms(ms)` | Sleep in milliseconds |
+| `busy_wait_ms(ms)` | Spin in milliseconds |
+| `sleep_until(t)` | Sleep until absolute `absolute_time_t` |
+| `busy_wait_until(t)` | Spin until absolute `absolute_time_t` |
+| `time_us_64()` | Returns current time in µs as `uint64_t` |
+
+**Fixed-duration windows**: `sleep_until(make_timeout_time_us(target))` — compute the deadline before starting work, then wait until that fixed point at the end. Absorbs variable processing time automatically.
+
+### Pico W GPIO mapping differences
+
+On the standard Pico (RP2040/RP2350), GPIO23–29 have dedicated functions:
+- GPIO23: SMPS power save mode
+- GPIO24: VBUS sense
+- GPIO25: onboard LED
+- GPIO29: ADC3 / VSYS monitor
+
+On the **Pico W**, these internal functions are relocated to the CYW43439 WiFi chip's `WL_GPIO0`, `WL_GPIO1`, and `WL_GPIO2` pins. The RIA firmware targets the **RP6502-RIA-W** which carries a Pico W and uses `WL_GPIO0` for the LED instead of GPIO25. See [[rp6502-ria-w]].
+
+---
+
 ## Related pages
 
-- [[pio-architecture]] · [[pix-bus]] · [[rp6502-ria]] · [[rp6502-board]] · [[reset-model]] · [[quadros-rp2040]]
+- [[pio-architecture]] · [[pix-bus]] · [[rp6502-ria]] · [[rp6502-board]] · [[reset-model]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[dual-core-sio]]

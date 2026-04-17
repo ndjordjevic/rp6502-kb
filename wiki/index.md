@@ -18,6 +18,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp6502-github-repo]] | Monorepo source at commit 368ed8e: complete API op-codes, register map, GPIO pinout, PIO layout |
 | [[release-notes]] | All 23 releases v0.1–v0.23: feature introduction dates, breaking changes, known issues |
 | [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO, DMA, USB, clocks, UART, SPI (all planned chapters ingested) |
+| [[fairhead-pico-c]] | "Programming the Raspberry Pi Pico/W in C" (Fairhead, 3rd ed. 2025): SDK programming — PIO, GPIO, multicore, FreeRTOS, WiFi, SPI, UART (all planned chapters ingested) |
 
 ## Entities
 
@@ -65,8 +66,6 @@ When answering a query, read this file first to find relevant pages, then drill 
 
 | Page | Description |
 | --- | --- |
-| [[fairhead-pico-c-ingest-plan]] | Chapter-by-chapter relevance map for "Programming the Raspberry Pi Pico/W in C" (Fairhead, 3rd ed.) |
-
 ## Syntheses
 
 *Answers to queries worth keeping; comparisons; analyses.*

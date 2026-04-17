@@ -2,7 +2,7 @@
 type: concept
 tags: [rp2040, rp2350, spi, serial, rp6502-ria]
 related: [[gpio-pinout]], [[rp6502-ria]], [[rp2040-clocks]], [[dma-controller]]
-sources: [[quadros-rp2040]]
+sources: [[quadros-rp2040]], [[fairhead-pico-c]]
 created: 2026-04-16
 updated: 2026-04-16
 ---
@@ -131,6 +131,22 @@ gpio_set_function(MISO_PIN, GPIO_FUNC_SPI);
 gpio_set_function(MOSI_PIN, GPIO_FUNC_SPI);
 gpio_init(SS_PIN); gpio_set_dir(SS_PIN, GPIO_OUT); gpio_put(SS_PIN, 1);
 ```
+
+---
+
+## CS Timing Quirk (Fairhead)
+
+When using `gpio_put()` to deassert CS immediately after a blocking transfer, the CS line goes high ~0.7 µs **before** the final clock pulse completes — the SPI hardware is still finishing the last bit. Devices that latch data on CS deassert may miss the last bit.
+
+Fix: insert a delay between the end of the transfer and deassert:
+
+```c
+spi_write16_read16_blocking(spi, tx, rx, len);
+sleep_us(1000000 / (2 * clock_hz));  // wait half a clock period
+gpio_put(cs_pin, 1);                  // safe to deassert now
+```
+
+Where `clock_hz` is the SPI clock frequency (e.g. `1000000` for 1 MHz → `sleep_us(0)` is fine; at 125 kHz → `sleep_us(4)`).
 
 ---
 
