@@ -23,6 +23,77 @@ Three layers:
 
 ---
 
+## Use Case 0 — Ingesting a Source
+
+**Scenario:** You've found a useful document — an official hardware page, a GitHub repo,
+a PDF chapter, a Discord export — and you want the wiki to absorb it permanently.
+
+**Workflow:**
+
+1. Drop the file into `raw/` under the appropriate sub-folder:
+
+```
+raw/web/         ← scraped HTML → markdown
+raw/github/      ← repo files, headers, release notes
+raw/discord/     ← exported chat logs
+raw/pdf/         ← PDF → markdown conversions
+raw/youtube/     ← transcripts
+```
+
+2. Ask Claude to ingest it:
+
+```
+Ingest raw/web/picocomputer.github.io/hardware.html.md into the wiki.
+```
+
+Claude follows the **ingest workflow** in `CLAUDE.md`:
+
+- Creates/updates `wiki/sources/<short-name>.md` (summary, key facts, frontmatter).
+- Extracts named things → `wiki/entities/` pages.
+- Extracts mechanisms and ideas → `wiki/concepts/` pages.
+- Revises `wiki/overview.md` and `wiki/index.md`.
+- Appends an entry to `wiki/log.md`.
+- Flags any contradictions with existing pages using a `> **Conflict:**` block.
+
+A single source typically touches 10–15 wiki pages. That is normal and expected.
+
+### Large sources — incremental ingestion (~25 pages per session)
+
+For books, long PDFs, or large HTML docs, ingest in chapters across multiple sessions:
+
+1. Ask Claude to **plan the ingestion** first:
+
+```
+Plan the ingestion of raw/pdf/w65c02s-datasheet.md — list chapters and suggest order.
+```
+
+Claude creates `wiki/inbox/<short-name>-ingest-plan.md` with a chapter checklist.
+
+2. Each session, pick up where you left off:
+
+```
+Continue ingesting raw/pdf/w65c02s-datasheet.md — follow the inbox plan.
+```
+
+Claude reads the plan, processes the next ~25 pages, marks completed chapters `[x]`,
+and writes/updates wiki pages normally. When all chapters are done, it deletes the
+plan file — the `wiki/sources/` page and `wiki/log.md` are the permanent record.
+
+### Resolving contradictions
+
+When a new source conflicts with an existing wiki page, Claude flags it inline.
+You can also trigger explicit reconciliation:
+
+```
+Source A says the PIX bus runs at 8 MHz; Source B says 6 MHz. Reconcile and update
+the wiki with the correct value, citing the higher-authority source.
+```
+
+Claude ranks by source authority (official docs > repo > Discord) and updates the
+affected pages, retiring the incorrect claim.
+
+---
+
 ## Use Case 1 — Simple Question and Answer
 
 **Scenario:** You're reading a datasheet, a Discord thread confuses you, or you just
@@ -321,7 +392,102 @@ web and the raw/ files and create one.
 
 ---
 
-## Use Case 7 — Publishing and Sharing
+## Use Case 7 — Rich Output Formats
+
+**Scenario:** You need more than a prose answer — a comparison table, a presentation
+for a meetup, or a chart from register timing data.
+
+Query answers don't have to be text. Ask Claude to render the wiki's knowledge in any
+format that suits your need:
+
+| Output format | Example prompt |
+|---|---|
+| **Comparison table** | `Compare the RIA register layouts between firmware v1 and v2 as a markdown table.` |
+| **Marp slide deck** | `Generate a Marp presentation on the RP6502-OS file I/O API for a 10-minute talk.` |
+| **matplotlib chart** | `Plot the PHI2 clock timing budget from the wiki timing data.` |
+| **Checklist / runbook** | `Turn the getting-started page into a step-by-step setup checklist.` |
+| **Synthesis page** | `Write wiki/syntheses/ria-vs-via.md comparing the two peripheral models.` |
+
+Marp is a markdown slide format with an Obsidian plugin (`marp-slides`). A generated
+deck lives as a `.md` file in the wiki and is readable both as slides and as plain text.
+
+Filed output (tables, syntheses, runbooks) compounds in the wiki like any other page —
+you ask once, it's there forever.
+
+---
+
+## Use Case 8 — Version History and Collaboration
+
+**Scenario:** You work with a team, or you want to track how the wiki evolved over time.
+
+The wiki is a plain git repo. You get:
+
+- **Version history** — `git log wiki/` shows every change: which pages were added,
+  updated, or linked after each ingest or lint pass. `git diff` compares any two states.
+- **Blame** — `git log -p wiki/concepts/memory-map.md` shows exactly which session
+  changed a register address and what the source was.
+- **Branching** — experiment with a large ingest or a controversial synthesis on a
+  branch; merge when you're happy.
+- **Collaboration** — push to a private GitHub repo. Teammates can open pull requests
+  adding sources to `raw/` or correcting wiki pages; Claude does the maintenance work.
+- **Review workflow** — in team settings, configure Claude to propose wiki edits as
+  commits on a branch rather than directly to `main`. A human reviews the diff before
+  merging — the same review loop used for code.
+
+```bash
+# See the last 5 wiki operations
+git --no-pager log --oneline wiki/ | head -5
+
+# What changed after yesterday's ingest?
+git --no-pager diff HEAD~1 wiki/
+```
+
+---
+
+## Use Case 9 — Scaling Search Infrastructure
+
+**Scenario:** The wiki has grown past ~100 pages and `wiki/index.md` alone is no longer
+enough to orient Claude quickly.
+
+At small scale, the index file works fine. As the wiki grows, a proper search layer
+helps the LLM find relevant pages without reading everything:
+
+**Option A — Shell-out search (qmd)**
+
+[qmd](https://github.com/tobi/qmd) is a local markdown search engine with hybrid
+BM25/vector search and LLM re-ranking, all on-device. It exposes both a CLI and an
+MCP server. Claude can shell out to it:
+
+```
+Search for pages mentioning XRAM bank switching.
+```
+
+**Option B — ripgrep (zero setup)**
+
+For a wiki under ~200 pages, `rg` is fast enough and already available:
+
+```
+Search the wiki for every mention of VSYNC timing.
+```
+
+Claude runs `rg -l "VSYNC" wiki/` internally to narrow down which pages to read.
+
+**Option C — MCP server**
+
+Point an MCP-compatible search server at `wiki/` and add it to `.claude/settings.json`.
+Claude uses it as a native tool rather than shelling out.
+
+Add a note to `CLAUDE.md` when you deploy a search tool so every session knows it's
+available:
+
+```markdown
+## Search tool
+Run `rg -l "<term>" wiki/` to find relevant pages before reading index.md.
+```
+
+---
+
+## Use Case 10 — Publishing and Sharing
 
 The wiki is plain markdown with YAML frontmatter — it can be published without any
 transformation:
@@ -349,11 +515,14 @@ Day 2–5
   → Open Obsidian; explore the graph
   → Start a small coding project; point CLAUDE.md at the wiki
   → Notice what the coding agent gets wrong; file the correction as a new wiki page
+  → Ask for a comparison table or runbook — try a rich output format (Use Case 7)
 
 Week 2+
   → Run lint; fix orphans and contradictions
   → Add one new raw source (a PDF chapter, a Discord export, a release notes page)
   → Ask the hardest question you have about the OS API; file the synthesis
+  → Push to GitHub; share with a collaborator (Use Case 8)
+  → If search feels slow, add a ripgrep hint to CLAUDE.md (Use Case 9)
 ```
 
 The compounding effect kicks in around 30–40 pages. By then the wiki knows more
