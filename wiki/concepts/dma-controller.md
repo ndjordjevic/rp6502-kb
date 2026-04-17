@@ -1,10 +1,10 @@
 ---
 type: concept
-tags: [rp2040, dma, xram, pio, peripheral]
+tags: [rp2040, rp2350, dma, pio2, xram, pio, peripheral, errata]
 related: [[rp2040-memory]], [[pio-architecture]], [[xram]], [[rp6502-ria]]
-sources: [[quadros-rp2040]]
+sources: [[quadros-rp2040]], [[pico-c-sdk]]
 created: 2026-04-16
-updated: 2026-04-16 (audit: corrected DREQ_PWM_WRAP8→WRAP7 book typo)
+updated: 2026-04-17 (S5 ingest: RP2350 DREQ table, encoded_transfer_count, self-trigger/endless DMA, new functions, errata IDs)
 ---
 
 # DMA Controller (RP2040)
@@ -93,12 +93,12 @@ This pattern is used in the SPI display example: three screen strips at non-cont
 Transfers are paced by **Transfer Requests (TREQ)**. Options per channel:
 
 - **Device DREQ** — peripheral signals when its FIFO is ready. The RP2040 DMA supports a **credit-based DREQ** model: it tracks outstanding requests so the FIFO is always fully utilised without overflow.
-- **Pacing timer** — one of 4 fractional timers that run at `(X/Y) × sys_clk` (X, Y are 16-bit; `X/Y ≤ 1`).
-- **Permanent** — transfers as fast as possible (memory-to-memory).
+- **Pacing timer** — one of 4 fractional timers that run at `(X/Y) × sys_clk` (X, Y are 16-bit; `X/Y ≤ 1`). TREQ values 0x3b–0x3e select timers 0–3.
+- **Permanent** (TREQ = 0x3f) — transfers as fast as possible (memory-to-memory).
 
 > A DREQ must not be shared across more than one channel, and the peripheral FIFO must not be accessed by software while DMA is using it.
 
-### DREQ table (40 sources)
+### DREQ table — RP2040 (40 sources)
 
 | DREQ | Name | DREQ | Name |
 |---|---|---|---|
@@ -124,6 +124,28 @@ Transfers are paced by **Transfer Requests (TREQ)**. Options per channel:
 | 19 | `DREQ_SPI1_RX` | 39 | `DREQ_XIP_SSIRX` |
 
 > **Conflict:** The Quadros book (page 44) lists DREQ 31 as `DREQ_PWM_WRAP8`, skipping WRAP7. The RP2040 has 8 PWM slices numbered 0–7, and the RP2040 datasheet and SDK headers (`dreq.h`) confirm DREQ 31 = `DREQ_PWM_WRAP7`. Corrected here.
+
+### DREQ table — RP2350 (55 sources)
+
+RP2350 adds **PIO2** (8 new DREQs), **HSTX**, **CORESIGHT**, **SHA256** and renames XIP SSI entries. All existing RP2040 DREQ names shift upward:
+
+| DREQ | Name | DREQ | Name |
+|---|---|---|---|
+| 0–7 | `DREQ_PIO0_TX0–3`, `DREQ_PIO0_RX0–3` | 24 | `DREQ_SPI0_TX` |
+| 8–15 | `DREQ_PIO1_TX0–3`, `DREQ_PIO1_RX0–3` | 25 | `DREQ_SPI0_RX` |
+| 16 | `DREQ_PIO2_TX0` | 26 | `DREQ_SPI1_TX` |
+| 17 | `DREQ_PIO2_TX1` | 27 | `DREQ_SPI1_RX` |
+| 18 | `DREQ_PIO2_TX2` | 28 | `DREQ_UART0_TX` |
+| 19 | `DREQ_PIO2_TX3` | 29 | `DREQ_UART0_RX` |
+| 20 | `DREQ_PIO2_RX0` | 30 | `DREQ_UART1_TX` |
+| 21 | `DREQ_PIO2_RX1` | 31 | `DREQ_UART1_RX` |
+| 22 | `DREQ_PIO2_RX2` | 32–43 | `DREQ_PWM_WRAP0–11` (12 slices on RP2350) |
+| 23 | `DREQ_PIO2_RX3` | 44–47 | `DREQ_I2C0_TX/RX`, `DREQ_I2C1_TX/RX` |
+| 48 | `DREQ_ADC` | 49 | `DREQ_XIP_STREAM` |
+| 50 | `DREQ_XIP_QMITX` | 51 | `DREQ_XIP_QMIRX` |
+| 52 | `DREQ_HSTX` | 53 | `DREQ_CORESIGHT` |
+| 54 | `DREQ_SHA256` | 59–62 | `DREQ_DMA_TIMER0–3` |
+| 63 | `DREQ_FORCE` | | |
 
 **RIA-relevant DREQs**: `DREQ_PIO0_RX*` and `DREQ_PIO1_RX*` pace XRAM-fill DMA from PIO bus capture FIFOs.
 
@@ -173,7 +195,9 @@ int  dma_claim_unused_channel(bool required);   // preferred way to pick a chann
 void dma_channel_claim(uint channel);           // claim by fixed number
 void dma_claim_mask(uint32_t channel_mask);     // claim multiple at once
 void dma_channel_unclaim(uint channel);
+void dma_unclaim_mask(uint32_t channel_mask);   // unclaim multiple at once
 bool dma_channel_is_claimed(uint channel);
+bool dma_channel_is_busy(uint channel);         // true if transfer in progress
 ```
 
 ### Configuration
@@ -186,51 +210,79 @@ dma_channel_config c = dma_channel_get_default_config(channel);
 channel_config_set_transfer_data_size(&c, DMA_SIZE_8 | DMA_SIZE_16 | DMA_SIZE_32);
 channel_config_set_read_increment(&c, bool incr);
 channel_config_set_write_increment(&c, bool incr);
+// Or use the typed variants (RP2350 adds DMA_ADDRESS_UPDATE_NONE / _INCREMENT enum):
+channel_config_set_read_address_update_type(&c, dma_address_update_type_t);
+channel_config_set_write_address_update_type(&c, dma_address_update_type_t);
 channel_config_set_dreq(&c, uint dreq);              // use dma_get_xxx_dreq() helpers
 channel_config_set_chain_to(&c, uint chain_to);
+// Disable chaining: set chain_to == the channel itself
 channel_config_set_ring(&c, bool write, uint size_bits);
+// size_bits 1–15: wraps on (1<<size_bits) byte boundary; 0 = off
 channel_config_set_bswap(&c, bool bswap);
+// No effect for byte transfers; swaps 2 bytes for halfword; reverses 4 bytes for word.
+// Note: if both channel bswap and dma_sniffer_set_byte_swap_enabled are true, effects cancel for sniffer.
 channel_config_set_irq_quiet(&c, bool irq_quiet);
 channel_config_set_high_priority(&c, bool high);
+// High priority: in each scheduling round, ALL high-priority channels run first, then ONE low-priority channel.
+// Does NOT change the DMA's bus priority — only affects scheduling order between channels.
 channel_config_set_enable(&c, bool enable);
 channel_config_set_sniff_enable(&c, bool sniff_enable);
+uint32_t channel_config_get_ctrl_value(&c);  // get raw CTRL register value
 ```
 
 ### Configure and start
 
 ```c
 // Main setup call
-dma_channel_configure(channel, &config, write_addr, read_addr, count, trigger);
+// encoded_transfer_count: on RP2040 = plain count (0..2^32-1)
+// on RP2350 = low 28 bits count (0..2^28-1), top 4 bits encode options
+// Best practice: always use dma_encode_transfer_count() etc. (see below)
+dma_channel_configure(channel, &config, write_addr, read_addr, encoded_count, trigger);
 
 // Partial updates (trigger = start immediately)
 dma_channel_set_read_addr(channel, read_addr, trigger);
 dma_channel_set_write_addr(channel, write_addr, trigger);
-dma_channel_set_trans_count(channel, count, trigger);
+dma_channel_set_transfer_count(channel, encoded_count, trigger);
+dma_channel_set_config(channel, &config, trigger);  // update config only
+
+// Transfer count helpers (always use these for portability)
+uint32_t dma_encode_transfer_count(uint count);                       // RP2040: 0..2^32-1; RP2350: 0..2^28-1
+uint32_t dma_encode_transfer_count_with_self_trigger(uint count);     // RP2350 only: channel re-triggers itself
+uint32_t dma_encode_endless_transfer_count(void);                     // RP2350 only: continuous (never stops)
 
 // Convenience
-dma_channel_transfer_from_buffer_now(channel, read_addr, count);
-dma_channel_transfer_to_buffer_now(channel, write_addr, count);
+dma_channel_transfer_from_buffer_now(channel, read_addr, encoded_count);
+dma_channel_transfer_to_buffer_now(channel, write_addr, encoded_count);
 
 // Start multiple channels simultaneously
 dma_start_channel_mask(uint32_t chan_mask);
 dma_channel_start(channel);
-dma_channel_abort(channel);  // stops transfer (may fire completion interrupt — RP2040 bug)
+dma_channel_wait_for_finish_blocking(channel);  // spin-wait until not busy
+dma_channel_abort(channel);   // stops transfer; see errata below
+dma_channel_cleanup(channel); // disables IRQs, aborts, clears IRQ flag — use before unclaim
 ```
 
 ### Interrupt handling
 
 ```c
 dma_channel_set_irq0_enabled(channel, true);
+dma_channel_set_irq1_enabled(channel, true);
+// Or set/clear multiple at once:
+dma_set_irq0_channel_mask_enabled(uint32_t mask, bool enabled);
+dma_set_irq1_channel_mask_enabled(uint32_t mask, bool enabled);
+dma_irqn_set_channel_enabled(irq_index, channel, enabled);       // generic index 0 or 1
+dma_irqn_set_channel_mask_enabled(irq_index, mask, enabled);
+
+int dma_get_irq_num(irq_index);  // returns actual IRQ number for DMA_IRQ_0 or DMA_IRQ_1
+
 irq_set_exclusive_handler(DMA_IRQ_0, handler);
 irq_set_enabled(DMA_IRQ_0, true);
 
 // In handler:
-bool dma_channel_get_irq0_status(channel);   // check if this channel caused IRQ
+bool dma_channel_get_irq0_status(channel);   // check if this channel caused IRQ0
 dma_channel_acknowledge_irq0(channel);        // clear the channel's interrupt flag
-
-// Generic (irq_index = 0 or 1):
-dma_irqn_set_channel_enabled(irq_index, channel, enabled);
-dma_irqn_get_channel_status(irq_index, channel);
+// Generic:
+bool dma_irqn_get_channel_status(irq_index, channel);
 dma_irqn_acknowledge_channel(irq_index, channel);
 ```
 
@@ -238,6 +290,9 @@ dma_irqn_acknowledge_channel(irq_index, channel);
 
 ```c
 int  dma_claim_unused_timer(bool required);
+void dma_timer_claim(uint timer);           // claim a specific timer; panics if already claimed
+void dma_timer_unclaim(uint timer);
+bool dma_timer_is_claimed(uint timer);
 void dma_timer_set_fraction(uint timer, uint16_t numerator, uint16_t denominator);
      // runs at (numerator/denominator) * sys_clk; denominator >= numerator
 uint dma_get_timer_dreq(uint timer_num);   // use as DREQ
@@ -247,9 +302,17 @@ uint dma_get_timer_dreq(uint timer_num);   // use as DREQ
 
 ```c
 dma_sniffer_enable(channel, mode, force_channel_enable);
+// force_channel_enable=true sets sniff_enable in the channel config too (usually what you want)
+// If both channel bswap AND sniffer byte swap are enabled, their effects cancel for the sniffer.
 dma_sniffer_set_byte_swap_enabled(bool swap);
+dma_sniffer_set_output_invert_enabled(bool invert);    // bit-invert result when reading
+dma_sniffer_set_output_reverse_enabled(bool reverse);  // bit-reverse result when reading
 dma_sniffer_disable();
-// Accumulator is at dma_hw->sniff_data (write to init, read for result)
+// Accumulator (CRC-32 seed typically 0xFFFFFFFF, CRC-16 seed 0xFFFF):
+dma_sniffer_set_data_accumulator(uint32_t seed);
+uint32_t dma_sniffer_get_data_accumulator(void);  // read computed checksum
+// Also: dma_channel_config_t channel_config_get_ctrl_value(&config) — get raw CTRL word
+// Also: dma_channel_config_t dma_get_channel_config(channel)        — read current HW config
 ```
 
 ---
@@ -266,7 +329,9 @@ The DMA controller is the backbone of XRAM throughput in [[rp6502-ria]] firmware
 
 The two-core design (Core 0: bus loop; Core 1: OS task dispatcher) means DMA transfers can be set up from either core and will proceed independently — the bus loop core doesn't have to poll for completion.
 
-> **Note**: `dma_channel_abort()` has a known RP2040 bug — it may generate a spurious completion interrupt even when the transfer was not complete.
+> **Note**: `dma_channel_abort()` has chip-specific errata:
+> - **RP2040 (errata RP2040-E13)**: aborting a channel with in-flight transfers (read done but write pending) clears ABORT prematurely, and those in-flight transfers fire a spurious completion IRQ. Workaround: disable the channel IRQ before abort, call abort, acknowledge IRQ, re-enable.
+> - **RP2350 (errata RP2350-E5)**: clear the enable bit in the CTRL register of the aborted channel *and any chained channels* before calling `dma_channel_abort()`, to prevent automatic re-triggering.
 
 ## Related pages
 

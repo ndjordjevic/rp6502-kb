@@ -19,7 +19,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[release-notes]] | All 23 releases v0.1–v0.23: feature introduction dates, breaking changes, known issues |
 | [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO, DMA, USB, clocks, UART, SPI (all planned chapters ingested) |
 | [[fairhead-pico-c]] | "Programming the Raspberry Pi Pico/W in C" (Fairhead, 3rd ed. 2025): SDK programming — PIO, GPIO, multicore, FreeRTOS, WiFi, SPI, UART (all planned chapters ingested) |
-| [[pico-c-sdk]] | Raspberry Pi Pico-series C/C++ SDK (RP-009085-KB-1, 2025): official API reference — function signatures, PIOASM encoding, RP2040/RP2350 compat table; S1 ingested |
+| [[pico-c-sdk]] | Raspberry Pi Pico-series C/C++ SDK (RP-009085-KB-1, 2025): official API reference — function signatures, PIOASM encoding, RP2040/RP2350 compat table; all 14 sessions ingested ✅ |
 
 ## Entities
 
@@ -51,15 +51,17 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[launcher]] | Process manager hook for persistent host ROM + native-OS boot pattern |
 | [[ria-registers]] | Exact register addresses $FFE0–$FFFF, return stub, full errno table |
 | [[api-opcodes]] | Complete OS call dispatch table (op-codes 0x01–0x2E) from main.c |
-| [[pio-architecture]] | PIO state machine layout for 65C02 bus interface and PIX; RP2350 overclock |
-| [[gpio-pinout]] | GPIO pin assignments for RIA Pico and VGA Pico confirmed from source |
-| [[dual-core-sio]] | Two-core ARM model, SIO FIFOs, hardware spinlocks, atomic GPIO, `pico_multicore`/`pico_sync` SDK |
+| [[pio-architecture]] | PIO state machine layout for 65C02 bus interface and PIX; RP2350 overclock; DMA-DREQ integration; dynamic program generation (`pio_encode_*` composition, full JMP variants, `pio_src_dest` enum, wait_pin vs wait_gpio); SM EXEC; v0/v1 ISA encoding; v1-only additions; `pio_interrupt_source` enum; compile-time macros; MOV STATUS type; multi-SM synchronization; sticky output; RP2350B GPIO base |
+| [[pioasm]] | PIOASM assembler: complete directive reference, value/expression syntax, output pass-through, generated header structure, v0/v1 ISA opcode table |
+| [[gpio-pinout]] | GPIO pin assignments for RIA/VGA Pico confirmed from source; RP2040/RP2350 function select tables; full SDK API (pull state queries, PAD config, interrupt model, concurrency-safe gpio_put_masked, raw handler notes); 64-bit/bank-n RP2350 variants; Erratum E9 |
+| [[hardware-irq]] | `hardware_irq` SDK: NVIC per-core semantics, IRQ number tables (RP2040 + RP2350), three handler-install patterns, priority model, user (software) IRQs |
+| [[dual-core-sio]] | Two-core ARM model, SIO FIFOs (RP2040: 8 deep, RP2350: 4 deep), lockout mechanism, doorbell API (RP2350), hardware spinlocks (32 locks, number assignment table, RP2350-E2 erratum), memory barriers, processor events, interrupt control, atomic GPIO, full `pico_multicore` + `pico_sync` SDK (critical_section, mutex, recursive_mutex, semaphore with all timeout variants) |
 | [[rp2040-memory]] | RP2040 memory types (ROM/SRAM/Flash), SRAM banking, XIP, full APB/AHB address map |
-| [[dma-controller]] | 12-channel DMA: DREQ table, control blocks, chaining, CRC sniffing, SDK API |
+| [[dma-controller]] | 12-channel DMA: RP2040/RP2350 DREQ tables, control blocks, chaining, CRC sniffing, RP2350 encoded_transfer_count/endless/self-trigger, SDK API |
 | [[usb-controller]] | RP2040 USB 1.1 controller: host/device modes, HID boot protocol (keyboard/gamepad), CDC VCP, TinyUSB API, RIA host usage |
-| [[rp2040-clocks]] | RP2040 clock subsystem: ROSC/XOSC/PLLs, 10 clock domains, 256 MHz overclock; Timer (64-bit µs, alarm pools), Watchdog, RTC |
-| [[rp2040-uart]] | RP2040 UARTs: framing, 32-entry FIFOs + error flags, fractional baud rate, interrupts, hardware flow control, SDK API; RIA uses UART1/GPIO4-5/115200 |
-| [[rp2040-spi]] | RP2040 SPI: master/slave, 4–16-bit words, CPOL/CPHA modes, manual SS in master mode, DMA, SDK API; RIA uses USB MSC (not SPI) for storage |
+| [[rp2040-clocks]] | RP2040/RP2350 clock subsystem: ROSC/XOSC/LPOSC/PLLs, clock domains, divisor precision, resus; 256 MHz overclock; `pll_init`/`pll_deinit` SDK functions; Timer (RP2350 two instances, 64-bit µs, full alarm API, compile-time macros); full `pico_time` API (absolute_time_t, sleep/busy_wait, alarm pools, repeating timers); Watchdog, RTC |
+| [[rp2040-uart]] | RP2040 UARTs: framing, 32-entry FIFOs + error flags, fractional baud rate, interrupts, hardware flow control, full SDK API (incl. macros `UART_FUNCSEL_NUM` etc.), `uart_deinit`; RIA uses UART1/GPIO4-5/115200 |
+| [[rp2040-spi]] | RP2040 SPI: master/slave, 4–16-bit words, CPOL/CPHA modes, manual SS in master mode, DMA DREQ macros, full SDK API (`spi_init`/`spi_deinit`/`spi_get_baudrate`/`spi_get_index`/blocking transfer variants); RIA uses USB MSC (not SPI) for storage |
 | [[sdk-architecture]] | Pico SDK build model: CMake INTERFACE libraries, library tiers, hardware claiming, builder pattern, RP2040/RP2350 platform split |
 
 ## Inbox

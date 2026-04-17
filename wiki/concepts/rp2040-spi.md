@@ -2,9 +2,9 @@
 type: concept
 tags: [rp2040, rp2350, spi, serial, rp6502-ria]
 related: [[gpio-pinout]], [[rp6502-ria]], [[rp2040-clocks]], [[dma-controller]]
-sources: [[quadros-rp2040]], [[fairhead-pico-c]]
+sources: [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-17
 ---
 
 # RP2040 SPI
@@ -105,7 +105,10 @@ GPIO function select: `GPIO_FUNC_SPI`. Remember: SS is only relevant if operatin
 | Function | Description |
 |---|---|
 | `spi_init(spi, baudrate)` | Init in master mode; returns actual baud rate |
+| `spi_deinit(spi)` | Disable SPI; `spi_init` required to re-enable |
 | `spi_set_baudrate(spi, baud)` | Change baud rate; returns actual value |
+| `spi_get_baudrate(spi)` | Query actual baud rate set by last `spi_set_baudrate` call |
+| `spi_get_index(spi)` | Returns 0 or 1 for `spi0`/`spi1` |
 | `spi_set_format(spi, data_bits, cpol, cpha, order)` | Format: data_bits 4–16, cpol/cpha constants, order must be `SPI_MSB_FIRST` |
 | `spi_set_slave(spi, slave)` | `false` = master (default), `true` = slave |
 | `spi_is_writable(spi)` | Space available in TX FIFO |
@@ -120,6 +123,14 @@ GPIO function select: `GPIO_FUNC_SPI`. Remember: SS is only relevant if operatin
 | `spi_get_dreq(spi, is_tx)` | DMA DREQ: `is_tx=true` for TX, `false` for RX |
 
 All blocking functions return the number of items transferred.
+
+**DMA macros** (resolve at compile time, no parameter checking):
+
+| Macro | Returns |
+|---|---|
+| `SPI_DREQ_NUM(spi, is_tx)` | `dreq_num_t` for DMA pacing — same as `spi_get_dreq` but compile-time |
+| `SPI_NUM(spi)` | SPI number (0 or 1) from instance pointer |
+| `SPI_INSTANCE(num)` | SPI instance pointer from number |
 
 ### Typical initialization sequence
 

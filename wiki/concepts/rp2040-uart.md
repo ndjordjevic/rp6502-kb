@@ -2,9 +2,9 @@
 type: concept
 tags: [rp2040, rp2350, uart, serial, rp6502-ria]
 related: [[gpio-pinout]], [[rp6502-ria]], [[rp2040-clocks]], [[dma-controller]]
-sources: [[quadros-rp2040]], [[fairhead-pico-c]]
+sources: [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-18
 ---
 
 # RP2040 UARTs
@@ -120,37 +120,60 @@ TX interrupt pattern: start with TX interrupt disabled → fill FIFO directly; i
 
 ## SDK (`hardware_uart`)
 
+`uart_init` always enables FIFOs and configures the default format 8N1. Set GPIO function **before** calling `uart_init` using `UART_FUNCSEL_NUM(uart, gpio)` to avoid losing early characters.
+
+```c
+gpio_set_function(0, UART_FUNCSEL_NUM(uart0, 0));  // TX
+gpio_set_function(1, UART_FUNCSEL_NUM(uart0, 1));  // RX
+uart_init(uart0, 115200);
+```
+
+### Compile-time macros (`hardware_uart`)
+
+| Macro | Description |
+|---|---|
+| `UART_NUM(uart)` | Returns UART instance number (0 or 1); resolves at compile time |
+| `UART_INSTANCE(num)` | Returns `uart_inst_t *` for a given UART number; resolves at compile time |
+| `UART_DREQ_NUM(uart, is_tx)` | Returns `dreq_num_t` for DMA pacing; compile-time |
+| `UART_CLOCK_NUM(uart)` | Returns `clock_num_t` of the clock feeding the given UART; compile-time |
+| `UART_FUNCSEL_NUM(uart, gpio)` | Returns `gpio_function_t` to select UART on the given GPIO; compile-time |
+| `UART_IRQ_NUM(uart)` | Returns `irq_num_t` for processor interrupts from UART; compile-time |
+| `UART_RESET_NUM(uart)` | Returns `reset_num_t` to reset the UART; compile-time |
+
+### Function reference
+
 | Function | Description |
 |---|---|
-| `uart_init(uart, baudrate)` | Initialize UART; returns actual baud rate set |
-| `uart_set_baudrate(uart, baud)` | Change baud rate; returns actual value |
-| `uart_set_format(uart, data_bits, stop_bits, parity)` | Frame format; parity: `UART_PARITY_NONE/EVEN/ODD` |
+| `uart_init(uart, baudrate)` | Initialize UART; always enables FIFOs, 8N1 default; returns actual baud set |
+| `uart_deinit(uart)` | Disable UART; must call `uart_init` again before reuse |
+| `uart_set_baudrate(uart, baud)` | Change baud rate; UART paused ~2 char periods; returns actual value |
+| `uart_set_format(uart, data_bits, stop_bits, parity)` | Frame format; UART paused ~2 char periods; parity: `UART_PARITY_NONE/EVEN/ODD` |
 | `uart_set_hw_flow(uart, cts, rts)` | Enable/disable hardware flow control |
-| `uart_set_fifo_enabled(uart, en)` | Enable FIFOs (both TX and RX together) |
-| `uart_set_irq_enables(uart, rx_has_data, tx_needs_data)` | Enable RX / TX interrupts (also enables RX timeout with RX) |
+| `uart_set_fifo_enabled(uart, en)` | Enable FIFOs (both TX and RX together); UART paused ~2 char periods |
+| `uart_set_irqs_enabled(uart, rx_has_data, tx_needs_data)` | Enable RX / TX interrupts (enabling RX also enables RX timeout) |
+| `uart_is_enabled(uart)` | True if UART is enabled |
 | `uart_is_readable(uart)` | True if RX FIFO has data |
 | `uart_is_readable_within_us(uart, us)` | Wait up to `us` µs for data; returns bool |
 | `uart_is_writable(uart)` | True if TX FIFO has space |
 | `uart_tx_wait_blocking(uart)` | Block until TX FIFO and shift register empty |
-| `uart_putc_raw(uart, c)` | Write char — no CR/LF translation |
-| `uart_putc(uart, c)` | Write char — translates LF→CR+LF if enabled |
-| `uart_puts(uart, s)` | Write null-terminated string |
+| `uart_default_tx_wait_blocking()` | Same for the default UART instance |
+| `uart_putc_raw(uart, c)` | Write char — no CR/LF translation; blocks until in FIFO |
+| `uart_putc(uart, c)` | Write char — translates LF→CR+LF if enabled; blocks until in FIFO |
+| `uart_puts(uart, s)` | Write null-terminated string; blocks until all chars in FIFO |
 | `uart_write_blocking(uart, src, len)` | Write `len` bytes — no CR/LF translation |
 | `uart_getc(uart)` | Blocking read of one char |
 | `uart_read_blocking(uart, dst, len)` | Read `len` bytes blocking |
 | `uart_set_break(uart, en)` | Assert/de-assert break condition |
 | `uart_set_translate_crlf(uart, translate)` | LF → CR+LF in `putc`/`puts` |
-| `uart_get_dreq(uart, is_tx)` | Return DMA DREQ for TX (`is_tx=true`) or RX |
+| `uart_get_dreq_num(uart, is_tx)` | Return `dreq_num_t` for DMA TX (`is_tx=true`) or RX |
+| `uart_get_reset_num(uart)` | Return `reset_num_t` for resetting the UART |
+| `uart_get_index(uart)` | Returns UART instance number (0 or 1) |
+| `uart_get_instance(num)` | Returns `uart_inst_t *` for a given UART number |
+| `uart_get_hw(uart)` | Returns `uart_hw_t *` to the raw hardware registers |
 
-Note: `uart_putc` / `uart_puts` return when the character enters the FIFO, not when it is actually transmitted. If flow control is in use, the call may block.
+> **Note:** `uart_set_baudrate`, `uart_set_format`, and `uart_set_fifo_enabled` pause the UART for ~2 character periods. Data received during this pause may be dropped. Call `uart_tx_wait_blocking()` first to drain the TX buffer, and do not call these from an interrupt context.
 
-Additional functions from Fairhead:
-
-| Function | Description |
-|---|---|
-| `uart_is_readable_within_us(uart, us)` | Wait up to `us` µs; returns bool but also encodes count of chars waiting |
-| `uart_tx_wait_blocking(uart)` | Wait until TX FIFO and shift register fully empty |
-| `uart_default_tx_wait_blocking()` | Same for default UART (UART0 by default) |
+Note: `uart_putc` / `uart_puts` return when the character enters the FIFO, not when it is actually transmitted. If flow control is in use, the call may block waiting for CTS.
 
 ---
 

@@ -7,7 +7,163 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
-## [2026-04-17] ingest | pico-c-sdk S1 | Ch.1 + Ch.2 §§2.1–2.10 (PDF pp.10–33)
+## [2026-04-17] ingest | pico-c-sdk S14 | §5.2.13 pico_time (PDF pp.412–433)
+
+- `wiki/concepts/rp2040-clocks.md`: replaced brief pico_time section with full reference — `absolute_time_t` type note (SDK 2.0+ defaults to uint64_t; `PICO_OPAQUE_ABSOLUTE_TIME_T=1` for type-checked mode); `at_the_end_of_time`/`nil_time` sentinels; full timestamp API (14 functions); sleep API with WFE/alarm-pool requirement + `best_effort_wfe_or_timeout()`; busy_wait variants; default pool config macros (`PICO_TIME_DEFAULT_ALARM_POOL_DISABLED`, `_HARDWARE_ALARM_NUM=3`, `_MAX_TIMERS=16`); `alarm_callback_t` return-value semantics (<0=reschedule from prev target, >0=reschedule from now, 0=cancel); `alarm_id_t` note; full pool management (create/destroy/query); `alarm_pool_add_alarm_at_force_in_context()`; default-pool convenience wrappers; repeating_timer API with delay sign convention (+ve=gap, -ve=fixed-rate)
+- `wiki/sources/pico-c-sdk.md`: S14 row → `[x] ingested — S14`
+- `wiki/inbox/pico-c-sdk-ingest-plan.md`: all 14 sessions `[x]` — **plan file deleted**
+
+## [2026-04-17] ingest | pico-c-sdk S13 | §5.2.7 pico_multicore + §5.2.12 pico_sync (PDF pp.397–412)
+
+- `wiki/concepts/dual-core-sio.md`: corrected core-launch section (removed non-existent `_with_config`, added `multicore_launch_core1_with_stack` + `multicore_launch_core1_raw` with full signatures); expanded FIFO section (RP2350 depth=4 vs RP2040 depth=8, SDK "precious resource" caution, full 11-function FIFO table incl. `rvalid/wready/clear_irq/get_status`, `SIO_FIFO_IRQ_NUM(core)` macro); added **Doorbell API** section (RP2350-only, 9 functions + `DOORBELL_IRQ_NUM` macro); added **Lockout API** section (7 functions); expanded pico_sync into full reference: `critical_section` (5 functions incl. `_with_lock_num`, `_deinit`, `_is_initialized`), `lock_core` internal model, `mutex` full API (12 functions + `auto_init_mutex`), `recursive_mutex` full API (8 functions + `auto_init_recursive_mutex`), `semaphore` full API (9 functions); updated RIA connections table (`SIO_FIFO_IRQ_NUM` replaces old RP2040-specific IRQ names)
+- `wiki/sources/pico-c-sdk.md`: S13 row → `[x] ingested — S13`
+- `wiki/inbox/pico-c-sdk-ingest-plan.md`: S13 checkbox → `[x]` (S14 still `[ ]`)
+
+## [2026-04-17] ingest | pico-c-sdk S12 | §5.1.29 hardware_timer + §5.1.30 hardware_uart (PDF pp.349–397)
+
+- `wiki/concepts/rp2040-clocks.md`: expanded Timer section — RP2350 two-timer architecture (TIMER0/TIMER1), updated timebase notes, full `hardware_alarm_callback_t` typedef, expanded default-timer wrappers table (5 new functions: `hardware_alarm_claim_unused`, `hardware_alarm_unclaim`, `hardware_alarm_is_claimed`, `hardware_alarm_force_irq`, `hardware_alarm_get_irq_num`), compile-time macros table (`TIMER_ALARM_IRQ_NUM`, `TIMER_ALARM_NUM_FROM_IRQ`, `TIMER_NUM_FROM_IRQ`, `PICO_DEFAULT_TIMER`, `PICO_DEFAULT_TIMER_INSTANCE`), full RP2350 multi-instance `timer_*` API table (21 functions)
+- `wiki/concepts/rp2040-uart.md`: added `uart_deinit`, `uart_is_enabled`, `uart_get_index`, `uart_get_instance`, `uart_get_hw`, `uart_get_reset_num`, corrected `uart_set_irqs_enabled` (was `uart_set_irq_enables`), corrected `uart_get_dreq_num` (was `uart_get_dreq`); added compile-time macros table (7 macros: `UART_NUM`, `UART_INSTANCE`, `UART_DREQ_NUM`, `UART_CLOCK_NUM`, `UART_FUNCSEL_NUM`, `UART_IRQ_NUM`, `UART_RESET_NUM`); added `uart_init` GPIO setup pattern; added pause-duration warnings for format/baud/FIFO changes; updated sources to include `pico-c-sdk`
+- `wiki/sources/pico-c-sdk.md`: S12 row → `[x] ingested — S12`
+- `wiki/inbox/pico-c-sdk-ingest-plan.md`: S12 checkbox → `[x]`
+
+## [2026-04-17] ingest | pico-c-sdk S11 | §5.1.25 hardware_spi + §5.1.27 hardware_sync (PDF pp.329–349)
+
+- `wiki/concepts/rp2040-spi.md`: added `spi_deinit`, `spi_get_baudrate`, `spi_get_index` to SDK table; added DMA compile-time macros table (`SPI_DREQ_NUM`, `SPI_NUM`, `SPI_INSTANCE`); updated sources to include `pico-c-sdk`
+- `wiki/concepts/dual-core-sio.md`: expanded hardware spinlocks section — spinlock number assignment table (0-13/14-15/16-23/24-31 ranges), RP2350-E2 erratum note, full `hardware_sync` spinlock SDK API table (14 functions); added memory barrier section (`__dmb`/`__dsb`/`__isb`/`__mem_fence_acquire`/`__mem_fence_release`); added processor events section (`__sev`/`__wfe`/`__wfi`/`__nop`); added interrupt control section (`save_and_disable_interrupts`/`restore_interrupts`/`restore_interrupts_from_disabled`)
+- `wiki/sources/pico-c-sdk.md`: S11 row → `[x] ingested — S11`
+- `wiki/inbox/pico-c-sdk-ingest-plan.md`: S11 checkbox → `[x]`
+
+## [2026-04-17] ingest | pico-c-sdk S10 | §5.1.16 hardware_pio end + §5.1.17 hardware_pll (PDF pp.254–264)
+
+- `wiki/concepts/pio-architecture.md`: expanded `pio_encode_*` section — composition helpers (`pio_encode_delay`/`sideset`/`sideset_opt` return ORable bits, not instructions), complete JMP variant table (8 variants), `wait_pin` vs `wait_gpio` addressing distinction, `pio_src_dest` enum reference table
+- `wiki/concepts/rp2040-clocks.md`: added `hardware_pll` SDK functions section — `pll_init`, `pll_deinit`, `PLL_RESET_NUM` macro, `pll_sys`/`pll_usb` handles; caution re `pll_deinit` not checking if PLL is in use
+- `wiki/sources/pico-c-sdk.md`: S10 row → `[x] ingested — S10`
+- `wiki/inbox/pico-c-sdk-ingest-plan.md`: S10 checkbox → `[x]`
+
+## [2026-04-17] ingest | pico-c-sdk S9 | §5.1.16 hardware_pio pt.2 (PDF pp.236–254)
+
+Updated `wiki/concepts/pio-architecture.md`. No new pages created.
+
+**New content:**
+1. **Multi-SM synchronization** — `pio_enable_sm_mask_in_sync` (atomic enable + clock-divider restart); `pio_clkdiv_restart_sm_mask`; `pio_restart_sm_mask`; `pio_set_sm_mask_enabled`; `pio_claim_sm_mask`. Note: disabling a SM does not halt its clock divider — use clkdiv_restart on re-enable if timing precision matters.
+2. **`pio_sm_drain_tx_fifo`** — empties TX FIFO via `pull` instructions (disturbs OSR); contrast with `pio_sm_clear_fifos` (discards FIFO without touching SM registers).
+3. **Sticky output** (`sm_config_set_out_special`) — re-asserts last OUT/SET value on idle cycles; auxiliary enable pin option.
+4. **IN pin masking** (`sm_config_set_in_pin_count`) — RP2350 feature to mask unused IN pins to zero; RP2040 always reads 32 bits.
+5. **Default SM config table** — all `pio_get_default_sm_config` defaults documented; warning about `wrap=31` default.
+6. **RP2350B GPIO base** — `pio_set_gpio_base(pio, 0|16)` for 48-pin RP2350B; 64-bit pin variants (`pio_sm_set_pindirs_with_mask64`, etc.).
+
+## [2026-04-17] ingest | pico-c-sdk S8 | §5.1.15 hardware_irq + §5.1.16 hardware_pio pt.1 (PDF pp.216–236)
+
+Created `wiki/concepts/hardware-irq.md` (new page). Updated `wiki/concepts/pio-architecture.md`.
+
+**New content:**
+1. **hardware-irq.md (new)** — NVIC per-core architecture; IRQ number tables for RP2040 (0–25) and RP2350 (0–51); three handler installation patterns (`irq_set_exclusive_handler`, `irq_add_shared_handler`, static symbol); full API function table; priority model (0–255 inverted, default 0x80; RP2040 top 2 bits, RP2350 top 4 bits); shared `order_priority` (higher = called first, opposite of IRQ priority); vector table dual-core caveat; user IRQs (`irq_set_pending`, core-local, claim/unclaim); `irq_clear` hardware-IRQ limitation.
+2. **pio-architecture.md** — added `pio_interrupt_source` enum table (pis_interrupt0-3, pis_smN_tx_fifo_not_full, pis_smN_rx_fifo_not_empty); `pio_set_irqn_source_enabled` generic variant; `pio_mov_status_type` enum (STATUS_TX_LESSTHAN, STATUS_RX_LESSTHAN); compile-time macros section (PIO_NUM, PIO_INSTANCE, PIO_FUNCSEL_NUM, PIO_DREQ_NUM, PIO_IRQ_NUM); added [[hardware-irq]] to related pages.
+
+## [2026-04-17] ingest | pico-c-sdk S7 | §5.1.11 hardware_gpio pt.2 (PDF pp.170–186)
+
+Updated `wiki/concepts/gpio-pinout.md` with SDK-authoritative content. No new pages created.
+
+**New content / corrections to gpio-pinout.md:**
+1. **`gpio_put_masked()` correction** — wiki incorrectly stated "not atomic". SDK confirms it uses hardware TOGL alias and IS concurrency-safe with IRQ on the same core; only unsafe for two-core simultaneous access.
+2. **Speed benchmark table corrected** — `gpio_put_masked` entry updated to reflect TOGL alias behavior.
+3. **`gpio_set_irq_enabled_with_callback` decomposition** — SDK explicit equivalence: `gpio_set_irq_enabled` + `gpio_set_irq_callback` + `irq_set_enabled(IO_IRQ_BANK0, true)`.
+4. **Pull-state query functions** — added `gpio_is_pulled_up()`, `gpio_is_pulled_down()`, `gpio_disable_pulls()`, `gpio_pull_up()`, `gpio_pull_down()`, `gpio_set_pulls()` to basic API section.
+5. **PAD config functions** — consolidated `gpio_set_drive_strength`, `gpio_get_drive_strength`, `gpio_set_slew_rate`, `gpio_get_slew_rate`, `gpio_set_input_hysteresis_enabled`, `gpio_is_input_hysteresis_enabled` into basic API section.
+6. **Hysteresis note** — disabling Schmitt trigger slightly reduces input delay but risks inconsistent readings for slow-rising signals.
+7. **`gpio_remove_raw_irq_handler_masked` same-mask requirement** — must use same `gpio_mask` as when adding the handler.
+8. **`gpio_set_irqover`** — added to GPIO overrides section (can invert/force IRQ signal).
+9. **`gpio_is_dir_out`** — clarified description in basic API.
+
+## [2026-04-17] ingest | pico-c-sdk S6 | §5.1.11 hardware_gpio pt.1 (PDF pp.155–170)
+
+Updated `wiki/concepts/gpio-pinout.md` with SDK-authoritative content. No new pages created; existing page substantially expanded.
+
+**New content added to gpio-pinout.md:**
+1. **RP2350 package variants** — QFN-60 (RP2350A, 30 GPIO, ADC26–29) vs QFN-80 (RP2350B, 48 GPIO GPIO0–47, ADC40–47); updated GPIO structure table.
+2. **RP2350 function select enum** — `GPIO_FUNC_HSTX=0` (GPIO12–19), `GPIO_FUNC_PIO2=8`, `GPIO_FUNC_XIP_CS1=9`, `GPIO_FUNC_CORESIGHT_TRACE=9`, `GPIO_FUNC_UART_AUX=11`; expanded function select table with RP2040/RP2350 columns.
+3. **HSTX on GPIO12–19** — High-Speed Serial Transmit function (display interfaces); RP2350 only.
+4. **64-bit API variants** — `gpio_get_all64()`, `gpio_set_mask64()`, `gpio_clr_mask64()`, `gpio_xor_mask64()`, `gpio_put_masked64()`, `gpio_put_all64()`, plus direction variants `64`; for RP2350 QFN-80.
+5. **Bank-n API variants** — `gpio_set_mask_n(n, mask)`, `gpio_clr_mask_n()`, `gpio_xor_mask_n()`, `gpio_put_masked_n()`; operate on 32-bit GPIO bank indexed by n.
+6. **`gpio_set_function_masked()`/`gpio_set_function_masked64()`** — set function for multiple pins at once.
+7. **`gpio_deinit()`** — reset to NULL function (disables pin to high-Z).
+8. **`gpio_get_out_level()`** — returns current driven output state (vs `gpio_get()` which reads input).
+9. **`gpio_set_dormant_irq_enabled()`** — enable dormant mode wake-up interrupt.
+10. **`gpio_set_irq_callback()`** — set per-core callback without affecting enable state (separates from `gpio_set_irq_enabled_with_callback()`).
+11. **Order-priority raw handler variants** — `gpio_add_raw_irq_handler_with_order_priority[_masked][64]()`.
+12. **`gpio_remove_raw_irq_handler*()` variants** — clean up raw handler registrations.
+13. **IRQ latch behavior** — level events not latched; edge events stored in INTR register, must be cleared.
+
+## [2026-04-17] ingest | pico-c-sdk S5 | §5.1.8 hardware_dma (PDF pp.122–147)
+
+Updated `wiki/concepts/dma-controller.md` with SDK-authoritative content. No new pages created; existing page substantially expanded.
+
+**New content added to dma-controller.md:**
+1. **RP2350 DREQ table** — 55 sources vs RP2040's 40; PIO2 adds DREQ 16–23 (shifts all RP2040 non-PIO DREQs up by 8); new entries: HSTX (52), CORESIGHT (53), SHA256 (54); XIP_QMITX/QMIRX replace XIP_SSITX/SSIRX; RP2350 has 12 PWM slices (WRAP0–11) vs 8 on RP2040.
+2. **RP2350 encoded_transfer_count** — only 28-bit count on RP2350 (top 4 bits = options); use `dma_encode_transfer_count()`, `dma_encode_transfer_count_with_self_trigger()`, `dma_encode_endless_transfer_count()` for portability.
+3. **Self-triggering DMA (RP2350 only)** — `dma_encode_transfer_count_with_self_trigger()`: channel automatically re-triggers itself on completion.
+4. **Endless DMA (RP2350 only)** — `dma_encode_endless_transfer_count()`: continuous non-terminating transfer; not supported on RP2040.
+5. **Errata IDs** — RP2040-E13 (abort spurious IRQ) and RP2350-E5 (must clear enable bit of aborted+chained channels before abort) documented with names.
+6. **New functions** — `dma_channel_cleanup()`, `dma_channel_wait_for_finish_blocking()`, `dma_channel_is_busy()`, `dma_unclaim_mask()`, `dma_channel_set_config()`, `dma_sniffer_get/set_data_accumulator()`, `dma_sniffer_set_output_invert/reverse_enabled()`, `dma_timer_claim/unclaim/is_claimed()`, `dma_get_irq_num()`, `dma_irqn_set_channel_mask_enabled()`, `dma_set_irq0/1_channel_mask_enabled()`, `channel_config_set_read/write_address_update_type()`, `channel_config_get_ctrl_value()`, `dma_get_channel_config()`.
+7. **chain_to = self to disable**, **high-priority scheduling detail** (all high-prio run before one low-prio per round; bus priority unchanged), **bswap note** (no effect on bytes; swaps bytes within halfwords/words; bswap + sniffer byte swap cancel for sniffer).
+8. **Updated frontmatter** — added `[[pico-c-sdk]]` to sources; added `rp2350`, `pio2`, `errata` to tags.
+
+---
+
+## [2026-04-17] ingest | pico-c-sdk S4 | §5.1.5 hardware_clocks (PDF pp.95–112)
+
+Updated `wiki/concepts/rp2040-clocks.md` with SDK-authoritative content. No new pages created; existing page substantially expanded.
+
+**New content added to rp2040-clocks.md:**
+1. **LPOSC source (RP2350 only)** — Low Power Oscillator ~32 kHz; can feed clk_ref on RP2350. Added to sources table.
+2. **PLL parameter model** — VCO freq, post_div1, post_div2 explained; formula `output = vco_freq / (post_div1 × post_div2)`; example: 256 MHz = 1536 MHz VCO / (3 × 2).
+3. **RP2350 clock domain differences** — `clk_rtc` removed; `clk_hstx` added; LPOSC available for clk_ref; divisor range 1.0→65536.0 in 1/65536 steps (vs RP2040: 1/256 steps, max 16777216).
+4. **GPOUT GPIO differences** — RP2350 adds GPIO 13 (GPOUT0) and GPIO 15 (GPOUT1); RP2040 only had 21/23/24/25.
+5. **New SDK functions** — `clock_configure_undivided()`, `clock_configure_int_divider()`, `clock_gpio_init_int_frac16()`, `clock_gpio_init_int_frac8()`, `set_sys_clock_48mhz()`, `set_sys_clock_pll()`, `set_sys_clock_hz()`, `set_sys_clock_khz()`, `check_sys_clock_hz()`, `check_sys_clock_khz()`, `clocks_enable_resus()`, `gpio_to_gpout_clock_handle()`.
+6. **Resus feature** — `clocks_enable_resus(callback)` auto-restarts clk_sys from clk_ref when it stalls; invokes user callback; safety net for PLL experiments.
+7. **Sources frontmatter** — added `[[pico-c-sdk]]` to sources; added `lposc`, `hstx` to tags.
+
+---
+
+## [2026-04-17] ingest | pico-c-sdk S3 | Ch.3 §§3.3–3.4 PIOASM + PIO ISA (PDF pp.54–78)
+
+Created `wiki/concepts/pioasm.md` (new page). Updated `wiki/concepts/pio-architecture.md` with v1 ISA additions.
+
+**pioasm.md** covers §3.3 in full:
+1. **Tool overview** — output formats (c-sdk/python/hex), `-v` version flag, CMake `pico_generate_pio_header` integration.
+2. **Directives** — complete table: `.program`, `.pio_version`, `.origin`, `.side_set`, `.wrap`/`.wrap_target`, `.define PUBLIC`, `.clock_div`, `.fifo`, `.mov_status`, `.in`/`.out`/`.set`, `.lang_opt`, `.word`.
+3. **`.fifo` extended modes (v1 only)** — `txput`/`txget`/`putget` repurpose RX FIFO as random-access status registers; both SM and Cortex can read/write independently.
+4. **Values and expressions** — integer/hex/binary/symbol/label; full arithmetic + bit-reverse `::` operator.
+5. **`nop` pseudoinstruction** — expands to `mov y, y`.
+6. **Output pass-through** — `% c-sdk { ... %}` embeds C init code directly in generated header; makes `.pio` files fully self-contained.
+7. **Generated header structure** — instruction array, `pio_program` struct, `get_default_config()` factory, pass-through functions.
+8. **v0/v1 opcode table** — all 8 opcodes with 3-bit encoding and v1 additions column.
+
+**pio-architecture.md** additions from §3.4:
+- PULL noblock → copies X to OSR (default value pattern for continuous-clock protocols like I2S).
+- STATUS source in MOV → controlled by `EXECCTRL_STATUS_SEL`; all-ones/zeros based on TX/RX FIFO fullness.
+- Delay timing rule: delay cycles on stalling instructions don't start until the wait condition clears.
+- v1 ISA additions section: MOV PINDIRS destination; `MOV rxfifo[y/idx], isr`; `MOV osr, rxfifo[y/idx]`; WAIT JMPPIN; IRQ PREV/NEXT; all 8 IRQ flags assertable on v1.
+- Cross-reference link to `[[pioasm]]` added to ISA section and related pages.
+
+---
+
+
+
+Updated `wiki/concepts/pio-architecture.md` — added six new SDK subsections under "SDK Programming Patterns":
+
+1. **FIFO joining** — `sm_config_set_fifo_join()` with `PIO_FIFO_JOIN_TX` / `_RX` / `_NONE`; when to use each; doubled-depth latency benefit.
+2. **State machine cleanup and restart** — `pio_sm_set_enabled`, `pio_sm_clear_fifos`, `pio_sm_restart`; importance of clearing ISR shift counter.
+3. **Dynamic program generation** — `pio_encode_*` helpers (all opcodes covered); `struct pio_program` with `origin = -1`; equivalent to pioasm output.
+4. **SM EXEC — one-shot instruction injection** — `pio_sm_exec`; stall-and-latch behaviour for trigger-armed captures; `out exec` and `mov exec` paths.
+5. **DMA integration with PIO** — full RX drain pattern with DREQ (`pio_get_dreq`), `dma_channel_configure`, `dma_channel_wait_for_finish_blocking`; TX feed inversion; bus priority register for high-bandwidth use.
+6. **Program claiming helpers** — `pio_claim_free_sm_and_add_program_for_gpio_range`; `pio_remove_program_and_unclaim_sm`; necessity of `_for_gpio_range` on RP2350.
+
+Also updated `pico-c-sdk.md` Scope table (S2 → `[x]`), `pico-c-sdk-ingest-plan.md` (S2 → `[x]`), frontmatter `sources:` and `related:` in `pio-architecture.md`.
+
+Key findings: §3.1 confirms PIO was designed precisely for the sub-1/1000-of-clock-speed I/O problem the RIA faces with the 65C02 bus. The DMA-DREQ pattern (§3.2.3 logic analyser) is the exact mechanism used in the RIA for zero-CPU-overhead bus data capture. `pio_sm_exec` + `pio_encode_wait_gpio` is the authoritative way to arm a PIO SM on a hardware trigger without pre-flooding the FIFO.
+
+
 
 Created `wiki/sources/pico-c-sdk.md` (source summary with full 14-session scope table). Created `wiki/concepts/sdk-architecture.md` covering: CMake INTERFACE library model, library naming tiers (`hardware_` vs `pico_`), hardware structs and atomic register aliases, hardware claiming, builder pattern for peripheral config, function naming conventions, error handling, directory/platform split (RP2040 vs RP2350), multi-core model, runtime, floating point, and board customisation. Updated `rp6502-ria.md` and `rp6502-vga.md` to reference `pico-c-sdk` and `sdk-architecture`. Updated `index.md`, `overview.md`.
 

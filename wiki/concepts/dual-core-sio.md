@@ -2,9 +2,9 @@
 type: concept
 tags: [rp6502, ria, rp2040, rp2350, multicore, sio, firmware]
 related: [[rp6502-ria]], [[pio-architecture]], [[reset-model]], [[xram]]
-sources: [[quadros-rp2040]], [[rp6502-github-repo]], [[fairhead-pico-c]]
+sources: [[quadros-rp2040]], [[rp6502-github-repo]], [[fairhead-pico-c]], [[pico-c-sdk]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-17
 ---
 
 # Dual-Core and SIO
@@ -32,7 +32,16 @@ multicore_reset_core1();              // reset before launch (good practice)
 multicore_launch_core1(entry_fn);     // wake core 1 and run entry_fn(void) on it
 ```
 
-Core 1 starts with the same interrupt vector table and stack base as core 0 (overridable via `multicore_launch_core1_with_config()`).
+Core 1 starts with the same interrupt vector table and stack base as core 0 (overridable via `multicore_launch_core1_with_stack()`).
+
+All launch variants require core 1 to be reset first via `multicore_reset_core1()`:
+
+| Function | Description |
+|---|---|
+| `multicore_reset_core1()` | Reset core 1 into its initial state (ready for re-launch); call only from core 0 |
+| `multicore_launch_core1(entry)` | Wake core 1, run `entry(void)` using default core 1 stack (below core 0 stack) |
+| `multicore_launch_core1_with_stack(entry, stack_bottom, stack_size_bytes)` | Wake core 1 with a caller-supplied stack; `stack_size_bytes` must be a multiple of 4 |
+| `multicore_launch_core1_raw(entry, sp, vector_table)` | Low-level launch with explicit stack pointer and vector table; no stack guard even if `USE_STACK_GUARDS` is defined |
 
 ---
 
@@ -43,7 +52,7 @@ The SIO lives at `0xD0000000` (the IOPORT address). Both cores have single-cycle
 | Component | Per-core? | Purpose |
 |---|---|---|
 | **CPUID** | Yes (0/1) | Identifies which core is executing |
-| **Inter-processor FIFOs** | Shared | 2 × 8-word queues for core-to-core messaging |
+| **Inter-processor FIFOs** | Shared | 2 × 8-word queues (RP2040) / 2 × 4-word queues (RP2350) for core-to-core messaging |
 | **Hardware spinlocks ×32** | Shared | Atomic test-and-set flags for short critical sections |
 | **Integer divider** | Yes | Hardware 32-bit divide per core |
 | **Interpolators 0/1** | Yes | Linear interpolation hardware (graphics/DSP use) |
@@ -55,27 +64,80 @@ The SIO lives at `0xD0000000` (the IOPORT address). Both cores have single-cycle
 
 ### Inter-processor FIFOs
 
-Two independent 8-word (8 × 32-bit) FIFOs in opposite directions:
+Two independent FIFOs in opposite directions:
 - **FIFO 0→1**: core 0 writes, core 1 reads.
 - **FIFO 1→0**: core 1 writes, core 0 reads.
 
-Data availability triggers an interrupt on the *reading* core:
-- `SIO_IRQ_PROC0` (IRQ 15) — fires on core 0 when FIFO 1→0 has data
-- `SIO_IRQ_PROC1` (IRQ 16) — fires on core 1 when FIFO 0→1 has data
+Depth: **8 entries (32-bit) on RP2040; 4 entries on RP2350.**
+
+Data availability triggers an interrupt on the *reading* core. The IRQ number depends on platform:
+
+```c
+// RP2040: SIO_IRQ_PROC0 (fires on core 0), SIO_IRQ_PROC1 (fires on core 1)
+// RP2350: both cores share SIO_IRQ_PROC but with different SIO outputs routed per core
+// Portable:
+irq_num_t irq = SIO_FIFO_IRQ_NUM(get_core_num());
+```
 
 This enables zero-polling communication: the sending core pushes a word; the receiving core wakes via interrupt and processes it. See [[pio-architecture]] for how PIO IRQ flags combine with this mechanism in the RIA, and [[quadros-rp2040]] for the full NVIC IRQ table.
 
-SDK functions (`pico_multicore`):
+> **SDK caution**: The inter-core FIFOs are a *precious resource* — the SDK uses them during core 1 launch and for lockout functions; FreeRTOS SMP also requires exclusive FIFO access. Prefer passing data via a shared queue unless you have specific reasons to use the FIFOs directly.
+
+**FIFO SDK functions (`pico_multicore`/fifo):**
 
 | Function | Description |
 |---|---|
-| `multicore_reset_core1()` | Reset core 1 (required before re-launch) |
-| `multicore_launch_core1(entry)` | Wake core 1 and run `entry(void)` |
-| `multicore_fifo_drain()` | Discard all data in read FIFO |
-| `multicore_fifo_pop_blocking()` | Block until data available; return it |
-| `multicore_fifo_pop_timeout_us(us, *out)` | Block up to `us` µs; true if data read |
 | `multicore_fifo_push_blocking(data)` | Block until space; push `data` |
+| `multicore_fifo_push_blocking_inline(data)` | Inline variant of above |
 | `multicore_fifo_push_timeout_us(data, us)` | Block up to `us` µs; true if pushed |
+| `multicore_fifo_pop_blocking()` | Block until data available; return it |
+| `multicore_fifo_pop_blocking_inline()` | Inline variant of above |
+| `multicore_fifo_pop_timeout_us(us, *out)` | Block up to `us` µs; true if data read |
+| `multicore_fifo_rvalid()` | True if read FIFO has data available |
+| `multicore_fifo_wready()` | True if write FIFO has space |
+| `multicore_fifo_drain()` | Discard all data in read FIFO |
+| `multicore_fifo_clear_irq()` | Clear ROE/WOF sticky interrupt flags (not VLD) |
+| `multicore_fifo_get_status()` | Return status bitfield: bit0=RX not empty, bit1=TX not full, bit2=WOF sticky, bit3=ROE sticky |
+
+### Doorbell interrupts (RP2350 only)
+
+RP2350 adds a **doorbell** mechanism: named interrupt signals a core can raise on itself or the other core, without using the FIFOs. Each doorbell is just an IRQ trigger; no data is transferred.
+
+| Function | Description |
+|---|---|
+| `multicore_doorbell_claim(num, core_mask)` | Cooperatively claim a doorbell number; panics if already claimed |
+| `multicore_doorbell_claim_unused(core_mask, required)` | Claim an unused doorbell; returns -1 (or panics if `required`) if none free |
+| `multicore_doorbell_unclaim(num, core_mask)` | Release claim on a doorbell |
+| `multicore_doorbell_set_other_core(num)` | Activate doorbell IRQ on the *other* core |
+| `multicore_doorbell_clear_other_core(num)` | Deactivate doorbell on the other core |
+| `multicore_doorbell_set_current_core(num)` | Activate doorbell IRQ on *this* core |
+| `multicore_doorbell_clear_current_core(num)` | Deactivate doorbell on this core |
+| `multicore_doorbell_is_set_current_core(num)` | Check if doorbell is active on this core |
+| `multicore_doorbell_is_set_other_core(num)` | Check if doorbell is active on the other core |
+
+`DOORBELL_IRQ_NUM(doorbell_num)` — compile-time macro returning the `irq_num_t` for the doorbell's processor interrupt.
+
+`core_mask` values: `0b01` = core 0 only, `0b10` = core 1 only, `0b11` = both cores.
+
+### Lockout (pause the other core)
+
+The lockout mechanism enables one core to force the other into a **known paused state** (tight RAM loop, interrupts disabled). Primary use case: writing to flash when no flash code may execute.
+
+> **Important**: Lockout uses the inter-core FIFOs. The FIFOs cannot be used for any other purpose while lockout is active.
+
+Setup: the *victim* core calls `multicore_lockout_victim_init()` to hook the FIFO IRQ. Either or both cores can do this.
+
+| Function | Description |
+|---|---|
+| `multicore_lockout_victim_init()` | Hook the FIFO IRQ so this core can be locked out; FIFO unavailable for other use after this |
+| `multicore_lockout_victim_deinit()` | Unhook FIFO IRQ; FIFO usable again for other purposes |
+| `multicore_lockout_victim_is_initialized(core_num)` | Query whether `victim_init` was called on a given core (state persists across core reset — always reinit after reset) |
+| `multicore_lockout_start_blocking()` | Interrupt the other core and wait until it is paused |
+| `multicore_lockout_start_timeout_us(us)` | Same but with timeout; returns false if other core did not pause in time |
+| `multicore_lockout_end_blocking()` | Release the other core from lockout |
+| `multicore_lockout_end_timeout_us(us)` | Release with timeout; returns false if the lockout mutex could not be acquired |
+
+Note: `lockout_start_*` functions are not nestable; must be paired with a corresponding `lockout_end_*`.
 
 ### Hardware spinlocks
 
@@ -84,6 +146,46 @@ SDK functions (`pico_multicore`):
 2. **Release**: write any value to the same address.
 
 Spinlocks are designed for very short critical sections — a few cycles. For anything longer, prefer `pico_sync` mutexes.
+
+**Spinlock number assignments** (SDK defaults):
+
+| Range | Constants | Ownership |
+|---|---|---|
+| 0–13 | `PICO_SPINLOCK_ID_*` (various) | Reserved for exclusive SDK/library use — do not claim directly |
+| 14–15 | `PICO_SPINLOCK_ID_OS1`, `PICO_SPINLOCK_ID_OS2` | Reserved for OS-level software co-existing with the SDK |
+| 16–23 | `PICO_SPINLOCK_ID_STRIPED_FIRST`–`PICO_SPINLOCK_ID_STRIPED_LAST` | Shared striped pool — allocated round-robin via `next_striped_spin_lock_num()` |
+| 24–31 | `PICO_SPINLOCK_ID_CLAIM_FREE_FIRST`–`PICO_SPINLOCK_ID_CLAIM_FREE_LAST` | Exclusive-use pool — allocated first-come via `spin_lock_claim_unused()` |
+
+> **RP2350-E2 erratum**: On RP2350 A2 silicon, writes to SIO registers at offset `+0x180` and above alias the spinlock registers, causing spurious lock releases. The SDK works around this by using atomic memory accesses for all `hardware_sync` spin lock operations by default.
+
+**`hardware_sync` SDK API:**
+
+| Function | Description |
+|---|---|
+| `spin_lock_init(lock_num)` | Initialise a spin lock; returns its instance pointer |
+| `spin_lock_instance(lock_num)` | Get `spin_lock_t *` from lock number |
+| `spin_lock_get_num(lock)` | Get lock number from `spin_lock_t *` |
+| `spin_lock_blocking(lock)` | Acquire safely — disables IRQs; returns saved IRQ state for unlock |
+| `spin_unlock(lock, saved_irq)` | Release safely — restores IRQ state |
+| `spin_lock_unsafe_blocking(lock)` | Acquire without disabling IRQs (caller must ensure IRQ safety) |
+| `spin_unlock_unsafe(lock)` | Release without re-enabling IRQs |
+| `is_spin_locked(lock)` | Non-blocking check: true if currently acquired elsewhere |
+| `spin_lock_claim(lock_num)` | Mark a lock as used; panics if already claimed |
+| `spin_lock_claim_mask(mask)` | Mark multiple locks as used via bitmask |
+| `spin_lock_unclaim(lock_num)` | Mark a lock as no longer used |
+| `spin_lock_claim_unused(required)` | Allocate a free lock; panics if `required` and none free |
+| `spin_lock_is_claimed(lock_num)` | Query whether a lock is claimed |
+| `next_striped_spin_lock_num()` | Return next number from the striped range (16–23), round-robin |
+| `spin_locks_reset()` | Release ALL spin locks (use only during reset/restart) |
+
+Typical safe usage pattern:
+```c
+spin_lock_t *lock = spin_lock_init(spin_lock_claim_unused(true));
+
+uint32_t save = spin_lock_blocking(lock);   // acquire + save IRQ state
+// ... critical section ...
+spin_unlock(lock, save);                     // release + restore IRQ state
+```
 
 ### SIO GPIO registers and speed
 
@@ -168,35 +270,140 @@ hw_set_bits(en_reg, events_mask << (4 * (n % 8)));
 
 Each core has its own `proc0_irq_ctrl` / `proc1_irq_ctrl` — interrupts must be enabled on the core that will handle them.
 
+### Memory barriers (`hardware_sync`)
+
+ARM memory barrier instructions exposed as C inlines. Critical when ordering access to memory-mapped hardware registers or shared variables across cores.
+
+| Function | ARM instruction | Effect |
+|---|---|---|
+| `__dmb()` | `DMB` | Data memory barrier — all prior memory accesses globally visible before any after |
+| `__dsb()` | `DSB` | Data sync barrier — all prior explicit memory accesses **complete** before continuing |
+| `__isb()` | `ISB` | Instruction sync barrier — flushes pipeline; instructions after ISB re-fetched from memory |
+| `__mem_fence_acquire()` | `DMB` | Acquire fence — prevents later loads from appearing before this point |
+| `__mem_fence_release()` | `DMB` | Release fence — prevents earlier stores from appearing after this point |
+
+Use `__mem_fence_acquire()` / `__mem_fence_release()` as the preferred portable pair for cross-core data sharing (e.g. producer/consumer with a shared flag). Use `__dmb()`/`__dsb()` when directly manipulating hardware registers where ordering guarantees are needed.
+
+### Processor event instructions (`hardware_sync`)
+
+| Function | ARM instruction | Effect |
+|---|---|---|
+| `__sev()` | `SEV` | Send event — wakes both cores from WFE |
+| `__wfe()` | `WFE` | Wait for event — idles the core until an event (SEV, interrupt, etc.) arrives |
+| `__wfi()` | `WFI` | Wait for interrupt — idles the core until an interrupt fires |
+| `__nop()` | `NOP` | No-op — one idle cycle; on RP2350 Arm binaries forced to 32-bit to avoid dual-issue |
+
+`__wfe()` / `__sev()` together form an efficient cross-core notification primitive:
+```c
+// Core 1 — signal that data is ready
+data_ready = true;
+__sev();
+
+// Core 0 — sleep until woken (does not spin)
+while (!data_ready) __wfe();
+```
+
+### Interrupt control (`hardware_sync`)
+
+| Function | Description |
+|---|---|
+| `save_and_disable_interrupts()` | Disables IRQs on calling core; returns prior PRIMASK for later restore |
+| `restore_interrupts(status)` | Restores IRQ state to `status` returned by `save_and_disable_interrupts()` |
+| `restore_interrupts_from_disabled(status)` | As above, but only valid when current state is **already disabled** (more efficient) |
+| `disable_interrupts()` | Unconditionally disable IRQs (no state returned) |
+| `enable_interrupts()` | Unconditionally enable IRQs |
+
+`save_and_disable_interrupts()` + `restore_interrupts_from_disabled()` is the canonical pattern for short atomic sections in both task and IRQ context:
+```c
+uint32_t save = save_and_disable_interrupts();
+// ... atomic region ...
+restore_interrupts_from_disabled(save);
+```
+
 ---
 
-## pico_sync — higher-level synchronization
+## pico_sync — Higher-level synchronization primitives
 
-Built on top of spinlocks and interrupt masking:
+Built on top of spinlocks and interrupt masking. Choose by context:
 
 | Primitive | When to use |
 |---|---|
-| `critical_section` | Interrupt-level mutual exclusion; disables interrupts on this core while held. Keep sections very short. |
-| `mutex` / `recursive_mutex` | Task-level mutual exclusion for data structures. Blocks (spin-waits) if held by other core. |
-| `semaphore` | Counting resource guard. Acquire in normal code; release can come from interrupt handlers. |
+| `critical_section` | Interrupt-level mutual exclusion; disables interrupts on this core while held. Keep sections **very short**. |
+| `mutex` | Task-level mutual exclusion for data structures. Not re-entrant. Do not call blocking mutex functions from IRQ handlers. |
+| `recursive_mutex` | As mutex, but the same owner may acquire it multiple times (re-entrant). Higher overhead. |
+| `semaphore` | Counting resource guard. Acquire in normal code; `sem_release()` is safe to call from IRQ handlers. |
 
-Key API:
+### lock_core (internal)
+
+All `pico_sync` primitives (except `critical_section`) embed a `lock_core_t` member that holds a spin lock protecting the primitive's internal state. The spin lock is always released before returning from any API call — it is **not** held across a block/wait. The `lock_internal_spin_unlock_with_wait/notify` macros implement the atomic "unlock + wait" and "unlock + notify" patterns needed for correct cross-core blocking; they default to `spin_unlock + __wfe()` / `spin_unlock + __sev()` but can be overridden for RTOS integration.
+
+### critical_section API
+
 ```c
-// Critical section
-critical_section_init(&cs);
-critical_section_enter_blocking(&cs);  // spin-wait + disable local interrupts
-critical_section_exit(&cs);             // release + re-enable interrupts
-
-// Mutex
-mutex_init(&mtx);
-mutex_enter_blocking(&mtx);            // blocks until ownership acquired
-mutex_exit(&mtx);
-
-// Semaphore
-sem_init(&sem, initial_permits, max_permits);
-sem_acquire_blocking(&sem);            // decrement; blocks if count == 0
-sem_release(&sem);                     // increment
+critical_section_t cs;
+critical_section_init(&cs);                            // auto-assigns a spin lock number
+critical_section_init_with_lock_num(&cs, lock_num);   // explicit spin lock number (needed when nesting)
+critical_section_enter_blocking(&cs);                  // spin-wait for spin lock + disable local IRQs
+critical_section_exit(&cs);                            // release spin lock + re-enable IRQs
+critical_section_deinit(&cs);                          // free the associated spin lock (only for auto-init)
+bool ok = critical_section_is_initialized(&cs);
 ```
+
+> **Note**: `critical_section_init` uses a shared (striped) spin lock, so nested critical sections will deadlock. Use `critical_section_init_with_lock_num` with distinct lock numbers when nesting is required.
+
+### mutex API
+
+```c
+mutex_t mtx;
+mutex_init(&mtx);                                          // initialize
+mutex_enter_blocking(&mtx);                               // blocks until ownership acquired (not re-entrant)
+bool ok = mutex_try_enter(&mtx, &owner_out);              // non-blocking attempt; fills owner_out if already locked
+bool ok = mutex_try_enter_block_until(&mtx, until);       // non-blocking if caller owns it, else waits until absolute_time_t
+bool ok = mutex_enter_timeout_ms(&mtx, ms);               // block up to ms milliseconds
+bool ok = mutex_enter_timeout_us(&mtx, us);               // block up to us microseconds
+bool ok = mutex_enter_block_until(&mtx, until);           // block until absolute_time_t
+mutex_exit(&mtx);                                         // release ownership
+bool ok = mutex_is_initialized(&mtx);
+```
+
+**`auto_init_mutex(name)`** — places mutex in `.mutex_array` section; SDK runtime automatically calls `mutex_init()` before `main()`. Equivalent to a static mutex + manual init call.
+
+### recursive_mutex API
+
+All the same functions as mutex but prefixed `recursive_mutex_` and taking `recursive_mutex_t *`:
+
+```c
+recursive_mutex_t rmtx;
+recursive_mutex_init(&rmtx);
+recursive_mutex_enter_blocking(&rmtx);       // same owner can call multiple times without deadlock
+recursive_mutex_try_enter(&rmtx, &owner_out);
+recursive_mutex_enter_timeout_ms(&rmtx, ms);
+recursive_mutex_enter_timeout_us(&rmtx, us);
+recursive_mutex_enter_block_until(&rmtx, until);
+recursive_mutex_exit(&rmtx);                 // each exit decrements the re-entry count
+bool ok = recursive_mutex_is_initialized(&rmtx);
+```
+
+**`auto_init_recursive_mutex(name)`** — static definition with automatic initialization.
+
+> **Important**: A regular `mutex_t` will deadlock if the same core tries to acquire it twice. Use `recursive_mutex_t` whenever re-entrancy is possible (e.g., if a callback might call back into code that already holds the lock).
+
+### semaphore API
+
+```c
+semaphore_t sem;
+sem_init(&sem, initial_permits, max_permits);  // initial_permits: available count; max_permits: cap
+sem_acquire_blocking(&sem);                    // decrement count; blocks if count == 0
+bool ok = sem_try_acquire(&sem);               // non-blocking; returns false if count == 0
+bool ok = sem_acquire_timeout_ms(&sem, ms);    // block up to ms milliseconds
+bool ok = sem_acquire_timeout_us(&sem, us);    // block up to us microseconds
+bool ok = sem_acquire_block_until(&sem, until); // block until absolute_time_t
+bool released = sem_release(&sem);             // increment count (capped at max_permits); safe from IRQ
+sem_reset(&sem, permits);                      // reset count to specific value
+int count = sem_available(&sem);               // query current available count
+```
+
+> Calling `sem_release()` beyond `max_permits` is silently capped — the count will not exceed the configured maximum.
 
 ---
 
@@ -206,7 +413,7 @@ sem_release(&sem);                     // increment
 |---|---|
 | `multicore_launch_core1()` | Starts `api_task()` OS dispatcher on core 1 |
 | Inter-processor FIFOs | Primary signaling path between PIO bus capture (core 0) and OS dispatcher (core 1) |
-| `SIO_IRQ_PROC0` / `SIO_IRQ_PROC1` | Interrupt wakeup for FIFO-based cross-core signaling |
+| `SIO_FIFO_IRQ_NUM(core)` | Portable IRQ number for FIFO interrupt on given core (RP2040: distinct per core; RP2350: shared `SIO_IRQ_PROC`) |
 | Atomic GPIO SET/CLR/XOR | Race-free `RESB` / `IRQB` control from either core |
 | Hardware spinlocks | Short critical sections protecting shared OS call state |
 | CPUID | Entry functions can identify which core they are running on |

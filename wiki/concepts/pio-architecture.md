@@ -1,10 +1,11 @@
 ---
 type: concept
 tags: [rp6502, ria, vga, pio, rp2350, hardware, firmware]
-related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[gpio-pinout]], [[reset-model]]
-sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]]
+related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[gpio-pinout]], [[reset-model]], [[pioasm]], [[hardware-irq]]
+sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-17
+
 ---
 
 # PIO Architecture
@@ -111,16 +112,31 @@ All instructions are **16-bit**, execute in **1 cycle** + optional delay. Instru
 | Instruction | Notes |
 |---|---|
 | `JMP (cond) target` | Conditions: always, !X, X-- (decrement-and-test), !Y, Y--, X≠Y, PIN, !OSRE |
-| `WAIT pol gpio/pin/irq idx` | Stall until GPIO/PIN/IRQ matches polarity; for IRQ: `rel` makes index relative to SM number |
+| `WAIT pol gpio/pin/irq idx` | Stall until GPIO/PIN/IRQ matches polarity; for IRQ: `rel` makes index relative to SM number; v1 adds JMPPIN source and PREV/NEXT cross-PIO |
 | `IN source, bit_count` | Shift bits into ISR from PINS/X/Y/NULL/ISR/OSR; auto-push when threshold reached |
 | `OUT dest, bit_count` | Shift bits from OSR to PINS/X/Y/PINDIR/PC/ISR/EXEC; auto-pull when threshold reached |
 | `PUSH (iffull) (block)` | Push ISR to RX FIFO, clear ISR; IfFull: only if shift count reached threshold |
-| `PULL (ifempty) (block)` | Load TX FIFO into OSR; IfEmpty: only if shift count reached threshold |
-| `MOV dest, (op,) source` | Copy with None/Invert/Bit-reverse; `MOV EXEC` runs source as instruction |
-| `IRQ (set/wait/clear) num (rel)` | Set, set-and-wait, or clear IRQ flag; `rel` adds SM index for portable multi-SM code |
+| `PULL (ifempty) (block)` | Load TX FIFO into OSR; IfEmpty: only if shift count reached threshold; PULL noblock from empty FIFO copies X to OSR |
+| `MOV dest, (op,) source` | Copy with None/Invert/Bit-reverse; sources include STATUS (all-ones/zeros based on FIFO state); `MOV EXEC` runs source as instruction; v1 adds PINDIRS as destination |
+| `IRQ (set/wait/clear) num (rel)` | Set, set-and-wait, or clear IRQ flag; `rel` adds SM index for portable multi-SM code; v1 adds PREV/NEXT cross-PIO; v1 all 8 flags can assert system IRQs (v0: only flags 0–3) |
 | `SET dest, value` | Write immediate 0–31 to PINS/X/Y/PINDIRS |
 
 Stalling instructions: WAIT, IN (auto-push full), OUT (auto-pull empty), PUSH (block), PULL (block), IRQ (wait). A stalled SM holds its position indefinitely until the condition is met.
+
+> **Delay timing rule**: delay cycles on stalling instructions do **not** begin counting until after the wait condition clears. If an instruction completes without stalling, delay cycles run immediately.
+
+### v1 (RP2350) ISA additions over v0 (RP2040)
+
+These features are only available when using `.pio_version 1` (or targeting RP2350):
+
+1. **`MOV PINDIRS`** — destination `011` in MOV encoding, previously reserved. Writes to pin directions using the OUT pin mapping.
+2. **`MOV rxfifo[y/idx], isr`** — stores ISR into a selected RX FIFO entry (indexed by Y or immediate). Uses previously-reserved PUSH opcode (bit7=0) encodings. Requires `.fifo txput` or `.fifo putget`.
+3. **`MOV osr, rxfifo[y/idx]`** — reads a selected RX FIFO entry into OSR. Uses previously-reserved PULL opcode (bit7=1) encodings. Requires `.fifo txget` or `.fifo putget`.
+4. **`WAIT JMPPIN`** — waits on the pin indexed by `PINCTRL_JMP_PIN + offset (0–3)`, modulo 32. New WAIT source type.
+5. **IRQ PREV/NEXT** — `IRQ PREV <n>` / `IRQ NEXT <n>` sets/clears an IRQ flag on the adjacent lower/higher PIO block. Enables synchronisation between PIO blocks without involving the Cortex.
+6. **All 8 IRQ flags** can assert system-level interrupts. On v0, only flags 0–3 are routable to the NVIC; v1 lifts this restriction.
+
+See [[pioasm]] for the full assembler directive reference and `.fifo` mode descriptions.
 
 **Delay/side-set tradeoff**: 5 bits are shared between delay and side-set count. With no side-set, up to 31 delay cycles per instruction. With 1 side-set pin: max 15 delay cycles. Each additional side-set pin costs 1 delay bit.
 
@@ -151,15 +167,71 @@ The lower 4 PIO IRQ flags (0–3) can be routed to two ARM NVIC interrupt lines 
 
 SDK routing functions (`hardware_pio`):
 - `pio_set_irq0_source_enabled(pio, pis_interrupt0 + sm, true)` — enables PIO SM IRQ flag 0 to assert `PIOx_IRQ_0`
+- `pio_set_irqn_source_enabled(pio, irq_index, source, true)` — generic version for IRQ 0 or 1
 - `pio_interrupt_get(pio, sm)` — check if a specific SM's IRQ flag is set (must call in handler)
 - `pio_interrupt_clear(pio, sm)` — clear the flag (must call in handler — **not automatic**)
+
+The `pio_interrupt_source_t` enum lists all events that can be routed to PIO NVIC lines:
+
+| Enum value | Meaning |
+|---|---|
+| `pis_interrupt0`–`pis_interrupt3` | PIO SM IRQ flags 0–3 (set by `IRQ` instruction) |
+| `pis_sm0_tx_fifo_not_full`–`pis_sm3_tx_fifo_not_full` | TX FIFO has room |
+| `pis_sm0_rx_fifo_not_empty`–`pis_sm3_rx_fifo_not_empty` | RX FIFO has data |
+
+Use these with `pio_set_irq0_source_mask_enabled` (bitmask variant) for efficient multi-source routing.
 
 > **RIA note**: The RIA firmware uses `PIO0_IRQ_0` (IRQ7) and `PIO1_IRQ_0` (IRQ9) for OS call dispatch. `ria_action` fires an IRQ flag → asserts the NVIC line → Cortex enters `api_task()` on the designated core. Each core has its own NVIC; the PIO interrupt should be enabled on only one core.
 
 Inter-core related:
 - `SIO_IRQ_PROC0` (IRQ15) / `SIO_IRQ_PROC1` (IRQ16): fired when the inter-core FIFO has data. Relevant to RIA's dual-core architecture where one core handles PIO bus capture and the other runs the OS dispatcher.
 
-### Program wrapping
+### MOV STATUS type
+
+The `pio_mov_status_type` enum controls what the `STATUS` source returns in a `MOV dest, STATUS` instruction:
+
+| Value | Meaning |
+|---|---|
+| `STATUS_TX_LESSTHAN` | All-ones when TX FIFO level < threshold; all-zeros otherwise |
+| `STATUS_RX_LESSTHAN` | All-ones when RX FIFO level < threshold; all-zeros otherwise |
+
+Configured via `sm_config_set_mov_status(&c, status_sel, n)`. Useful for PIO programs that auto-stall based on FIFO fullness without involving the Cortex.
+
+### Compile-time macros
+
+Useful for building configuration tables that resolve at compile time without runtime overhead:
+
+| Macro | Returns |
+|---|---|
+| `PIO_NUM(pio)` | Integer index of a PIO instance (0, 1, or 2) |
+| `PIO_INSTANCE(n)` | Hardware pointer for PIO instance n |
+| `PIO_FUNCSEL_NUM(pio, gpio)` | `gpio_function_t` to select this PIO on a given GPIO |
+| `PIO_DREQ_NUM(pio, sm, is_tx)` | `dreq_num_t` for DMA pacing (TX or RX) — compile-time equivalent of `pio_get_dreq` |
+| `PIO_IRQ_NUM(pio, irqn)` | `irq_num_t` for the PIO's NVIC interrupt line (irqn = 0 or 1) |
+
+`PIO_DREQ_NUM` and `PIO_IRQ_NUM` are the compile-time counterparts of `pio_get_dreq()` and `pio_get_irq_num()`.
+
+### Default SM configuration
+
+`pio_get_default_sm_config()` returns a `pio_sm_config` struct with these defaults (also what `pio_sm_init` applies when passed `NULL`):
+
+| Setting | Default |
+|---|---|
+| Out Pins | 32 pins starting at GPIO 0 |
+| Set Pins | 0 count starting at GPIO 0 |
+| In Pins | 32 pins starting at GPIO 0 |
+| Side Set Pins (base) | GPIO 0 |
+| Side Set | disabled |
+| Wrap | `wrap=31`, `wrap_target=0` (wraps entire 32-instruction space) |
+| In Shift | right, autopush=false, threshold=32 |
+| Out Shift | right, autopull=false, threshold=32 |
+| Jmp Pin | GPIO 0 |
+| Out Special | sticky=false, no enable pin |
+| Mov Status | `STATUS_TX_LESSTHAN`, n=0 |
+
+In practice, always call the appropriate `sm_config_set_*` functions after `get_default_config` — relying on defaults for anything other than trivial programs leads to subtle bugs (e.g. default `wrap=31` wraps at instruction 31, not at the end of your program).
+
+
 
 `EXECCTRL_WRAP_TOP` / `EXECCTRL_WRAP_BOTTOM`: when PC reaches WRAP_TOP (and it is not a taken JMP), execution jumps to WRAP_BOTTOM with zero timing penalty. Replaces an explicit `JMP start` at loop end — saves one instruction and one cycle per loop iteration. Set via `.wrap` / `.wrap_target` directives.
 
@@ -215,6 +287,10 @@ pio_sm_set_pindirs_with_mask(pio, sm, pin_dirs, pin_mask);
 ```
 
 **Key rule**: OUT and SET groups can overlap with SIDESET; when they target the same GPIO, SIDESET has precedence.
+
+**Sticky output** (`sm_config_set_out_special`): re-asserts the most recent OUT/SET pin values on cycles where no `OUT`/`SET` instruction executes. Useful for SPI-like protocols where the data pin must hold its last value between transfers. Also supports an auxiliary output-enable pin (`has_enable_pin`, `enable_bit_index`) that gates the other output pins using one bit of the data word.
+
+**IN pin masking** (RP2350 only): `sm_config_set_in_pin_count(&c, n)` limits how many bits are read by `IN PINS` — bits beyond the count read as zero. On RP2040, this field does not exist and the effective count is always 32.
 
 ### Clock divider
 
@@ -314,6 +390,222 @@ The build system runs `pioasm` → generates `myprogram.pio.h` containing:
 - `static const struct pio_program myprogram_program` — struct with pointer, length, origin
 - `static inline pio_sm_config myprogram_program_get_default_config(uint offset)` — default config factory
 
+### FIFO joining
+
+Each state machine has two independent 4-word FIFOs (TX and RX). When a program only moves data in one direction, both FIFOs can be pooled into a single 8-word FIFO:
+
+```c
+sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);   // 8-word TX FIFO; RX disabled
+sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);   // 8-word RX FIFO; TX disabled
+sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_NONE); // default: 4 TX + 4 RX
+```
+
+Use `PIO_FIFO_JOIN_TX` for output-only programs (WS2812 LED driver, PIX bus transmitter). Use `PIO_FIFO_JOIN_RX` for input-only programs (logic analyser, PIX bus receiver). The doubled depth gives more latency tolerance between PIO and DMA service.
+
+### State machine cleanup and restart
+
+Before re-arming a state machine (e.g. re-triggering a capture), fully reset its state:
+
+```c
+pio_sm_set_enabled(pio, sm, false);   // stop SM
+pio_sm_clear_fifos(pio, sm);          // flush TX+RX FIFO contents
+pio_sm_restart(pio, sm);              // clear ISR shift counter + SM internal state
+```
+
+`pio_sm_restart` clears any partially-filled ISR — important when the SM stalled mid-shift during a previous run.
+
+**`pio_sm_drain_tx_fifo`** is a separate utility that empties the TX FIFO by executing `pull` instructions on the SM until empty. Unlike `pio_sm_clear_fifos` (which simply discards FIFO contents), drain operates through the PIO instruction path and disturbs the OSR contents. Use `clear_fifos` when you want a clean slate without touching SM register state; use `drain_tx_fifo` when you need to flush in-flight data through the OSR (rare — typically for protocol flush scenarios).
+
+### Dynamic program generation (`pio_encode_*`)
+
+For very short programs or programs whose instruction parameters are only known at runtime, the SDK provides `pio_encode_*` helpers to generate 16-bit instruction words without writing a `.pio` file:
+
+```c
+// Generate `in pins, <n>` — n only known at runtime
+uint16_t instr = pio_encode_in(pio_pins, pin_count);
+
+// Wrap in a pio_program struct (origin = -1 → no fixed placement required)
+struct pio_program prog = {
+    .instructions = &instr,
+    .length = 1,
+    .origin = -1,
+};
+uint offset = pio_add_program(pio, &prog);
+
+// Encode a `wait gpio <level> <pin>` for one-shot injection:
+uint16_t wait_instr = pio_encode_wait_gpio(trigger_level, trigger_pin);
+```
+
+`pio_encode_*` variants cover all PIO opcodes. The generated 16-bit words are identical to what `pioasm` produces for the same instruction.
+
+#### Composition helpers (not standalone instructions)
+
+Three helpers return **bit patterns to OR with an instruction word** — they do NOT return a valid instruction on their own:
+
+| Helper | Returns | Shares bits with |
+|---|---|---|
+| `pio_encode_delay(cycles)` | delay-slot bits (0–31, or less if sideset in use) | `pio_encode_sideset`, `pio_encode_sideset_opt` |
+| `pio_encode_sideset(bit_count, value)` | side-set bits (non-optional mode) | `pio_encode_delay` |
+| `pio_encode_sideset_opt(bit_count, value)` | side-set bits (optional `.sideset <n> opt` mode) | `pio_encode_delay` |
+
+Usage:
+```c
+// SET pins, 1 with 5-cycle delay and sideset value 2 (2 sideset bits):
+uint instr = pio_encode_set(pio_pins, 1)
+           | pio_encode_delay(5)
+           | pio_encode_sideset(2, 2);
+```
+
+#### Complete JMP variant table
+
+| SDK function | Assembly equivalent | Condition |
+|---|---|---|
+| `pio_encode_jmp(addr)` | `JMP <addr>` | Unconditional |
+| `pio_encode_jmp_not_x(addr)` | `JMP !X <addr>` | X == 0 |
+| `pio_encode_jmp_x_dec(addr)` | `JMP X-- <addr>` | X != 0, then post-decrement X |
+| `pio_encode_jmp_not_y(addr)` | `JMP !Y <addr>` | Y == 0 |
+| `pio_encode_jmp_y_dec(addr)` | `JMP Y-- <addr>` | Y != 0, then post-decrement Y |
+| `pio_encode_jmp_x_ne_y(addr)` | `JMP X!=Y <addr>` | X != Y |
+| `pio_encode_jmp_pin(addr)` | `JMP PIN <addr>` | JMP pin is high |
+| `pio_encode_jmp_not_osre(addr)` | `JMP !OSRE <addr>` | OSR not empty (autopull threshold not met) |
+
+All return encoding with 0 delay and no side-set; compose with `pio_encode_delay`/`pio_encode_sideset` as needed.
+
+#### `wait_pin` vs `wait_gpio`
+
+Two WAIT helpers target pins differently:
+
+| Helper | Assembly | Pin addressing |
+|---|---|---|
+| `pio_encode_wait_pin(polarity, pin)` | `WAIT <polarity> PIN <pin>` | Relative to SM's **input pin mapping** (`sm_config_set_in_pins`) |
+| `pio_encode_wait_gpio(polarity, gpio)` | `WAIT <polarity> GPIO <gpio>` | **Absolute GPIO** number relative to the PIO's `GPIO_BASE` (0–31) |
+
+For `wait_gpio` on RP2350 with a non-zero GPIO base: subtract `GPIO_BASE` from the physical GPIO number. E.g. GPIO 42 with `GPIO_BASE=16` → pass `42-16 = 26`.
+
+#### `pio_src_dest` enum — source/destination values
+
+Used as arguments to `pio_encode_in`, `pio_encode_out`, `pio_encode_mov`, etc.:
+
+| Value | Constant | Valid for |
+|---|---|---|
+| `pio_pins` | 0 | IN src, OUT/SET dest |
+| `pio_x` | 1 | IN/OUT/MOV src+dest, JMP condition |
+| `pio_y` | 2 | IN/OUT/MOV src+dest, JMP condition |
+| `pio_null` | 3 | IN src, OUT dest (discard) |
+| `pio_pindirs` | 4 | OUT dest (set pin directions) |
+| `pio_exec_mov` | 4 | MOV dest (execute from register) |
+| `pio_status` | 5 | MOV src (FIFO status flag) |
+| `pio_pc` | 5 | MOV dest (jump via register) |
+| `pio_isr` | 6 | IN/MOV src+dest |
+| `pio_osr` | 7 | MOV src+dest |
+| `pio_exec_out` | 7 | OUT dest (execute shifted-out word) |
+
+> **NOTE**: Not all values are valid for all functions. Validity is only checked in debug builds when `PARAM_ASSERTIONS_ENABLED_PIO_INSTRUCTIONS=1`.
+
+### SM EXEC — one-shot instruction injection
+
+`pio_sm_exec` runs a single instruction on a state machine immediately, without writing it to instruction memory:
+
+```c
+pio_sm_exec(pio, sm, pio_encode_wait_gpio(trigger_level, trigger_pin));
+```
+
+If the instruction stalls (e.g. a `wait` condition not yet met), the SM latches it and retries each clock cycle until the condition clears. This is the standard mechanism to arm a capture program on a trigger: the SM is enabled but holds on the injected `wait` until the pin transitions — no data floods the RX FIFO until the trigger fires.
+
+Two further EXEC options (same underlying hardware):
+- **`out exec`** — shift an instruction word out of the OSR and execute it immediately; the data stream itself directs the SM's behaviour.
+- **`mov exec`** — execute an instruction stored in X, Y, ISR, or OSR; useful for data-defined dispatch tables.
+
+> **RIA note**: `pio_sm_exec` is used to poke initial setup instructions into bus-capture SMs during firmware init, avoiding the need for setup-only code paths in the PIO program itself.
+
+### DMA integration with PIO
+
+DMA and PIO are designed to work together. The DMA paces itself using a **DREQ** (data request) signal from the state machine — the SM asserts DREQ when its RX FIFO has data (for memory captures) or its TX FIFO has room (for memory playback):
+
+```c
+// PIO → memory (RX FIFO drain — e.g. logic analyser, 65C02 bus capture)
+dma_channel_config dc = dma_channel_get_default_config(dma_chan);
+channel_config_set_read_increment(&dc, false);               // always read from same FIFO address
+channel_config_set_write_increment(&dc, true);               // advance destination buffer
+channel_config_set_dreq(&dc, pio_get_dreq(pio, sm, false));  // false → RX DREQ
+
+dma_channel_configure(dma_chan, &dc,
+    dest_buf,          // write destination
+    &pio->rxf[sm],     // read source (RX FIFO register)
+    num_words,         // total 32-bit words to transfer
+    true               // start immediately
+);
+
+// Block until all transfers complete:
+dma_channel_wait_for_finish_blocking(dma_chan);
+```
+
+For memory → PIO (TX FIFO feeding — e.g. DMA-fed pixel output), swap the increment flags and use `pio_get_dreq(pio, sm, true)` (TX DREQ).
+
+**Bus priority**: at very high transfer rates (>16 bits per system clock), grant DMA elevated bus priority to prevent CPU accesses from starving the FIFO:
+
+```c
+bus_ctrl_hw->priority = BUSCTRL_BUS_PRIORITY_DMA_W_BITS | BUSCTRL_BUS_PRIORITY_DMA_R_BITS;
+```
+
+> **RIA relevance**: The RIA firmware uses DMA to move data between PIO RX FIFOs and RP2350 memory at 65C02 bus speed. The DREQ handshake is what makes zero-polling data capture possible — the DMA only transfers when the SM has produced data.
+
+### Program claiming helpers
+
+Higher-level SDK functions atomically claim a free SM and load a program in one call:
+
+```c
+// Find free PIO + SM that can address the required GPIO range, then load program
+bool ok = pio_claim_free_sm_and_add_program_for_gpio_range(
+    &my_program, &pio, &sm, &offset, gpio_base, gpio_count, true);
+
+// Matching release (unload program + unclaim SM)
+pio_remove_program_and_unclaim_sm(&my_program, pio, sm, offset);
+```
+
+The `_for_gpio_range` variant is essential on RP2350 where PIO2 can address GPIO ≥32. Without it, `pio0`/`pio1` might be selected on a board using extended GPIOs, causing silent failures. Always pair with `pio_remove_program_and_unclaim_sm` to allow other programs to reuse the resources.
+
+### Multi-SM synchronization
+
+When multiple state machines must run in exact lockstep (e.g. the RIA's five bus-handling SMs), the SDK provides mask-based variants that operate on all specified SMs simultaneously in a single register write:
+
+```c
+// Enable/disable multiple SMs atomically
+pio_set_sm_mask_enabled(pio, (1u<<sm0)|(1u<<sm1), true);
+
+// Restart multiple SMs simultaneously (clears ISR, shift counters, PC, etc.)
+pio_restart_sm_mask(pio, (1u<<sm0)|(1u<<sm1));
+
+// Restart clock dividers on multiple SMs from phase 0
+pio_clkdiv_restart_sm_mask(pio, (1u<<sm0)|(1u<<sm1));
+
+// Atomic: enable + clock-divider restart in one cycle (most useful for sync start)
+pio_enable_sm_mask_in_sync(pio, (1u<<sm0)|(1u<<sm1));
+```
+
+`pio_enable_sm_mask_in_sync` is the preferred way to start multiple SMs that share a tight timing relationship. It is equivalent to calling `pio_set_sm_mask_enabled` and `pio_clkdiv_restart_sm_mask` on the same clock cycle, ensuring the divided clocks of all masked SMs are in phase from the first cycle.
+
+> **Clock divider independence**: Disabling a SM does **not** halt its clock divider — it keeps counting in the background. This means re-enabling a SM after a pause may resume at an arbitrary phase within the divider cycle, introducing jitter. To avoid this, always call `pio_sm_clkdiv_restart` (single SM) or `pio_clkdiv_restart_sm_mask` (multi-SM) when timing precision matters.
+
+The mask functions also make cooperative claiming efficient:
+
+```c
+pio_claim_sm_mask(pio, (1u<<0)|(1u<<1)|(1u<<2));  // claim SMs 0,1,2 atomically (panics if any taken)
+```
+
+### RP2350B GPIO base
+
+On the RP2350B 80-pin variant, there are 48 GPIOs but each PIO instance can only address 32 at a time. The GPIO base determines which 32 are accessible:
+
+```c
+// Set PIO0 to access GPIO 16–47 (base=16); default is base=0 (GPIO 0–31)
+pio_set_gpio_base(pio0, 16);
+```
+
+Valid values: 0 (accesses GPIO 0–31) or 16 (accesses GPIO 16–47). No single PIO instance can simultaneously access both GPIO 0–15 and GPIO 32–47. The `pio_claim_free_sm_and_add_program_for_gpio_range` helper handles base selection automatically.
+
+On RP2040 and RP2350A (48-pin), `pio_get_gpio_base` always returns 0 and `pio_set_gpio_base` has no effect.
+
 ---
 
 ### Custom protocol design patterns
@@ -377,4 +669,4 @@ Both SET and IN groups point to the same GPIO. The open-collector model requires
 
 ## Related pages
 
-- [[gpio-pinout]] · [[pix-bus]] · [[rp6502-ria]] · [[rp6502-vga]] · [[reset-model]] · [[rp2040-clocks]] · [[quadros-rp2040]] · [[fairhead-pico-c]]
+- [[gpio-pinout]] · [[pix-bus]] · [[rp6502-ria]] · [[rp6502-vga]] · [[reset-model]] · [[rp2040-clocks]] · [[dma-controller]] · [[pioasm]] · [[hardware-irq]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]]

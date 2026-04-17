@@ -1,10 +1,10 @@
 ---
 type: concept
-tags: [rp6502, ria, vga, hardware, gpio, pinout]
+tags: [rp6502, ria, vga, hardware, gpio, pinout, rp2350, hstx]
 related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[pio-architecture]], [[rp6502-board]]
-sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]]
+sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-17
 ---
 
 # GPIO Pinout
@@ -75,25 +75,42 @@ See [[pix-bus]] for the frame format and [[pio-architecture]] for which PIO stat
 
 ### GPIO structure
 
-The RP2040 has 56 pins total; 36 are GPIO-capable. Of those, 30 are in the **user bank** (GPIO0–GPIO29) and 6 are in the **QSPI bank** (used internally for external flash — not available for application use). GPIO26–GPIO29 can additionally connect to the ADC.
+| Chip | Package | User GPIO | QSPI pins | ADC pins |
+|---|---|---|---|---|
+| RP2040 | QFN-56 | 30 (GPIO0–GPIO29) | 6 | GPIO26–29 |
+| RP2350A | QFN-60 | 30 (GPIO0–GPIO29) | 6 | GPIO26–29 |
+| RP2350B | QFN-80 | 48 (GPIO0–GPIO47) | 6 | GPIO40–47 |
+
+On RP2040 and RP2350A, the **user bank** has 30 GPIOs; the 6 QSPI pins are used internally for external flash and are not available for application use. The RP2350B QFN-80 package adds GPIOs 30–47, expanding the user bank to 48 pins.
 
 Each GPIO pin has a **CTRL register** that selects which peripheral drives it (function select) and allows signal override (invert, force-low, force-high).
 
 ### Function select
 
-Every GPIO can be assigned to one of up to 9 functions. Key functions used in the RIA:
+Every GPIO can be assigned to one of up to 9 (RP2040) or 12 (RP2350) functions. Key functions used in the RIA:
 
-| Function constant | Peripheral | Notes |
-|---|---|---|
-| `GPIO_FUNC_SPI` | SPI0 or SPI1 | Not used by current RIA firmware (storage is USB MSC) |
-| `GPIO_FUNC_UART` | UART0 or UART1 | Console on GPIO 4–5 |
-| `GPIO_FUNC_SIO` | SIO (software control) | Default CPU-controlled GPIO |
-| `GPIO_FUNC_PIO0` | PIO block 0 | Bus signals on RIA (GPIO 0–3, 6–21) |
-| `GPIO_FUNC_PIO1` | PIO block 1 | Bus signals on RIA; PIX TX |
-| `GPIO_FUNC_GPCLK` | Clock output | GPIO 20–25 can output clocks |
-| `GPIO_FUNC_NULL` | Disabled | Isolates pin |
+| Constant | Peripheral | RP2040 | RP2350 | Notes |
+|---|---|---|---|---|
+| `GPIO_FUNC_XIP` | Flash execute-in-place | F0 | — | QSPI bank only |
+| `GPIO_FUNC_HSTX` | High-Speed Transmit | — | F0 | GPIO12–19 only; RP2350 only |
+| `GPIO_FUNC_SPI` | SPI0 or SPI1 | F1 | F1 | — |
+| `GPIO_FUNC_UART` | UART0 or UART1 | F2 | F2 | Console on GPIO 4–5 |
+| `GPIO_FUNC_I2C` | I2C0 or I2C1 | F3 | F3 | — |
+| `GPIO_FUNC_PWM` | PWM channels | F4 | F4 | — |
+| `GPIO_FUNC_SIO` | CPU-controlled (SIO) | F5 | F5 | Default CPU-controlled GPIO |
+| `GPIO_FUNC_PIO0` | PIO block 0 | F6 | F6 | Bus signal capture in RIA |
+| `GPIO_FUNC_PIO1` | PIO block 1 | F7 | F7 | Bus signal capture in RIA; PIX TX |
+| `GPIO_FUNC_PIO2` | PIO block 2 | — | F8 | RP2350 only (3rd PIO) |
+| `GPIO_FUNC_GPCK` | Clock output | F8 | F9 | GPIO 20–25 can output clocks |
+| `GPIO_FUNC_XIP_CS1` | Second flash chip select | — | F9 | RP2350 only |
+| `GPIO_FUNC_CORESIGHT_TRACE` | Debug trace | — | F9 | RP2350 only |
+| `GPIO_FUNC_USB` | USB controller | F9 | F10 | — |
+| `GPIO_FUNC_UART_AUX` | Auxiliary UART | — | F11 | RP2350 only |
+| `GPIO_FUNC_NULL` | Disabled | 0x1f | 0x1f | Isolates pin |
 
-All GPIO0–GPIO29 can be assigned to PIO0 (F6) or PIO1 (F7). This is how the RIA firmware gives the PIO state machines direct hardware control of every bus signal.
+All GPIO0–GPIO29 can be assigned to PIO0 (F6) or PIO1 (F7). On RP2350, PIO2 (F8) is also available on all user GPIO. This is how the RIA firmware gives the PIO state machines direct hardware control of every bus signal.
+
+**RP2350 HSTX**: GPIO12–19 gain an extra function F0 = `GPIO_FUNC_HSTX` (High-Speed Serial Transmit — used for high-bandwidth display interfaces like HDMI/DVI). Not present on RP2040.
 
 ### PAD configuration
 
@@ -212,7 +229,12 @@ Events detect that *something* happened, but not *when* or *how many times*. For
 
 All user-bank GPIO lines share a single interrupt: **IO_IRQ_BANK0**. Unique feature: GPIO interrupts can be enabled independently on each core (`proc0_irq_ctrl` / `proc1_irq_ctrl`); all other Pico interrupts are single-core only.
 
+**Interrupt latch behavior**: Level events (`GPIO_IRQ_LEVEL_LOW`, `GPIO_IRQ_LEVEL_HIGH`) are **not latched** — they go inactive immediately when the pin changes. Edge events (`GPIO_IRQ_EDGE_FALL`, `GPIO_IRQ_EDGE_RISE`) are **latched** in the INTR register and must be cleared explicitly.
+
 ```c
+// Set per-core callback (without affecting enable state)
+gpio_set_irq_callback(gpio_irq_callback_t callback);
+
 // Register callback and enable interrupt (one callback for ALL GPIO lines)
 gpio_set_irq_enabled_with_callback(
     uint gpio, uint32_t events, bool enabled, gpio_irq_callback_t callback);
@@ -223,11 +245,22 @@ void my_callback(uint gpio, uint32_t events);
 // Enable/disable without changing callback
 gpio_set_irq_enabled(uint gpio, uint32_t events, bool enabled);
 
+// Enable dormant wake-up interrupt (fires when chip wakes from dormant mode)
+gpio_set_dormant_irq_enabled(uint gpio, uint32_t event_mask, bool enabled);
+
 // Clear a latched edge event (required in handlers for edge events)
 gpio_acknowledge_irq(uint gpio, uint32_t events);
 ```
 
-> **One callback limit**: despite the API suggesting per-pin callbacks, only one callback is active at a time — each new `gpio_set_irq_enabled_with_callback()` replaces the previous. The SDK's internal handler scans all GPIO lines and dispatches to this single function.
+> **One callback limit**: despite the API suggesting per-pin callbacks, only one callback is active at a time — each new `gpio_set_irq_enabled_with_callback()` replaces the previous. Use `gpio_set_irq_callback()` to set the callback without resetting enable state. The SDK's internal handler scans all GPIO lines and dispatches to this single function.
+
+**`gpio_set_irq_enabled_with_callback` decomposition** (SDK authoritative) — equivalent to:
+```c
+gpio_set_irq_enabled(gpio, event_mask, enabled);
+gpio_set_irq_callback(callback);
+if (enabled) irq_set_enabled(IO_IRQ_BANK0, true);
+```
+Use this for one-time setup, then use `gpio_set_irq_enabled()` alone to toggle individual GPIO events. The callback is shared across all GPIO lines on that core.
 
 **SDK default handler behavior** — `gpio_default_irq_handler` runs before user callback:
 1. Identifies which GPIO lines triggered
@@ -241,8 +274,28 @@ This means the user callback does not need to clear the IRQ manually — but it 
 Bypass the default handler to register your own with zero overhead:
 
 ```c
+// Basic raw handler (for 32-bit GPIO mask)
 gpio_add_raw_irq_handler_masked(uint32_t gpio_mask, irq_handler_t handler);
+gpio_add_raw_irq_handler_masked64(uint64_t gpio_mask, irq_handler_t handler); // RP2350
+gpio_add_raw_irq_handler(uint gpio, irq_handler_t handler); // single-GPIO convenience
+
+// With explicit order priority (lower value = called first)
+gpio_add_raw_irq_handler_with_order_priority_masked(
+    uint32_t gpio_mask, irq_handler_t handler, uint8_t order_priority);
+gpio_add_raw_irq_handler_with_order_priority_masked64(
+    uint64_t gpio_mask, irq_handler_t handler, uint8_t order_priority); // RP2350
+gpio_add_raw_irq_handler_with_order_priority(
+    uint gpio, irq_handler_t handler, uint8_t order_priority);
+
+// Remove raw handlers
+gpio_remove_raw_irq_handler_masked(uint32_t gpio_mask, irq_handler_t handler);
+gpio_remove_raw_irq_handler_masked64(uint64_t gpio_mask, irq_handler_t handler); // RP2350
+gpio_remove_raw_irq_handler(uint gpio, irq_handler_t handler);
 ```
+
+> **Important**: Adding a raw handler for a GPIO **disables the default callback** for that GPIO. Multiple raw handlers must NOT be added for the same GPIO — the SDK asserts if you try. Internally uses `irq_add_shared_handler`; limited by `PICO_MAX_IRQ_SHARED_HANDLERS`.
+
+> **Remove note**: When calling `gpio_remove_raw_irq_handler_masked()`, always use the **same `gpio_mask`** as was passed to the corresponding `gpio_add_raw_irq_handler_masked()` call.
 
 With a raw handler, you must manage everything manually:
 ```c
@@ -253,8 +306,10 @@ irq_set_enabled(IO_IRQ_BANK0, true);  // must enable the bank interrupt too
 
 // In handler — must clear or it will re-fire immediately
 void MyIRQHandler() {
-    gpio_acknowledge_irq(pin, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL);
-    // ... handle event ...
+    if (gpio_get_irq_event_mask(pin) & (GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL)) {
+        gpio_acknowledge_irq(pin, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL);
+        // ... handle event ...
+    }
 }
 ```
 
@@ -292,35 +347,80 @@ The RIA does not use GPIO interrupts for 65C02 bus capture — PIO handles that 
 
 *Based on [[fairhead-pico-c]] Ch.3. All functions from `hardware_gpio` library.*
 
-### Function select constants (complete list)
+### Function select constants (RP2040 vs RP2350)
 
-| Constant | Peripheral | Notes |
+**RP2040** (`gpio_function_rp2040`): 10 functions (F0–F9 + NULL)
+
+| Constant | Value | Peripheral |
 |---|---|---|
-| `GPIO_FUNC_XIP` | Flash execute-in-place | QSPI bank only; not for user GPIO |
-| `GPIO_FUNC_SPI` | SPI0 or SPI1 | — |
-| `GPIO_FUNC_UART` | UART0 or UART1 | RIA console on GPIO 4–5 |
-| `GPIO_FUNC_I2C` | I2C0 or I2C1 | — |
-| `GPIO_FUNC_PWM` | PWM channels | — |
-| `GPIO_FUNC_SIO` | CPU-controlled (SIO) | Default; use for `gpio_put`/`gpio_get` |
-| `GPIO_FUNC_PIO0` | PIO block 0 | Bus signal capture in RIA |
-| `GPIO_FUNC_PIO1` | PIO block 1 | Bus signal capture in RIA |
-| `GPIO_FUNC_GPCK` | Clock output | GPIO 20–25; not available on all pins |
-| `GPIO_FUNC_USB` | USB controller | — |
-| `GPIO_FUNC_NULL` | Disabled (high-Z) | Disconnects pin from all peripherals |
+| `GPIO_FUNC_XIP` | 0 | Flash XIP |
+| `GPIO_FUNC_SPI` | 1 | SPI |
+| `GPIO_FUNC_UART` | 2 | UART |
+| `GPIO_FUNC_I2C` | 3 | I2C |
+| `GPIO_FUNC_PWM` | 4 | PWM |
+| `GPIO_FUNC_SIO` | 5 | CPU-controlled |
+| `GPIO_FUNC_PIO0` | 6 | PIO block 0 |
+| `GPIO_FUNC_PIO1` | 7 | PIO block 1 |
+| `GPIO_FUNC_GPCK` | 8 | Clock output |
+| `GPIO_FUNC_USB` | 9 | USB |
+| `GPIO_FUNC_NULL` | 0x1f | Disabled (high-Z) |
+
+**RP2350** (`gpio_function_rp2350`): 12 functions (F0–F11 + NULL)
+
+| Constant | Value | Peripheral | Notes |
+|---|---|---|---|
+| `GPIO_FUNC_HSTX` | 0 | High-Speed Transmit | GPIO12–19 only |
+| `GPIO_FUNC_SPI` | 1 | SPI | — |
+| `GPIO_FUNC_UART` | 2 | UART | — |
+| `GPIO_FUNC_I2C` | 3 | I2C | — |
+| `GPIO_FUNC_PWM` | 4 | PWM | — |
+| `GPIO_FUNC_SIO` | 5 | CPU-controlled | — |
+| `GPIO_FUNC_PIO0` | 6 | PIO block 0 | — |
+| `GPIO_FUNC_PIO1` | 7 | PIO block 1 | — |
+| `GPIO_FUNC_PIO2` | 8 | PIO block 2 | RP2350 only |
+| `GPIO_FUNC_GPCK` / `GPIO_FUNC_XIP_CS1` / `GPIO_FUNC_CORESIGHT_TRACE` | 9 | Clock / 2nd flash CS / Debug trace | Pin-dependent |
+| `GPIO_FUNC_USB` | 10 | USB | — |
+| `GPIO_FUNC_UART_AUX` | 11 | Auxiliary UART | — |
+| `GPIO_FUNC_NULL` | 0x1f | Disabled (high-Z) | — |
+
+> `gpio_function_t` is a typedef that resolves to the correct chip-specific enum at compile time.
 
 ### Basic GPIO API
 
 ```c
 gpio_init(n);                        // Reset to SIO, input, no pulls
+gpio_deinit(n);                      // Reset to NULL function (high-Z, disables pin)
 gpio_set_function(n, GPIO_FUNC_SIO); // Select peripheral for this pin
+gpio_set_function_masked(mask, fn);  // Set function for multiple pins (32-bit mask)
+gpio_set_function_masked64(mask, fn);// Set function for multiple pins (64-bit mask, RP2350)
+gpio_get_function(n);                // Returns current function for pin
 gpio_set_dir(n, GPIO_OUT);           // true = output, false = input
-gpio_get_dir(n);                     // Returns direction
-gpio_is_dir_out(n);                  // True if output
+gpio_get_dir(n);                     // Returns direction (1=out, 0=in)
+gpio_is_dir_out(n);                  // true if pin direction is output
 gpio_set_input_enabled(n, enabled);  // Enable/disable input buffer
 
 gpio_get(n);                         // Read single pin
 gpio_put(n, val);                    // Write single pin (val: 0 or 1)
+gpio_get_out_level(n);               // Returns current driven output level (not input reading)
+
+// Pull resistor control
+gpio_set_pulls(n, up, down);         // Enable pull-up and/or pull-down
+gpio_pull_up(n);                     // Enable pull-up only
+gpio_pull_down(n);                   // Enable pull-down only
+gpio_disable_pulls(n);               // Disable both pull-up and pull-down
+gpio_is_pulled_up(n);                // true if pull-up is enabled
+gpio_is_pulled_down(n);              // true if pull-down is enabled
+
+// PAD signal conditioning
+gpio_set_drive_strength(n, drive);   // Set output drive strength (2/4/8/12mA)
+gpio_get_drive_strength(n);          // Read current drive strength
+gpio_set_slew_rate(n, rate);         // Set slew rate (GPIO_SLEW_RATE_SLOW/FAST)
+gpio_get_slew_rate(n);               // Read current slew rate
+gpio_set_input_hysteresis_enabled(n, enabled); // Enable/disable Schmitt trigger
+gpio_is_input_hysteresis_enabled(n); // Query current hysteresis state
 ```
+
+> **Hysteresis note**: Disabling the Schmitt trigger slightly reduces input delay, but can lead to inconsistent readings when the input signal has very long rise or fall times. Leave enabled (default) for bus signals.
 
 ### Mask API (act on multiple pins simultaneously)
 
@@ -340,7 +440,33 @@ gpio_get_all();                      // Read all 30 user GPIO inputs at once (si
 gpio_put_all(val);                   // Write all 30 user GPIO outputs at once
 ```
 
-> **Performance note**: `gpio_put_masked()` is a read-modify-write — not atomic and slower than `gpio_set_mask()`/`gpio_clr_mask()`. For race-free multi-core GPIO, use `sio_hw->gpio_set` / `sio_hw->gpio_clr` (see [[dual-core-sio]]).
+> **Concurrency note**: `gpio_put_masked()` uses the hardware TOGL alias — it is **concurrency-safe with an IRQ on the same core** bashing different pins simultaneously. However, it is NOT safe for two cores writing different masked pins at the same time. For race-free multi-core GPIO, use `sio_hw->gpio_set` / `sio_hw->gpio_clr` (see [[dual-core-sio]]).
+
+### 64-bit and bank-n API variants (RP2350)
+
+RP2350 QFN-80 has 48 GPIOs. The SDK provides 64-bit variants for all mask operations, plus bank-indexed variants (`_n`) for portability:
+
+```c
+// 64-bit variants — use uint64_t mask covering GPIO0–47
+gpio_get_all64();                     // Read all 48 GPIO inputs → uint64_t
+gpio_put_all64(value);                // Write all 48 GPIO outputs at once
+gpio_set_mask64(mask);                // Drive high every GPIO in 64-bit mask
+gpio_clr_mask64(mask);                // Drive low every GPIO in 64-bit mask
+gpio_xor_mask64(mask);                // Toggle every GPIO in 64-bit mask
+gpio_put_masked64(mask, value);       // Drive GPIOs per bit in 64-bit mask
+gpio_set_dir_out_masked64(mask);
+gpio_set_dir_in_masked64(mask);
+gpio_set_dir_masked64(mask, value);
+gpio_set_dir_all_bits64(values);
+
+// Bank-n variants — operate on 32-bit slice starting at GPIO (n*32)
+gpio_set_mask_n(n, mask);             // Drive high in bank n
+gpio_clr_mask_n(n, mask);             // Drive low in bank n
+gpio_xor_mask_n(n, mask);             // Toggle in bank n
+gpio_put_masked_n(n, mask, value);    // Drive per bit in bank n
+```
+
+> On RP2040/RP2350A (30 GPIO), `gpio_get_all()` returns `uint32_t` and is sufficient. Use `gpio_get_all64()` only when targeting RP2350B QFN-80.
 
 ### Speed benchmarks (Release build, 150 MHz)
 
@@ -348,7 +474,7 @@ gpio_put_all(val);                   // Write all 30 user GPIO outputs at once
 |---|---|
 | `gpio_put(n, v)` | ~6 ns per call |
 | Direct `sio_hw->gpio_set` | ~4 ns per call |
-| `gpio_put_masked(mask, v)` | slower (read-modify-write) |
+| `gpio_put_masked(mask, v)` | uses TOGL alias; safe with IRQ on same core |
 | `gpio_get_all()` | single cycle (~6 ns) |
 
 ### GPIO overrides
@@ -363,6 +489,7 @@ gpio_set_outover(n, GPIO_OVERRIDE_HIGH);   // force output high regardless of dr
 
 gpio_set_inover(n, val);   // override input signal seen by peripherals
 gpio_set_oeover(n, val);   // override output-enable signal
+gpio_set_irqover(n, val);  // override IRQ signal (can invert/force high/low)
 ```
 
 ### Pause / timing functions

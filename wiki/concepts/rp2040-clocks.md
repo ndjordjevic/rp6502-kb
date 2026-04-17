@@ -1,10 +1,10 @@
 ---
 type: concept
-tags: [rp2040, rp2350, clocks, pll, xosc, rosc, timer, watchdog, rtc, rp6502-ria]
+tags: [rp2040, rp2350, clocks, pll, xosc, rosc, lposc, hstx, timer, watchdog, rtc, rp6502-ria]
 related: [[pio-architecture]], [[gpio-pinout]], [[rp6502-ria]], [[dma-controller]], [[dual-core-sio]]
-sources: [[quadros-rp2040]]
+sources: [[quadros-rp2040]], [[pico-c-sdk]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-18
 ---
 
 # RP2040 Clock Generation, Timer, Watchdog and RTC
@@ -15,21 +15,50 @@ updated: 2026-04-16
 
 ## Clock Sources
 
-| Source | Typical Frequency | Characteristics |
-|---|---|---|
-| **ROSC** (Ring Oscillator) | ~6 MHz (typical) | On-chip, no external component, little power. Imprecise: guaranteed range 1.8–12 MHz. Used at boot. |
-| **XOSC** (Crystal Oscillator) | 12 MHz (reference design) | Requires external crystal (1–15 MHz range). Stable and accurate; preferred for clk_ref and clk_rtc. |
-| **External clocks** | up to 50 MHz | GPIO0, GPIO1, or XIN pins. Can feed the PLLs. |
-| **USB PLL** | 48 MHz | Multiplies XOSC to generate the 48 MHz clock required for USB and ADC. |
-| **System PLL** | 125 MHz (default) | Multiplies XOSC to generate `clk_sys`. Can be overclocked — **the RIA firmware sets it to 256 MHz**. |
+| Source | Chip | Typical Frequency | Characteristics |
+|---|---|---|---|
+| **ROSC** (Ring Oscillator) | RP2040/RP2350 | ~6 MHz (typical) | On-chip, no external component, little power. Imprecise: guaranteed range 1.8–12 MHz. Used at boot. |
+| **XOSC** (Crystal Oscillator) | RP2040/RP2350 | 12 MHz (reference design) | Requires external crystal (1–15 MHz range). Stable and accurate; preferred for clk_ref and clk_rtc. |
+| **LPOSC** (Low Power Oscillator) | RP2350 only | ~32 kHz | On-chip ultra-low-power oscillator. Can feed clk_ref on RP2350 (not available on RP2040). |
+| **External clocks** | RP2040/RP2350 | up to 50 MHz | GPIO20/GPIO22 (GPIN0/1). Can feed clk_ref or clk_sys aux mux. |
+| **USB PLL** | RP2040/RP2350 | 48 MHz | Multiplies XOSC to generate the 48 MHz clock required for USB and ADC. |
+| **System PLL** | RP2040/RP2350 | 125 MHz (default) | Multiplies XOSC to generate `clk_sys`. Can be overclocked — **the RIA firmware sets it to 256 MHz**. |
+
+### PLL parameter model
+
+The System (and USB) PLL is programmed with three values:
+
+- **VCO freq** — the voltage-controlled oscillator target (must be in the valid VCO range, typically 750–1600 MHz).
+- **post_div1** — first post-divider (1–7). Applied after the VCO.
+- **post_div2** — second post-divider (1–7). Applied after post_div1. Must be ≤ post_div1.
+
+`output = vco_freq / (post_div1 × post_div2)`.
+
+For example, 256 MHz = VCO 1536 MHz / (3 × 2). The SDK function `check_sys_clock_hz()` validates a target and returns the three PLL parameters if attainable.
 
 ### PLL mechanics
 
-Both PLLs are *Phase Locked Loops* that multiply the XOSC (or an external clock at XIN) to produce a faster output. The USB PLL targets 48 MHz; the System PLL targets `clk_sys`. Changing the System PLL frequency is how the RP2040/RP2350 is overclocked.
+Both PLLs are *Phase Locked Loops* that multiply the XOSC (or an external clock at XIN) to produce a faster output. The USB PLL targets 48 MHz; the System PLL targets `clk_sys`. Changing the System PLL frequency is how the RP2040/RP2350 is overclocked. See [PLL parameter model](#pll-parameter-model) above.
+
+### `hardware_pll` SDK functions
+
+The `hardware_pll` library exposes low-level PLL control. Normally called indirectly via `clock_configure` (which wraps PLL setup), but available for direct use:
+
+| Function | Description |
+|---|---|
+| `pll_init(pll, ref_div, vco_freq, post_div1, post_div2)` | Configure and start a PLL. `pll` is `pll_sys` or `pll_usb`. `ref_div` divides the reference clock into the VCO. |
+| `pll_deinit(pll)` | Power off a PLL. **Does not check if PLL is in use** — call only when you know the PLL output is no longer needed. |
+| `PLL_RESET_NUM(pll)` | Macro → returns the `reset_num_t` value for reset-controller integration. Resolves at compile time. |
+
+The two SDK handles: `pll_sys` (system clock PLL, up to 133 MHz on RP2040, higher with overclocking) and `pll_usb` (USB reference clock PLL, 48 MHz fixed).
+
+> **Caution**: `pll_deinit` powers off the PLL immediately. If any peripheral or clock domain still references it, the system will hang. The RIA firmware sets `pll_sys` to 256 MHz at boot via `clock_configure`; never call `pll_deinit(pll_sys)` while the 6502 is running.
 
 ---
 
 ## Clock Domains
+
+### RP2040 clock numbers
 
 Ten clock generators each select one of the sources (via muxes) and apply a divisor:
 
@@ -43,6 +72,19 @@ Ten clock generators each select one of the sources (via muxes) and apply a divi
 | RTC | `clk_rtc` | XOSC |
 | Timer, Watchdog | `clk_ref` | XOSC |
 | GPIO clock output | `clk_gpout0`–`clk_gpout3` | Any source + divisor |
+
+**RP2040 enum**: `clk_gpout0–3`, `clk_ref`, `clk_sys`, `clk_peri`, `clk_usb`, `clk_adc`, `clk_rtc` (10 total, `CLK_COUNT = 10`).
+
+### RP2350 clock numbers (differences from RP2040)
+
+| Change | Detail |
+|---|---|
+| **`clk_rtc` removed** | RP2350 has no hardware RTC peripheral; use POWMAN for time-keeping instead. |
+| **`clk_hstx` added** | New HSTX (High-Speed Transmit) peripheral clock. |
+| **`clk_ref` can use LPOSC** | RP2350 adds `CLOCKS_CLK_REF_CTRL_SRC_VALUE_LPOSC_CLKSRC` as a main source. |
+| **Clock divisor range** | RP2350 supports 1.0→65536.0 in steps of 1/65536 (16-bit fraction). RP2040 supports exactly 1.0 or 2.0→16777216.0 in steps of 1/256 (8-bit fraction). |
+
+**RP2350 enum**: `clk_gpout0–3`, `clk_ref`, `clk_sys`, `clk_peri`, `clk_hstx`, `clk_usb`, `clk_adc` (10 total, no `clk_rtc`).
 
 **RIA-relevant**: `clk_sys` runs at **256 MHz** (see [[pio-architecture]] — overclock required for PIO to handle 8 MHz PHI2). `clk_peri` drives the UART console (GPIO 4–5, 115200 8N1) and the SPI peripheral. `clk_ref` from XOSC provides the precise timebase for the timer and watchdog.
 
@@ -61,7 +103,11 @@ The SDK `clock_configure()` handles this sequence automatically.
 
 ## Clock Output on GPIO
 
-Up to four clock signals can be routed to GPIO pins (GPIO 21, 23, 24, 25). On the Raspberry Pi Pico only **GPIO 21** is brought to a connector pin (GPIO 25 is the onboard LED; 23 and 24 are internal). Useful for testing or providing a clock to an external device.
+Up to four clock signals can be routed to GPIO pins:
+- **RP2040**: GPIO 21, 23, 24, 25 (connected to GPOUT0–3). On Raspberry Pi Pico only GPIO 21 is on a connector pin.
+- **RP2350**: GPIO 13, 15, 21, 23, 24, 25 (GPOUT0 on 13/21; GPOUT1 on 15/23; GPOUT2/3 on 24/25).
+
+Useful for testing or providing a clock to an external device. Use `clock_gpio_init()` or `clock_gpio_init_int_frac16()` (RP2350, 16-bit fraction) / `clock_gpio_init_int_frac8()` (RP2040, 8-bit fraction) for precise divisors.
 
 ---
 
@@ -76,15 +122,31 @@ A hardware frequency counter measures a clock source by counting edges over a te
 | Function | Description |
 |---|---|
 | `clocks_init()` | Initialize the library (call first) |
-| `clock_configure(clk_index, src, auxsrc, src_freq, freq)` | Configure a clock; handles mux sequencing |
-| `clock_stop(clk_index)` | Stop a clock (power saving) |
-| `clock_get_hz(clk_index)` | Return current frequency in Hz |
-| `clock_set_reported_hz(clk_index, hz)` | Override reported frequency (when changed outside `clock_configure`) |
-| `frequency_count_khz(src)` | Measure a source using the frequency counter; ±1 kHz accuracy (2 µs interval) |
-| `clock_gpio_init(gpio, src, div)` | Route a clock to GPIO 21/23/24/25 |
-| `clock_configure_gpin(clk_index, gpio, src_freq, freq)` | Use GPIO 20 or 22 as clock source |
+| `clock_configure(clk, src, auxsrc, src_freq, freq)` | Configure a clock; handles mux sequencing; sets divisor automatically |
+| `clock_configure_undivided(clk, src, auxsrc, src_freq)` | Configure clock at full src_freq (no division) |
+| `clock_configure_int_divider(clk, src, auxsrc, src_freq, divider)` | Configure clock with integer-only divisor |
+| `clock_configure_gpin(clk, gpio, src_freq, freq)` | Use GPIO 20 or 22 as external clock source |
+| `clock_stop(clk)` | Stop a clock (power saving) |
+| `clock_get_hz(clk)` | Return current frequency in Hz |
+| `clock_set_reported_hz(clk, hz)` | Override reported frequency (when changed outside `clock_configure`) |
+| `frequency_count_khz(src)` | Measure a source using the hardware frequency counter; ±1 kHz accuracy |
+| `clock_gpio_init(gpio, src, div)` | Route a clock to a GPOUT GPIO (float divisor) |
+| `clock_gpio_init_int_frac16(gpio, src, div_int, div_frac16)` | Route a clock to GPOUT GPIO (16-bit fraction; RP2350 native) |
+| `clock_gpio_init_int_frac8(gpio, src, div_int, div_frac8)` | Route a clock to GPOUT GPIO (8-bit fraction; RP2040 wrapper) |
+| `set_sys_clock_48mhz()` | Set clk_sys to 48 MHz from USB PLL (simple, no math required) |
+| `set_sys_clock_pll(vco_freq, post_div1, post_div2)` | Set System PLL directly; caller computes VCO + dividers |
+| `set_sys_clock_hz(freq_hz, required)` | Set clk_sys to target Hz; returns false (or panics if required=true) if unattainable |
+| `set_sys_clock_khz(freq_khz, required)` | Set clk_sys to target kHz |
+| `check_sys_clock_hz(freq_hz, &vco, &d1, &d2)` | Validate target; outputs PLL params if attainable |
+| `check_sys_clock_khz(freq_khz, &vco, &d1, &d2)` | Validate target in kHz |
+| `clocks_enable_resus(callback)` | Enable resus: auto-restarts clk_sys if it accidentally stops |
+| `gpio_to_gpout_clock_handle(gpio, default)` | Return GPOUT clock handle for a GPIO, or default |
 
-`clock_index` values: `clk_gpout0`–`clk_gpout3`, `clk_ref`, `clk_sys`, `clk_peri`, `clk_usb`, `clk_adc`, `clk_rtc`.
+`clock_handle_t` / `clock_num_t` values: `clk_gpout0`–`clk_gpout3`, `clk_ref`, `clk_sys`, `clk_peri`, `clk_usb`, `clk_adc`, `clk_rtc` (RP2040 only), `clk_hstx` (RP2350 only).
+
+### Resus (clock restart)
+
+`clocks_enable_resus(callback)` watches `clk_sys`. If clk_sys falls below a minimum threshold or stalls (e.g., the feeding PLL is stopped by accident), the hardware automatically switches clk_sys back to `clk_ref` and invokes the user callback. This prevents a hard lock-up when experimenting with PLL configuration.
 
 ---
 
@@ -92,63 +154,212 @@ A hardware frequency counter measures a clock source by counting edges over a te
 
 The Timer peripheral provides a **64-bit monotonic microsecond counter** and four alarms.
 
+- **RP2040**: one timer instance. Timebase derived from the Watchdog `clk_tick` (`clk_ref` / XOSC).
+- **RP2350**: two independent timer instances (TIMER0 and TIMER1). Timebase generated by the tick block (`clk_ref`).
+
 ### Counter
 
 - Counts microseconds since boot (monotonic — never wraps in practice: 2⁶⁴ µs ≈ 600,000 years).
-- Timebase: derived from the Watchdog `clk_tick` (from `clk_ref`, nominally XOSC).
 - Read protocol: read the low 32 bits first; the hardware latches the high 32 bits at that moment, so the subsequent high-word read is coherent.
 
 ### Alarms
 
-- 4 alarms (alarm 0–3), generating **IRQs 0–3** respectively.
+- 4 alarms per timer instance (alarm 0–3), each generating its own IRQ.
 - Match on the **lower 32 bits** of the counter — fires when the counter's lower bits equal the alarm value.
 - Since 2³² µs ≈ 72 minutes, alarms are suitable for delays of tens of microseconds to about one hour.
 - Delays shorter than ~10 µs have significant imprecision; use PIO for sub-microsecond timing.
 
-### Low-level SDK (`hardware_timer`)
+### Callback type
+
+```c
+typedef void (*hardware_alarm_callback_t)(uint alarm_num);
+```
+
+Invoked from the timer's IRQ handler when the alarm fires. The callback receives the alarm number.
+
+### Low-level SDK (`hardware_timer`) — default-timer wrappers
+
+These functions operate on `PICO_DEFAULT_TIMER_INSTANCE` (TIMER0 on RP2350, the single timer on RP2040).
 
 | Function | Description |
 |---|---|
-| `time_us_32()` | Lower 32 bits of timer counter |
-| `time_us_64()` | Full 64-bit counter |
+| `time_us_32()` | Lower 32 bits of default timer counter |
+| `time_us_64()` | Full 64-bit counter of default timer |
 | `busy_wait_us_32(delay)` / `busy_wait_us(delay)` | Spin-wait for N microseconds |
 | `busy_wait_ms(delay)` | Spin-wait for N milliseconds |
 | `busy_wait_until(t)` | Spin-wait until absolute timestamp |
 | `time_reached(t)` | Non-blocking: is counter ≥ t? |
-| `hardware_alarm_claim(num)` | Claim exclusive use of an alarm |
+| `hardware_alarm_claim(num)` | Claim exclusive use of alarm `num` on default timer |
+| `hardware_alarm_claim_unused(required)` | Claim any unclaimed alarm; panics if none and `required=true` |
+| `hardware_alarm_unclaim(num)` | Release claim on alarm `num` |
+| `hardware_alarm_is_claimed(num)` | Returns true if alarm `num` is currently claimed |
 | `hardware_alarm_set_callback(num, cb)` | Set IRQ callback + enable interrupt |
-| `hardware_alarm_set_target(num, t)` | Arm alarm to fire at timestamp t |
+| `hardware_alarm_set_target(num, t)` | Arm alarm; returns `true` if `t` is already in the past |
 | `hardware_alarm_cancel(num)` | Cancel a pending alarm |
+| `hardware_alarm_force_irq(num)` | Immediately fire the alarm IRQ (testing/software-trigger) |
+| `hardware_alarm_get_irq_num(num)` | Returns `irq_num_t` for alarm `num` on default timer |
 
-### High-level SDK (`pico_time` in `pico_stdlib`)
+### Compile-time macros (`hardware_timer`)
 
-`pico_time` wraps the hardware timer in four modules:
+| Macro | Description |
+|---|---|
+| `TIMER_ALARM_IRQ_NUM(timer, alarm_num)` | Returns `irq_num_t` for a given alarm on a given timer instance |
+| `TIMER_ALARM_NUM_FROM_IRQ(irq)` | Extracts alarm number from an IRQ number |
+| `TIMER_NUM_FROM_IRQ(irq)` | Extracts timer instance number from an IRQ number |
+| `PICO_DEFAULT_TIMER` | Index of the default timer (0 on both RP2040 and RP2350) |
+| `PICO_DEFAULT_TIMER_INSTANCE` | `timer_hw_t *` pointer to the default timer registers |
 
-**timestamp** — `absolute_time_t` type (opaque uint64_t) representing instants. `get_absolute_time()` returns "now". `delayed_by_us()` / `delayed_by_ms()` add an offset.
+### RP2350 multi-instance API (`timer_*` variants)
 
-**sleep** — delay in low-power state. `sleep_us(n)`, `sleep_ms(n)`, `sleep_until(t)`.
-
-**alarm** — builds *alarm pools* on top of hardware alarms. Each pool is backed by one hardware alarm and supports multiple concurrent software alarms.
+On RP2350, all functions exist in a `timer_*` form that takes an explicit `timer_hw_t *timer` parameter. The default-timer wrappers above call these with `PICO_DEFAULT_TIMER_INSTANCE`.
 
 | Function | Description |
 |---|---|
-| `alarm_pool_init_default()` | Initialize default pool (uses hardware alarm 3, max 16 alarms) |
-| `alarm_pool_create(hw_alarm, max)` | Custom pool |
-| `alarm_pool_add_alarm_at(pool, time, cb, data, fire_if_past)` | Fire at absolute timestamp |
-| `alarm_pool_add_alarm_in_us/ms(pool, delay, cb, data, fire_if_past)` | Fire after delay |
-| `alarm_pool_cancel_alarm(pool, id)` | Cancel alarm |
+| `timer_time_us_32(timer)` | Lower 32 bits of given timer |
+| `timer_time_us_64(timer)` | Full 64-bit counter of given timer |
+| `timer_busy_wait_us_32(timer, delay)` | Spin-wait on given timer |
+| `timer_busy_wait_us(timer, delay)` | Spin-wait (64-bit delay) on given timer |
+| `timer_busy_wait_ms(timer, delay)` | Spin-wait ms on given timer |
+| `timer_busy_wait_until(timer, t)` | Spin-wait until timestamp on given timer |
+| `timer_time_reached(timer, t)` | Non-blocking: is given timer counter ≥ t? |
+| `timer_hardware_alarm_claim(timer, num)` | Claim alarm `num` on given timer |
+| `timer_hardware_alarm_claim_unused(timer, required)` | Claim any unclaimed alarm on given timer |
+| `timer_hardware_alarm_unclaim(timer, num)` | Release alarm `num` on given timer |
+| `timer_hardware_alarm_is_claimed(timer, num)` | True if alarm `num` claimed on given timer |
+| `timer_hardware_alarm_set_callback(timer, num, cb)` | Set callback for alarm on given timer |
+| `timer_hardware_alarm_set_target(timer, num, t)` | Arm alarm on given timer; returns true if past |
+| `timer_hardware_alarm_cancel(timer, num)` | Cancel alarm on given timer |
+| `timer_hardware_alarm_force_irq(timer, num)` | Force IRQ for alarm on given timer |
+| `timer_hardware_alarm_get_irq_num(timer, num)` | Get IRQ number for alarm on given timer |
+| `timer_get_index(timer)` | Returns the timer instance number (0 or 1) |
+| `timer_get_instance(num)` | Returns `timer_hw_t *` for timer instance number |
 
-Callbacks run from the timer interrupt handler on **core 0**. If the callback returns a non-zero positive value, the alarm re-fires that many µs after the current timestamp; negative re-fires relative to the previous target.
+### High-level SDK (`pico_time` library)
 
-**repeating_timer** — simplifies periodic callbacks.
+> **Important**: Do not modify the hardware timer directly when using `pico_time`. The library expects the timer to increase monotonically at 1 µs per tick. Shift time by adding/subtracting constants instead of touching the counter.
+
+`pico_time` is split into four sub-modules:
+
+#### absolute_time_t and timestamp API
+
+`absolute_time_t` is an opaque type representing an instant in time (µs since boot). In SDK 2.0+ it defaults to a plain `uint64_t`; set `PICO_OPAQUE_ABSOLUTE_TIME_T=1` to enable type-checked wrapping.
+
+**Sentinel values:**
+- `at_the_end_of_time` — set to `0x7fffffff_ffffffff` µs (~300,000 years); used as "never fire" marker. **Note**: not the maximum uint64_t — avoids overflow in signed arithmetic.
+- `nil_time` — the null timestamp (0).
 
 | Function | Description |
 |---|---|
-| `add_repeating_timer_us(delay, cb, data, out)` | Repeating callback every `delay` µs (default pool) |
-| `add_repeating_timer_ms(delay, cb, data, out)` | Every `delay` ms |
-| `cancel_repeating_timer(timer)` | Stop |
+| `get_absolute_time()` | Return current time as `absolute_time_t` |
+| `to_us_since_boot(t)` | Convert `absolute_time_t` → `uint64_t` µs |
+| `to_ms_since_boot(t)` | Convert `absolute_time_t` → `uint32_t` ms |
+| `from_us_since_boot(us)` | Convert `uint64_t` µs → `absolute_time_t` |
+| `update_us_since_boot(&t, us)` | Update an existing `absolute_time_t` in place |
+| `delayed_by_us(t, us)` | Return `t + us` as a new timestamp |
+| `delayed_by_ms(t, ms)` | Return `t + ms` as a new timestamp |
+| `make_timeout_time_us(us)` | `get_absolute_time() + us` (convenience) |
+| `make_timeout_time_ms(ms)` | `get_absolute_time() + ms` (convenience) |
+| `absolute_time_diff_us(from, to)` | Signed difference in µs (positive if `to` is later); be careful diffing against `at_the_end_of_time` — may overflow |
+| `absolute_time_min(a, b)` | Return the earlier of two timestamps |
+| `is_at_the_end_of_time(t)` | True if `t == at_the_end_of_time` |
+| `is_nil_time(t)` | True if `t == nil_time` |
 
-Positive delay → counted from callback return; negative delay → counted from previous target (jitter-free).
+#### sleep API
+
+Low-power sleep using `__wfe()`. Requires the **default alarm pool** (if disabled, falls back to busy-wait).
+
+> **Note**: Do NOT call sleep functions from an IRQ handler.
+
+| Function | Description |
+|---|---|
+| `sleep_us(us)` | Sleep at least `us` µs (WFE-based if alarm pool available) |
+| `sleep_ms(ms)` | Sleep at least `ms` ms |
+| `sleep_until(t)` | Sleep until `absolute_time_t` |
+| `best_effort_wfe_or_timeout(t)` | Do a `__wfe()` if possible; returns true when `t` is reached. Use in a polling loop: `do { check(); } while (!best_effort_wfe_or_timeout(timeout));` |
+
+`busy_wait_us()`, `busy_wait_us_32()`, `busy_wait_ms()`, `busy_wait_until()` are the non-sleep equivalents (spin-wait; no alarm pool needed; returns slightly sooner after target).
+
+#### alarm API
+
+Alarm pools multiplex many software alarms onto a single hardware alarm. The **default pool** is created on core 0 using hardware alarm 3, with up to 16 concurrent alarms.
+
+**Default pool compile-time config macros:**
+
+| Macro | Default | Description |
+|---|---|---|
+| `PICO_TIME_DEFAULT_ALARM_POOL_DISABLED` | 0 | Set to 1 to disable the default pool (sleep becomes busy-wait; some SDK code won't compile) |
+| `PICO_TIME_DEFAULT_ALARM_POOL_HARDWARE_ALARM_NUM` | 3 | Which hardware alarm backs the default pool |
+| `PICO_TIME_DEFAULT_ALARM_POOL_MAX_TIMERS` | 16 | Max concurrent alarms (hard limit: 255 due to heap) |
+
+**Callback type and return semantics:**
+
+```c
+typedef int64_t (*alarm_callback_t)(alarm_id_t id, void *user_data);
+// Return  <0: reschedule |return_value| µs from the previous scheduled fire time
+// Return  >0: reschedule return_value µs from the time this callback returns
+// Return   0: do not reschedule
+```
+
+**alarm_id_t**: `int32_t` — positive = valid alarm; 0 = time already passed (and `fire_if_past=false`); negative = error (no slots available). IDs may eventually be reused — do not hold stale IDs for long.
+
+**Pool management:**
+
+| Function | Description |
+|---|---|
+| `alarm_pool_init_default()` | Create the default pool (if not already created or disabled) |
+| `alarm_pool_get_default()` | Return the default pool pointer |
+| `alarm_pool_create(hw_alarm_num, max_timers)` | Create a custom pool on a specific hardware alarm; callbacks fire on the calling core |
+| `alarm_pool_create_with_unused_hardware_alarm(max_timers)` | Create pool claiming any free hardware alarm |
+| `alarm_pool_timer_alarm_num(pool)` | Query which hardware alarm a pool uses |
+| `alarm_pool_core_num(pool)` | Query which core the pool fires callbacks on |
+| `alarm_pool_destroy(pool)` | Cancel all alarms and free the hardware alarm |
+
+**Adding/cancelling alarms (pool variants):**
+
+| Function | Description |
+|---|---|
+| `alarm_pool_add_alarm_at(pool, time, cb, data, fire_if_past)` | Fire at `absolute_time_t`; if time is past and `fire_if_past=true`, calls `cb` immediately |
+| `alarm_pool_add_alarm_at_force_in_context(pool, time, cb, data)` | Guarantees `cb` is called from the pool's IRQ context even if time is already past (no `fire_if_past` parameter needed) |
+| `alarm_pool_add_alarm_in_us(pool, us, cb, data, fire_if_past)` | Fire after `us` µs |
+| `alarm_pool_add_alarm_in_ms(pool, ms, cb, data, fire_if_past)` | Fire after `ms` ms |
+| `alarm_pool_cancel_alarm(pool, alarm_id)` | Cancel; returns true if found and cancelled |
+| `alarm_pool_remaining_alarm_time_us(pool, id)` | µs until next fire (≥0); <0 if alarm gone/expired |
+| `alarm_pool_remaining_alarm_time_ms(pool, id)` | ms until next fire; INT32_MAX if >INT32_MAX ms |
+
+**Default pool convenience wrappers** (same semantics; use `alarm_pool_get_default()` internally):
+
+| Function | Description |
+|---|---|
+| `add_alarm_at(time, cb, data, fire_if_past)` | |
+| `add_alarm_in_us(us, cb, data, fire_if_past)` | |
+| `add_alarm_in_ms(ms, cb, data, fire_if_past)` | |
+| `cancel_alarm(alarm_id)` | |
+| `remaining_alarm_time_us(alarm_id)` | |
+| `remaining_alarm_time_ms(alarm_id)` | |
+
+#### repeating_timer API
+
+Periodic callbacks backed by the alarm pool. Unlike raw alarm rescheduling, `repeating_timer_t` stores the delay so the framework handles rescheduling automatically.
+
+**Callback type:**
+```c
+typedef bool (*repeating_timer_callback_t)(repeating_timer_t *rt);
+// Return true to continue repeating; false to stop.
+```
+
+**Delay sign convention** — same for both `_us` and `_ms` variants:
+- **Positive delay**: interval is measured from when the callback **returns** (gap between callbacks).
+- **Negative delay**: interval is measured from when the callback was **scheduled to fire** (fixed-rate, jitter-free). The absolute value is used as the period.
+
+| Function | Description |
+|---|---|
+| `add_repeating_timer_us(delay_us, cb, data, out)` | Default pool; fires every `|delay_us|` µs |
+| `add_repeating_timer_ms(delay_ms, cb, data, out)` | Default pool; fires every `|delay_ms|` ms |
+| `alarm_pool_add_repeating_timer_us(pool, delay_us, cb, data, out)` | Specific pool |
+| `alarm_pool_add_repeating_timer_ms(pool, delay_ms, cb, data, out)` | Specific pool |
+| `cancel_repeating_timer(timer)` | Stop the repeating timer |
+
+> **Caution**: The `repeating_timer_t` struct (pointed to by `out`) must outlive the repeating timer. Avoid storing it on the stack if the timer should survive the function that created it.
 
 ---
 
