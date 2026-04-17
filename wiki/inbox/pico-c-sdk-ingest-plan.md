@@ -114,7 +114,7 @@ The document is 743 pages. We read ~215 pages (14 sessions). The API reference s
 
 Sessions follow natural dependency order: SDK concepts first, then PIO (core of the RIA), then hardware APIs by decreasing importance to the firmware, then high-level multi-core/time APIs.
 
-- [ ] **S1** — SDK architecture (PDF 10–33, 24p): Ch.1+2 — build system, `INTERFACE` library model, naming conventions, hardware claiming, multi-core §2.8, C++ §2.9, RP2040/RP2350 compat §2.10
+- [x] **S1** — SDK architecture (PDF 10–33, 24p): Ch.1+2 — build system, `INTERFACE` library model, naming conventions, hardware claiming, multi-core §2.8, C++ §2.9, RP2040/RP2350 compat §2.10
 - [ ] **S2** — PIO getting started (PDF 34–53, 20p): §3.1 PIO concepts + §3.2 getting started — first program (p.37), WS2812 LED DMA feed (p.41), logic-analyser DMA pattern (p.49)
 - [ ] **S3** — PIOASM + PIO ISA (PDF 54–78, 25p): §3.3 PIOASM assembler spec (pp.54-64: directives, pseudoinstructions, generators) + §3.4 complete PIO instruction set reference (pp.65-78: v0 RP2040 / v1 RP2350 encodings, all opcodes)
 - [ ] **S4** — `hardware_clocks` (PDF 95–112, 18p): `clock_configure`, PLL setup, XOSC/ROSC, frequency measurement; `hardware_divider` at pp.113-121 is skipped

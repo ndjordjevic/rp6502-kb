@@ -19,6 +19,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[release-notes]] | All 23 releases v0.1–v0.23: feature introduction dates, breaking changes, known issues |
 | [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO, DMA, USB, clocks, UART, SPI (all planned chapters ingested) |
 | [[fairhead-pico-c]] | "Programming the Raspberry Pi Pico/W in C" (Fairhead, 3rd ed. 2025): SDK programming — PIO, GPIO, multicore, FreeRTOS, WiFi, SPI, UART (all planned chapters ingested) |
+| [[pico-c-sdk]] | Raspberry Pi Pico-series C/C++ SDK (RP-009085-KB-1, 2025): official API reference — function signatures, PIOASM encoding, RP2040/RP2350 compat table; S1 ingested |
 
 ## Entities
 
@@ -59,6 +60,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp2040-clocks]] | RP2040 clock subsystem: ROSC/XOSC/PLLs, 10 clock domains, 256 MHz overclock; Timer (64-bit µs, alarm pools), Watchdog, RTC |
 | [[rp2040-uart]] | RP2040 UARTs: framing, 32-entry FIFOs + error flags, fractional baud rate, interrupts, hardware flow control, SDK API; RIA uses UART1/GPIO4-5/115200 |
 | [[rp2040-spi]] | RP2040 SPI: master/slave, 4–16-bit words, CPOL/CPHA modes, manual SS in master mode, DMA, SDK API; RIA uses USB MSC (not SPI) for storage |
+| [[sdk-architecture]] | Pico SDK build model: CMake INTERFACE libraries, library tiers, hardware claiming, builder pattern, RP2040/RP2350 platform split |
 
 ## Inbox
 

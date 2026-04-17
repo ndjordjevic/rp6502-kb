@@ -7,6 +7,12 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-17] ingest | pico-c-sdk S1 | Ch.1 + Ch.2 §§2.1–2.10 (PDF pp.10–33)
+
+Created `wiki/sources/pico-c-sdk.md` (source summary with full 14-session scope table). Created `wiki/concepts/sdk-architecture.md` covering: CMake INTERFACE library model, library naming tiers (`hardware_` vs `pico_`), hardware structs and atomic register aliases, hardware claiming, builder pattern for peripheral config, function naming conventions, error handling, directory/platform split (RP2040 vs RP2350), multi-core model, runtime, floating point, and board customisation. Updated `rp6502-ria.md` and `rp6502-vga.md` to reference `pico-c-sdk` and `sdk-architecture`. Updated `index.md`, `overview.md`.
+
+Key finding: ingest plan incorrectly stated "RIA uses RP2040" — both RIA and VGA run on **RP2350** (Pi Pico 2). The `rp2350-arm-s` platform applies to both firmwares. This is now correctly reflected in `sdk-architecture.md` and `pico-c-sdk.md`.
+
 ## [2026-04-17] lint | full wiki audit | 8 fixes across 5 files
 
 Full lint pass across all 40 wiki pages, cross-checked against raw firmware source (api.h, cpu.h, ria.h, mem.h, main.c, sys.c, ria.c). Findings and fixes:

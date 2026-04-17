@@ -1,10 +1,10 @@
 ---
 type: entity
 tags: [rp6502, ria, firmware, rp2350, pico2]
-related: [[rp6502-ria-w]], [[rp6502-vga]], [[rp6502-os]], [[pix-bus]], [[xram]], [[xreg]], [[memory-map]], [[reset-model]], [[rom-file-format]]
-sources: [[rp6502-ria-docs]], [[picocomputer-intro]], [[rp6502-github-repo]]
+related: [[rp6502-ria-w]], [[rp6502-vga]], [[rp6502-os]], [[pix-bus]], [[xram]], [[xreg]], [[memory-map]], [[reset-model]], [[rom-file-format]], [[sdk-architecture]]
+sources: [[rp6502-ria-docs]], [[picocomputer-intro]], [[rp6502-github-repo]], [[pico-c-sdk]]
 created: 2026-04-15
-updated: 2026-04-16
+updated: 2026-04-17
 ---
 
 # RP6502-RIA
@@ -67,4 +67,5 @@ Full YM3812 register set (256 bytes). **Timers / interrupts / status register ar
 - [[usb-controller]] — USB 1.1 controller; RIA uses it in host mode for HID + VCP + NFC
 - [[rp2040-clocks]] — clock subsystem: 256 MHz System PLL overclock, clk_peri (UART/SPI), timer, watchdog
 - [[rp2040-uart]] — UART1 console on GPIO 4–5, 115200 8N1; SDK API and interrupt model
+- [[sdk-architecture]] — CMake INTERFACE model, builder pattern, hardware claiming, atomic aliases used in RIA firmware
 - [[rp6502-ria-w]] — wireless superset
