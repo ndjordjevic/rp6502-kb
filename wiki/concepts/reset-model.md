@@ -2,7 +2,7 @@
 type: concept
 tags: [rp6502, reset, control]
 related: [[rp6502-ria]], [[w65c02s]], [[rp6502-board]]
-sources: [[rp6502-ria-docs]]
+sources: [[rp6502-ria-docs]], [[youtube-playlist]]
 created: 2026-04-15
 updated: 2026-04-15
 ---
@@ -52,6 +52,24 @@ The two stop keys (Ctrl-Alt-Del and Alt-F4) have different effects on the [[laun
 
 See [[launcher]] for the full pattern.
 
+## User-visible consequence: BASIC + disk access (from [[yt-ep17-basics-of-basic]])
+
+> **Source**: [[yt-ep17-basics-of-basic]] (Ep17). The reboot/reset distinction has a practical consequence when using the BASIC interpreter.
+
+When the Picocomputer boots into BASIC (via `SET BOOT BASIC`) and the user needs filesystem access (which EhBASIC doesn't support directly):
+
+1. **Ctrl+Alt+Del** → stops BASIC, returns to monitor. BASIC interpreter and program remain in 6502 RAM.
+2. Use `LS`, `CD`, file management at the monitor.
+3. **`RESET`** command at monitor → 6502-only reset → BASIC restarts its interpreter from the reset vector. The program that was in RAM is **still there**.
+
+This works because:
+- Ctrl+Alt+Del causes RESB to go low (monitor takes over), but does NOT reboot the RIA.
+- `RESET` raises RESB (6502 starts from its reset vector), but does NOT reload any ROM or clear RAM.
+- Only a **REBOOT** (full RIA restart) reloads the boot ROM and starts fresh.
+
+See [[launcher]] for the `SET BOOT` pattern that sets up BASIC as the boot target.
+
 ## Related pages
 
 - [[rp6502-ria]] · [[w65c02s]] · [[rp6502-board]] · [[launcher]]
+- [[yt-ep17-basics-of-basic]] — concrete demonstration

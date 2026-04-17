@@ -565,3 +565,142 @@ Notes / open questions surfaced:
 - The OS source contains many more API entries than were summarized; only a representative sampling was lifted to keep this session focused. A future ingest pass should walk the rest of the file (Process control, Time, full file/dir API, attributes table, errno table) and expand `[[rp6502-os-docs]]`.
 
 ## [2026-04-15] setup | initial scaffold | created directory structure, CLAUDE.md, wiki stubs
+
+## [2026-04-17] ingest | YouTube playlist — Sessions 0 + 1 | Ep1–Ep4 ingested; scaffolding created
+
+Sessions completed: 0 (scaffolding) and 1 (Era A: Prototype).
+
+### Session 0 — Scaffolding
+- Created `wiki/topics/development-history.md` — topic page with Era A written, Eras B–E stub headings.
+- Created `wiki/sources/youtube-playlist.md` — hub page with episode table and Scope tracker.
+- Updated `wiki/index.md` — added youtube-playlist, yt-ep01–04 under Sources; development-history under Topics.
+
+### Session 1 — Era A: Prototype (Ep1–Ep4, late 2022 – early 2023)
+Source pages created (4):
+- `wiki/sources/yt-ep01-8bit-retro-computer.md`
+- `wiki/sources/yt-ep02-pio-and-dma.md`
+- `wiki/sources/yt-ep03-writing-to-pico.md`
+- `wiki/sources/yt-ep04-picocomputer-hello.md`
+
+Pages updated (3):
+- `wiki/concepts/pio-architecture.md` — added historical origin note (Ep2/Ep3) to "Why PIO?" section; added youtube-playlist to sources.
+- `wiki/topics/known-issues.md` — added "Hardware requirements" section with AC-chip/8 MHz rule (Ep3).
+- `wiki/concepts/rp6502-abi.md` — added historical note on `RIA_SPIN` prototype origin (Ep4); added youtube-playlist to sources.
+
+Key facts captured:
+- Initial design: 12 glue chips, single-Pico concept (Ep1).
+- Dual-Pico pivot formalized at Ep2 → became [[rp6502-ria]] + [[rp6502-vga]] architecture.
+- PIO+DMA bus interface introduced Ep2 (read path) and Ep3 (write path + chip-select gating).
+- 8 MHz achieved by doubling Pi Pico clock (Ep2); AC-family chips required for 8 MHz glue logic (Ep3); HC family defaults to 4 MHz.
+- RIA name coined in Ep3.
+- Fast-load (`RIA_SPIN`) prototype described in Ep4; 6502 startup garbage (first 7 cycles) quirk documented.
+
+## [2026-04-17] ingest | YouTube playlist — Session 2 | Ep6–Ep7 ingested (Era B)
+
+### Session 2 — Era B: Storage and OS emergence (Ep6, Ep7, 2023)
+
+Source pages created (2):
+- `wiki/sources/yt-ep06-roms-filesystem.md`
+- `wiki/sources/yt-ep07-operating-system.md`
+
+Pages updated (4):
+- `wiki/topics/development-history.md` — wrote Era B section: dual-filesystem rationale, ROM concept, OS emergence narrative, XRAM memory model clarification, RP2040-era context
+- `wiki/entities/rp6502-os.md` — added design philosophy section from Ep7 ("32 bytes", "OS emerged", protection model, third-party composition)
+- `wiki/concepts/xram.md` — added shared-ownership note from Ep7 (userland/kernel/video/audio all share XRAM)
+- `wiki/index.md` — added yt-ep06 and yt-ep07 entries
+
+Key facts captured:
+- FatFs (USB media) + littlefs (internal flash) coexistence rationale: wear-leveling divide
+- ROM concept introduced in Ep6: programs installed to internal flash, bootable
+- "I never set a goal of making an operating system" — emerged from POSIX intent (Ep7)
+- "All I ask for is 32 bytes" — RIA's only footprint in 6502 address space
+- XRAM shared by userland/kernel/video/audio (first explicit statement, Ep7)
+- At Ep7, RP2040/Cortex-M0+ was the hardware; migrated to RP2350 at v0.10
+- PIX bus not yet working at Ep7; VGA = ANSI terminal only
+
+## [2026-04-17] lint | full wiki lint pass | cross-ref gaps closed
+
+**Scope**: contradictions, orphans, data gaps, missing cross-refs, ingestion completeness across 76 wiki pages.
+
+**Findings + fixes**:
+- **Contradictions**: none surfaced.
+- **Orphans**: none. Lowest inbound is `[[yt-ep19-game-of-life]]` (1 ref from `youtube-playlist`); acceptable for a tutorial-only episode source.
+- **Data gaps**: none — every domain term mentioned in body has a corresponding page.
+- **Missing cross-refs**: ~40 candidates surfaced from heuristic scan; high-value ones fixed:
+  - `wiki/concepts/api-opcodes.md` — added `[[cc65]]` / `[[llvm-mos]]` links in errno-opt and lseek rows; expanded `related:`.
+  - `wiki/concepts/xreg.md` — pointed PSG/OPL2 example block to `[[programmable-sound-generator]]` / `[[opl2-fm-synth]]`; expanded `related:`.
+  - `wiki/concepts/pix-bus.md` — first PIO mention now links to `[[pio-architecture]]`.
+  - `wiki/concepts/opl2-fm-synth.md` — first XRAM and PIX-bus mentions now linked.
+  - `wiki/concepts/ria-registers.md` — XRAM, cc65, llvm-mos first mentions now linked; expanded `related:`.
+  - `wiki/concepts/memory-map.md` — first PIO + HSTX rows now wikilinked; expanded `related:`.
+  - `wiki/concepts/rp2040-clocks.md` — first HSTX mention now linked; added to `related:`.
+  - `wiki/topics/development-history.md` — first cc65/llvm-mos mentions in Eras D and toolchain split section now linked.
+  - `wiki/sources/rp6502-ria-docs.md` — PSG/OPL2 table rows now point at the dedicated concept pages.
+  - `wiki/sources/release-notes.md` — added `[[cc65]]` / `[[opl2-fm-synth]]` / `[[programmable-sound-generator]]` to `related:`.
+- **Ingestion completeness**: every `## Scope` table across all source pages is fully checked off (0 unchecked items).
+- **Frontmatter**: 1 strict-YAML violation in `wiki/overview.md` (colon inside `updated:` parenthetical) — fixed by simplifying to `updated: 2026-04-17`. The wiki-style `related: [[a]], [[b]]` syntax is per CLAUDE.md spec and is treated as wiki convention, not a YAML error.
+
+**Remaining low-priority gaps** (intentionally not fixed — repeated mentions inside the same paragraph or table; first mention is already linked elsewhere):
+- `youtube-playlist.md` body table reuses cc65/llvm-mos/PIX bus/PIO terms across many rows; episode source pages already link them where they're discussed in depth.
+- `quadros-rp2040.md`, `fairhead-pico-c.md`, `pico-c-sdk.md` use HSTX/PIX bus/XRAM in scope-listing context; no new fact would be reached by adding more links.
+
+## [2026-04-17] lint | post-YouTube polish pass | audio section + small fixes
+
+- `wiki/overview.md` — added "## Audio" section (PSG + OPL2 coexistence, v0.6 / v0.16 anchors, XREG+XRAM pathway); removed duplicate "Topics" line at EOF
+- `wiki/sources/yt-ep19-game-of-life.md` — added `[[development-history]]` to related
+- `wiki/sources/yt-ep21-ai-programming.md` — added `[[development-history]]` to related
+- Broken-link scan: 0 broken wikilinks across 76 pages (only `[[pia-registers]]` in this log, which is a historical record of a past typo fix)
+
+## [2026-04-17] ingest | YouTube playlist Sessions 3–9 | Eps 8–22 fully ingested
+
+**All 15 remaining transcript files ingested (Ep8–Ep22, except Ep5 no-captions).**
+
+### New pages created (20)
+
+**Source pages** (15):
+- `wiki/sources/yt-ep08-vga-pix-bus.md` — PIX bus design, DDR insight, PIO cost, DMA priority
+- `wiki/sources/yt-ep09-c-programming-setup.md` — cc65 + VSCode template workflow
+- `wiki/sources/yt-ep10-diy-build.md` — PCB soldering assembly, Founders Edition boards
+- `wiki/sources/yt-ep11-no-soldering.md` — PCBWay single-unit manufacturing
+- `wiki/sources/yt-ep12-fonts-vsync.md` — v0.1 release, code pages, VSYNC backchannel
+- `wiki/sources/yt-ep13-graphics-programming.md` — canvas/mode/xreg/planes/scanlines tutorial
+- `wiki/sources/yt-ep14-usb-mouse.md` — 3 input modes, fgets() added, paint demo
+- `wiki/sources/yt-ep15-asset-management.md` — CMake asset workflow, sprites with affine transforms
+- `wiki/sources/yt-ep16-psg-intro.md` — PSG: 8ch, 5 waveforms, ADSR, PWM
+- `wiki/sources/yt-ep17-basics-of-basic.md` — EhBASIC install, SET BOOT, reset vs. reboot, RND quirk
+- `wiki/sources/yt-ep18-llvm-mos.md` — cc65 vs LLVM-MOS comparison and Mandelbrot benchmark
+- `wiki/sources/yt-ep19-game-of-life.md` — 640×480 monochrome bitmap tutorial (thin)
+- `wiki/sources/yt-ep20-bbs.md` — Pi Pico 2 upgrade, WiFi BBS, NTP+DST
+- `wiki/sources/yt-ep21-ai-programming.md` — GitHub Copilot demos, documentation anchoring (thin)
+- `wiki/sources/yt-ep22-graphics-sound-demos.md` — community demos, OPL2 FM synth origin story
+
+**Concept pages** (3):
+- `wiki/concepts/code-pages.md` — CP437/CP850/CP855, FAT short-name fallback, SET CODEPAGE
+- `wiki/concepts/programmable-sound-generator.md` — 8ch, 5 waveforms, ADSR, PWM, stereo pan, XREG
+- `wiki/concepts/opl2-fm-synth.md` — YM3812-compatible, firmware emulation, origin story, FPGA experiment
+
+**Entity pages** (2):
+- `wiki/entities/cc65.md` — 1998+, stable stdlib, fastcall ABI, VSCode template, fork requirement
+- `wiki/entities/llvm-mos.md` — LLVM fork, C++/floats/64-bit, better optimization, sparse stdlib
+
+### Pages updated (16)
+
+- `wiki/concepts/pix-bus.md` — added "Design journey" section: SPI rationale, DDR brain-fart story, PIO cost, DMA priority, VSYNC backchannel complexity
+- `wiki/entities/rp6502-vga.md` — added graphics system details: color model, xreg register map, config structure fields, scanline partitioning, tiling, affine sprites, ANSI 16-bit upgrade
+- `wiki/topics/development-history.md` — wrote Era C (PIX bus + graphics), Era D (productization + CMake assets), Era E (RP2350 migration, BBS, BASIC, toolchains, PSG, OPL2, community)
+- `wiki/topics/known-issues.md` — added code page / filename fallback note; added EhBASIC RND(1) vs RND(0) quirk; added CONTINUE note
+- `wiki/topics/version-history.md` — added v0.1 "dozen working devices" trigger note
+- `wiki/concepts/rom-file-format.md` — added CMake asset workflow section (rp6502_asset, rp6502_executable, help shebang, install workflow)
+- `wiki/concepts/rp6502-abi.md` — added developer workflow section (template→compile→upload→run, rp6502.py, CMake structure)
+- `wiki/entities/rp6502-os.md` — added input modes section (UART stdio, HID bit-array, mouse counters)
+- `wiki/concepts/launcher.md` — added boot BASIC example (SET BOOT BASIC, reset vs. reboot workaround)
+- `wiki/concepts/reset-model.md` — added user-visible consequence: BASIC + disk access (Ctrl+Alt+Del → RESET workflow)
+- `wiki/entities/rp6502-ria-w.md` — added BBS demo section (Hayes modem, ANSI+CP437, NTP+DST, Pi Pico 2 upgrade path)
+- `wiki/entities/rp6502-ria.md` — added audio subsystem section (PSG + OPL2 coexistence, XREG addresses, 10-bit DAC upgrade note)
+- `wiki/sources/youtube-playlist.md` — updated all episode wikilinks + notes; marked all episodes [x] ingested in Scope table
+- `wiki/index.md` — added all new pages (15 source, 3 concept, 2 entity)
+- `wiki/overview.md` — added development-history and youtube-playlist to hub pages; added audio section (PSG+OPL2); added cc65/llvm-mos to entities; resolved open question #3 (toolchain pages now exist)
+- `PROGRESS.md` — updated YouTube ingest line to ✅; backfill items marked done; wiki size table updated (~74 pages)
+
+### Deleted
+- `wiki/inbox/youtube-rp6502-ingest-plan.md` — all sessions complete; superseded by source pages and log.md

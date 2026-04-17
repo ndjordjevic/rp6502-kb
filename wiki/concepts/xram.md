@@ -2,9 +2,9 @@
 type: concept
 tags: [rp6502, xram, memory]
 related: [[memory-map]], [[pix-bus]], [[xreg]], [[rp6502-ria]], [[rp6502-vga]], [[dma-controller]]
-sources: [[rp6502-ria-docs]], [[rp6502-os-docs]], [[quadros-rp2040]]
+sources: [[rp6502-ria-docs]], [[rp6502-os-docs]], [[quadros-rp2040]], [[youtube-playlist]]
 created: 2026-04-15
-updated: 2026-04-16
+updated: 2026-04-17
 ---
 
 # XRAM (Extended RAM)
@@ -55,3 +55,9 @@ XRAM lives in one of the RP2040's six SRAM banks. The RIA firmware uses [[dma-co
 ## Related pages
 
 - [[memory-map]] · [[pix-bus]] · [[xreg]] · [[rp6502-ria]] · [[rp6502-vga]] · [[dma-controller]]
+
+---
+
+## Shared ownership note (from [[yt-ep07-operating-system]])
+
+> **Ep7 (2023)** gave the first explicit description of XRAM's shared ownership: *"another 64K we'll talk about in a bit … shared between userland, the kernel, video, and audio."* The 6502 cannot execute code from XRAM, but all four consumers read and write it — userland stages assets, the kernel updates input state, the VGA firmware reads frame data, and the audio engine reads waveform data. See [[development-history]] Era B.

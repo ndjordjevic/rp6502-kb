@@ -27,7 +27,7 @@ Human-driven. Claude does not write to `raw/`.
 - ✅ **RP2350 datasheet** PDF → `raw/pdfs/RP-008373-DS-2-rp2350-datasheet.pdf`
 - ✅ **Raspberry Pi Pico C SDK reference** PDF → `raw/pdfs/RP-009085-KB-1-raspberry-pi-pico-c-sdk (1).pdf`
 - ⬜ Download **W65C02S datasheet** PDF → `raw/pdfs/w65c02s-datasheet.pdf`
-- ⬜ *(Optional)* Populate `raw/youtube/VIDEO_INDEX.md` with RP6502 videos and fetch captions via `yt-dlp`
+- ✅ Populate `raw/youtube/VIDEO_INDEX.md` with RP6502 videos and fetch captions via `yt-dlp` (21/22 transcripts; Ep5 has no captions)
 - ⬜ *(Optional)* Export Discord RP6502 channels via DiscordChatExporter → `raw/discord/`
 
 ## Phase 2 — Ingest sessions
@@ -42,7 +42,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ⏭ ~~Ingest RP2040 datasheet~~ — skipped; no RP2040 in RP6502; covered architecturally by Quadros + Fairhead
 - ✅ Ingest **RP2350 datasheet** — all 14 sessions complete: SIO/TMDS, PIO, GPIO, clocks, DMA, USB, SPI, UART, HSTX, errata (E1–E28); 1 new concept page ([[hstx]]), 9 concept pages updated with RP2350 differences, full errata table in [[known-issues]]; ingest plan deleted
 - 👉 Ingest **W65C02S datasheet** — instruction set, timing, pinout
-- ⬜ Ingest YouTube captions (if collected)
+- ✅ Ingest **YouTube playlist** — all 9 sessions complete; 21 source pages + 5 new concept/entity pages (code-pages, programmable-sound-generator, opl2-fm-synth, cc65, llvm-mos); development-history Eras A–E written
 - ⬜ Ingest Discord export (if collected)
 
 ## Phase 3 — Maintain & synthesize
@@ -52,7 +52,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Full source audit — all raw sources cross-checked against wiki; 4 fixes applied (ria-registers register map, XSTACK register name, RIA_SPIN stub size, DREQ_PWM_WRAP7 book typo)
 - ✅ `wiki/overview.md` kept current (revised after every ingest session)
 - ⬜ File first query answer to `wiki/syntheses/` (suggested: "What does the RIA actually do?")
-- ⬜ Backfill missing entity pages: [[cc65]], [[llvm-mos]] (both toolchains have first-class support but no pages)
+- ⬜ Backfill missing entity pages: ~~[[cc65]], [[llvm-mos]]~~ ✅ done (Sessions 3–9)
 - ⬜ VIA pinout / J1 GPIO header (requires schematic PDF — not yet in `raw/`)
 - ⬜ VGA GPIO full pinout — DAC output and sync pins not yet confirmed
 
@@ -62,12 +62,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 12 |
-| Entities | 8 |
-| Concepts | 23 |
-| Topics | 3 (overview, version-history, known-issues) |
-| Inbox | 0 |
-| **Total pages** | **~46** |
+| Sources | 12 + 22 (youtube-playlist + ep01–ep22 except ep05) = **34** |
+| Entities | 8 + 2 (cc65, llvm-mos) = **10** |
+| Concepts | 23 + 3 (code-pages, programmable-sound-generator, opl2-fm-synth) = **26** |
+| Topics | 4 (overview, version-history, known-issues, development-history) = **4** |
+| Inbox | 0 (youtube ingest plan deleted) |
+| **Total pages** | **~74** |
 
 ---
 

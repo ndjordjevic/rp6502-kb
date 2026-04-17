@@ -21,6 +21,28 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[fairhead-pico-c]] | "Programming the Raspberry Pi Pico/W in C" (Fairhead, 3rd ed. 2025): SDK programming — PIO, GPIO, multicore, FreeRTOS, WiFi, SPI, UART (all planned chapters ingested) |
 | [[pico-c-sdk]] | Raspberry Pi Pico-series C/C++ SDK (RP-009085-KB-1, 2025): official API reference — function signatures, PIOASM encoding, RP2040/RP2350 compat table; all 14 sessions ingested ✅ |
 | [[rp2350-datasheet]] | RP2350 datasheet (RP-008373-DS-2, 2025-07-29): authoritative RP2350 hardware reference — SIO/TMDS, clocks/LPOSC, GPIO F0–F11, PIO v1, DMA (16-ch), USB, UART, SPI, HSTX, errata E1–E28; all 14 sessions ingested ✅ |
+| [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
+| [[yt-ep01-8bit-retro-computer]] | Ep1: series intro, breadboard with 12 glue chips, USB/VGA working |
+| [[yt-ep02-pio-and-dma]] | Ep2: dual-Pico pivot; PIO+DMA 6502 read path; 8 MHz achieved |
+| [[yt-ep03-writing-to-pico]] | Ep3: write path; glue logic; AC-chip discovery; RIA name coined |
+| [[yt-ep04-picocomputer-hello]] | Ep4: first Hello World demo; fast-load pattern prototype; schematic release |
+| [[yt-ep06-roms-filesystem]] | Ep6: FatFs vs littlefs rationale; ROM concept introduced; first USB-drive 6502 load |
+| [[yt-ep07-operating-system]] | Ep7: OS emergence retrospective; "32 bytes is all I ask"; Colossal Cave Adventure demo |
+| [[yt-ep08-vga-pix-bus]] | Ep8: PIX bus design (DDR 4-wire); PIO resource cost; DMA priority hierarchy |
+| [[yt-ep09-c-programming-setup]] | Ep9: cc65 + VSCode template; Ctrl+Shift+B workflow; rp6502.py tool |
+| [[yt-ep10-diy-build]] | Ep10: through-hole PCB assembly; Founders Edition boards; 3-phase bring-up |
+| [[yt-ep11-no-soldering]] | Ep11: PCBWay single-unit manufacturing; no-soldering assembly |
+| [[yt-ep12-fonts-vsync]] | Ep12: v0.1 release; code pages; VSYNC backchannel over reversed UART TX |
+| [[yt-ep13-graphics-programming]] | Ep13: canvas/mode/xreg; 3-plane compositing; scanline partition; VSYNC scrolling |
+| [[yt-ep14-usb-mouse]] | Ep14: 3 input modes; fgets() added; paint program demo |
+| [[yt-ep15-asset-management]] | Ep15: CMake asset workflow; sprites with affine transforms; help-text shebang |
+| [[yt-ep16-psg-intro]] | Ep16: PSG intro — 8 channels, 5 waveforms, ADSR, PWM; music tracker |
+| [[yt-ep17-basics-of-basic]] | Ep17: EhBASIC install; SET BOOT BASIC; reset vs. reboot; RND quirk |
+| [[yt-ep18-llvm-mos]] | Ep18: cc65 vs LLVM-MOS comparison; performance benchmark |
+| [[yt-ep19-game-of-life]] | Ep19: Game of Life coding walkthrough; 640×480 monochrome bitmap |
+| [[yt-ep20-bbs]] | Ep20: Pi Pico 2 upgrade; WiFi BBS access; NTP+DST |
+| [[yt-ep21-ai-programming]] | Ep21: GitHub Copilot demos; "AI loves ignoring the docs" |
+| [[yt-ep22-graphics-sound-demos]] | Ep22: community demos; OPL2 FM synth origin story; music tracker |
 
 ## Entities
 
@@ -36,6 +58,8 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp6502-vga]] | Optional Pi Pico 2 + VGA firmware video adapter |
 | [[rp6502-os]] | 32-bit protected OS running inside the RIA (POSIX-like API) |
 | [[rp2350]] | RP2350 microcontroller: dual Cortex-M33 @ 150 MHz, 520 KB SRAM, 3 PIO blocks, TMDS encoder, HSTX; powers Pi Pico 2 |
+| [[cc65]] | cc65 cross-development package: C compiler + assembler + linker for 6502; primary Picocomputer toolchain since Ep9 |
+| [[llvm-mos]] | llvm-mos: LLVM fork for 6502 — C++/floats/64-bit; second supported Picocomputer toolchain; stronger optimization |
 
 ## Concepts
 
@@ -66,6 +90,9 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp2040-spi]] | RP2040 SPI: master/slave, 4–16-bit words, CPOL/CPHA modes, manual SS in master mode, DMA DREQ macros, full SDK API (`spi_init`/`spi_deinit`/`spi_get_baudrate`/`spi_get_index`/blocking transfer variants); RIA uses USB MSC (not SPI) for storage |
 | [[sdk-architecture]] | Pico SDK build model: CMake INTERFACE libraries, library tiers, hardware claiming, builder pattern, RP2040/RP2350 platform split |
 | [[hstx]] | RP2350 HSTX peripheral: DDR serial output up to 300 Mb/s/pin, async FIFO, output shift register, bit crossbar, clock generator, command expander (RAW/TMDS/REPEAT opcodes), PIO-coupled mode, DVI/TMDS example; used by RP6502 VGA firmware |
+| [[code-pages]] | Code page 437/850/855: glyph-set swap + FAT short-name encoding; CP850 default; 8.3 fallback with ~1 suffix |
+| [[programmable-sound-generator]] | PSG in RIA firmware: 8 channels, 5 waveforms, variable duty cycle, ADSR envelope, stereo pan, PWM physical layer; first in v0.6 |
+| [[opl2-fm-synth]] | OPL2 FM synthesizer (Yamaha YM3812-compatible) in RIA firmware: same as AdLib/Sound Blaster; firmware-flash only; added v0.16 |
 
 ## Inbox
 
@@ -89,3 +116,4 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[overview]] | Living synthesis across all sources (revised after every ingest) |
 | [[version-history]] | Narrative history from v0.1 (2023) to v0.23 (2026), organized by era |
 | [[known-issues]] | Bugs, workarounds, and things to watch out for — from release notes + full RP2350 silicon errata (E1–E28) |
+| [[development-history]] | Chronological narrative of RP6502 design evolution across 5 eras (late 2022–2026) |

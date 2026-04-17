@@ -1,8 +1,8 @@
 ---
 type: topic
-tags: [rp6502, bugs, workarounds, known-issues, rp2350, errata]
-related: [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[release-notes]], [[dma-controller]], [[usb-controller]]
-sources: [[release-notes]], [[rp2350-datasheet]]
+tags: [rp6502, bugs, workarounds, known-issues, rp2350, errata, hardware]
+related: [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[release-notes]], [[dma-controller]], [[usb-controller]], [[rp6502-board]]
+sources: [[release-notes]], [[rp2350-datasheet]], [[youtube-playlist]]
 created: 2026-04-16
 updated: 2026-04-17
 ---
@@ -20,6 +20,23 @@ v0.8 has a littlefs bug that **prevents formatting the internal filesystem on a 
 
 ### Pi Pico 1 support dropped at v0.10
 v0.10 migrated entirely to Pi Pico 2 (RP2350). **Pi Pico 1 boards are not supported in v0.10 or later.** There is no migration path — hardware upgrade required.
+
+---
+
+## Hardware requirements
+
+### AC-family logic chips required for 8 MHz
+
+**Source**: [[yt-ep03-writing-to-pico]] (Ep3); [[yt-ep02-pio-and-dma]] (Ep2)
+
+The glue logic chips in the address decode path must be **74AC-family** (or equivalent fast CMOS) to run the 6502 at 8 MHz. 74HC-family chips have ~15 ns/gate propagation; at 4 gates deep, this creates ~60 ns delay — half a clock cycle at 8 MHz, causing read errors (first seen at 7.7 MHz in Ep3).
+
+**74AC chips**: reduce propagation to ~35 ns → stable at 8 MHz (tested to 9 MHz).
+**74HC chips**: limit the system to **4 MHz** (the default PHI2 setting).
+
+> **Implication for builders**: When sourcing the [[rp6502-board]] BOM, the chips in the address decode logic path (notably the 7430 and address decode gates) must be AC-series, not HC-series. The RIA firmware auto-detects available speed via self-test. If you see the system running at 4 MHz when you expect 8 MHz, check the logic family on your glue chips.
+
+See also: [[development-history]] Era A; [[rp6502-board]] BOM notes.
 
 ---
 
@@ -153,6 +170,48 @@ The following errata are present in A2 silicon but are **fixed or mitigated by t
 - **v0.13+**: Only RIA-W firmware is released as a `.uf2`. Plain RIA must be compiled from source (`picocomputer/rp6502`).
 - **v0.10**: Must upgrade Pi Pico 1 boards to Pi Pico 2 — no Pico 1 support.
 
+## Code page / filename behavior
+
+**Source**: [[yt-ep12-fonts-vsync]] (Ep12)
+
+The Picocomputer uses a FAT filesystem with both long (Unicode/UCS-2) and short (8.3) filenames. The **active code page** tells the FAT driver which single-byte encoding to use for short names.
+
+**Issue**: If a file's long name contains characters that are not in the active code page's glyph set, the 6502 program will only see the 8.3 short name — a truncated name with a `~1` suffix (e.g., `RESUMÉ~1.TXT` instead of `résumé.txt`).
+
+**Behavior**: The file is still accessible; only the visible name is degraded. Switching to a code page that covers the necessary glyphs will reveal the full filename.
+
+**Workaround**: Match the active code page to the language of your filenames:
+- French/Spanish/Western European: CP850 (default)
+- English/German/Swedish/box-drawing: CP437
+- Cyrillic: CP855
+
+See [[code-pages]] for the full code page / FAT interaction.
+
+---
+
+## Running vintage BASIC (EhBASIC)
+
+**Source**: [[yt-ep17-basics-of-basic]] (Ep17)
+
+### `RND(1)` vs `RND(0)` in EhBASIC
+
+Lee Davison's Enhanced BASIC (EhBASIC) — the BASIC interpreter used on the Picocomputer — differs from Microsoft BASIC in one commonly-encountered function:
+
+| Function call | EhBASIC behavior | Microsoft BASIC behavior |
+|---|---|---|
+| `RND(1)` | **Sets the random seed** (returns seeded value, not truly random) | Returns a random number |
+| `RND(0)` | **Returns a random number** | Returns the last random number |
+
+**Impact**: Classic BASIC program listings from books like "BASIC Computer Games" (David Ahl) use `RND(1)` expecting Microsoft BASIC semantics — they will produce the same "random" output every run.
+
+**Fix**: Global search and replace `RND(1)` with `RND(0)` in any vintage listing that exhibits non-random behavior.
+
+> **Note from Ep17**: This is described as the only systematic change needed to run programs from the BASIC Computer Games books on EhBASIC. Other differences exist but are program-specific.
+
+### CONTINUE after unexpected stop
+
+If a program unexpectedly stops (e.g., user pressed Enter on an `INPUT` prompt without typing anything — EhBASIC stops the program in this case, unlike Microsoft BASIC which repeats the prompt), use the `CONTINUE` command to resume.
+
 ---
 
 ## Related pages
@@ -160,4 +219,6 @@ The following errata are present in A2 silicon but are **fixed or mitigated by t
 - [[release-notes]] · [[rp6502-ria-w]] · [[rp6502-ria]] · [[rp6502-vga]]
 - [[dma-controller]] — RP2350 DMA errata E5, E8
 - [[usb-controller]] — RP2350 USB errata E12
+- [[code-pages]] — full code page documentation
+- [[yt-ep12-fonts-vsync]] · [[yt-ep17-basics-of-basic]]
 

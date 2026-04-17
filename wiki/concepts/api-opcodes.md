@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [rp6502, os, api, opcodes, abi]
-related: [[ria-registers]], [[rp6502-abi]], [[rp6502-os]], [[rp6502-ria]]
+related: [[ria-registers]], [[rp6502-abi]], [[rp6502-os]], [[rp6502-ria]], [[cc65]], [[llvm-mos]]
 sources: [[rp6502-github-repo]]
 created: 2026-04-16
 updated: 2026-04-16
@@ -29,7 +29,7 @@ The 6502 writes a single byte to `$FFEF` (`RIA_OP`). The RIA's `main_api()` func
 | `0x02` | `atr_api_phi2` | *(deprecated)* Get/set PHI2 clock speed |
 | `0x03` | `atr_api_code_page` | *(deprecated)* Get/set OEM code page |
 | `0x04` | `atr_api_lrand` | *(deprecated)* Random number |
-| `0x06` | `atr_api_errno_opt` | *(deprecated)* Get/set errno mapping (cc65 vs llvm-mos) |
+| `0x06` | `atr_api_errno_opt` | *(deprecated)* Get/set errno mapping ([[cc65]] vs [[llvm-mos]]) |
 | `0x08` | `pro_api_argv` | Read argv — process arguments passed by launcher |
 | `0x09` | `pro_api_exec` | Execute a ROM (`ria_execl` / `ria_execv`) |
 | `0x0A` | `atr_api_get` | Generic attribute get (replaces deprecated 0x02/0x03/0x04/0x06) |
@@ -88,7 +88,7 @@ The 6502 writes a single byte to `$FFEF` (`RIA_OP`). The RIA's `main_api()` func
 ## Notes
 
 - Op-codes `0x05`, `0x07`, `0x0C`, `0x13` are unassigned — writing them returns `ENOSYS`.
-- The `lseek` split (0x1A vs 0x1D) exists because cc65 and llvm-mos use different conventions for the 64-bit offset argument. A cc65 program uses 0x1A; a llvm-mos program uses 0x1D.
+- The `lseek` split (0x1A vs 0x1D) exists because [[cc65]] and [[llvm-mos]] use different conventions for the 64-bit offset argument. A cc65 program uses 0x1A; a llvm-mos program uses 0x1D.
 - Op-codes 0x02/0x03/0x04/0x06 are deprecated but still functional. The generic 0x0A/0x0B attribute system replaces them.
 - `std_api_read_xram` / `std_api_write_xram` bypass XSTACK entirely and DMA directly into/from the 64 KB [[xram]] space — preferred for bulk I/O.
 

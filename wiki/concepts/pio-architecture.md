@@ -2,7 +2,7 @@
 type: concept
 tags: [rp6502, ria, vga, pio, rp2350, hardware, firmware]
 related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[gpio-pinout]], [[reset-model]], [[pioasm]], [[hardware-irq]]
-sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
+sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]], [[youtube-playlist]]
 created: 2026-04-16
 updated: 2026-04-17
 
@@ -17,6 +17,8 @@ updated: 2026-04-17
 ## Why PIO?
 
 The RP2350 has no dedicated 6502 bus controller. PIO (Programmable I/O) state machines fill that gap: they run tiny programs in hardware at deterministic cycle counts, independent of the main Cortex-M33 cores. The RIA uses PIO to sample the 65C02 address/data bus at exactly the right moment in the PHI2 cycle, decode chip-select and read/write, and drive data onto the bus — all without the Cortex touching the bus timing.
+
+> **Historical origin ([[yt-ep02-pio-and-dma]], [[yt-ep03-writing-to-pico]]):** The PIO+DMA bus interface was developed in late 2022 during the breadboard bring-up phase. The alternative — bitbanging the 6502 — "uses 100% of a CPU to meet a hard real-time requirement; DMA+PIO use a fraction of those resources and none of the CPU." Ep2 introduced the read path (PIO reads address bus, chained DMA delivers register value to data bus); Ep3 added the write path and chip-select gating. Achieving 8 MHz required doubling the Pi Pico system clock (Ep2). See [[development-history]] Era A.
 
 ---
 

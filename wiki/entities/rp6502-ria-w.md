@@ -2,7 +2,7 @@
 type: entity
 tags: [rp6502, ria, wireless, wifi, bluetooth, pico2w]
 related: [[rp6502-ria]], [[rp6502-board]], [[dual-core-sio]]
-sources: [[rp6502-ria-w-docs]], [[release-notes]], [[fairhead-pico-c]]
+sources: [[rp6502-ria-w-docs]], [[release-notes]], [[fairhead-pico-c]], [[youtube-playlist]]
 created: 2026-04-15
 updated: 2026-04-16
 ---
@@ -193,6 +193,20 @@ Enable: `#define LWIP_HTTPD_SSI 1` in `lwipopts.h`.
 
 ---
 
+## BBS demo (from [[yt-ep20-bbs]])
+
+> **Source**: [[yt-ep20-bbs]] (Ep20, 2025). The BBS demo was announced alongside the Pi Pico 1 → Pi Pico 2 upgrade path.
+
+The Pico 2 W's WiFi radio enables the 6502 to reach the internet. The first showcase was connecting to **BBS (Bulletin Board Systems)**:
+
+- **Hayes modem `ATD` command**: dial a BBS by hostname/IP — same interface as 1980s/90s modem usage.
+- **ANSI + CP437 rendering**: BBS systems typically use ANSI escape sequences and CP437 box-drawing / art characters. Both were already in the Picocomputer's console stack (see [[code-pages]]) — the system was an effective BBS terminal "as if it always knew."
+- **NTP with DST**: fetch current time from the internet and adjust automatically for daylight saving time.
+
+**Hardware upgrade path** from this episode: swap Pi Pico 1 for Pi Pico 2 (plain Pico 2 for VGA, Pico 2 W for RIA). This is the migration that corresponds to v0.10 in [[version-history]].
+
+**Current limitation**: raw TCP only; Telnet protocol (RFC 854 negotiation) is not yet implemented. See [[known-issues]].
+
 ## Related pages
 
 - [[rp6502-ria]] — everything else the RIA does
@@ -200,3 +214,4 @@ Enable: `#define LWIP_HTTPD_SSI 1` in `lwipopts.h`.
 - [[dual-core-sio]] — multicore context and FreeRTOS+WiFi integration
 - [[fairhead-pico-c]] — SDK patterns for cyw43 and LwIP
 - [[known-issues]] — telnet WIP, BLE-only limitations, TinyUSB history
+- [[yt-ep20-bbs]] — BBS demo episode

@@ -2,9 +2,9 @@
 type: concept
 tags: [rp6502, abi, os, fastcall, assembly]
 related: [[rp6502-os]], [[rp6502-ria]], [[xram]], [[memory-map]]
-sources: [[rp6502-os-docs]], [[rp6502-github-repo]]
+sources: [[rp6502-os-docs]], [[rp6502-github-repo]], [[youtube-playlist]]
 created: 2026-04-15
-updated: 2026-04-16 (audit: fixed 7→8-byte stub)
+updated: 2026-04-17
 ---
 
 # RP6502 ABI
@@ -101,6 +101,49 @@ You can chain calls without draining the xstack between them when the leftover b
 
 `stdio.h`, `unistd.h`, `fcntl.h`, `stdlib.h`, `time.h` are provided for both [[cc65]] and [[llvm-mos]]. The familiar POSIX functions (`open`, `read`, `write`, `lseek`, `chdir`, etc.) are wrappers that pick the right ABI variant (e.g. `lseek` calls `f_lseek` with reordered args).
 
+## Developer workflow (from [[yt-ep09-c-programming-setup]])
+
+> **Source**: [[yt-ep09-c-programming-setup]] (Ep9). The cc65-based developer workflow was established here.
+
+### The standard workflow (template → compile → upload → run)
+
+1. **Stamp out a new project**: GitHub → "Use this template" → create repo → clone → `git submodule update --init --recursive`.
+2. **Open in VSCode**: accept all default/obvious prompts; choose "don't allow" for IntelliSense (template has cc65 IntelliSense hacks that must not be overwritten).
+3. **Ctrl+Shift+B**: single keystroke builds the project, packages it as a `.rp6502` ROM, uploads over USB, and issues a reset to run it on the Picocomputer.
+4. **Iterate**: edit `src/*.c`, repeat Ctrl+Shift+B.
+
+### rp6502.py role
+
+The VSCode task drives `rp6502.py` — a Python script for remotely controlling a Picocomputer. It can:
+- Package ROM files (code + assets) from compiled output.
+- Upload files to the Picocomputer over USB (any file type).
+- Issue resets, load and run ROMs.
+
+Advanced users can call `rp6502.py` directly from the command line for automation, CI/CD, or alternate IDE setups.
+
+### CMake structure
+
+```cmake
+cmake_minimum_required(VERSION 3.12)
+project(myproject C ASM)
+add_subdirectory(sdk)
+add_executable(hello src/hello.c)
+target_link_libraries(hello rp6502)
+rp6502_executable(hello)          # adds ROM packaging step
+```
+
+All source files must be listed in `add_executable()`. No other CMake knowledge needed for most projects.
+
 ## Related pages
 
 - [[ria-registers]] · [[api-opcodes]] · [[rp6502-os]] · [[rp6502-ria]] · [[xram]] · [[memory-map]]
+
+---
+
+## Historical note: origin of RIA_SPIN
+
+> **Source**: [[yt-ep04-picocomputer-hello]] (Ep4, early 2023)
+>
+> The `RIA_SPIN` stub at `$FFF0–$FFF7` evolved from a **fast-load pattern** demonstrated in Ep4. Since the RIA Pico has only 5 address lines to the 6502 bus, it cannot directly address all 64 K of 6502 RAM. Instead, the RIA places a 10-byte template program in its register space that loops writing a value to an address. The RIA modifies the value, address, and branch instruction in real time (< 200 ns window at 8 MHz) to drive each byte of a bulk transfer.
+>
+> Writing a single byte via this mechanism uses three CPUs, two PIOs, and DMA in parallel. The production `RIA_SPIN` stub is the refined form of this prototype. See [[development-history]] Era A.

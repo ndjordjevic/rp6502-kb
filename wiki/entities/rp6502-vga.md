@@ -2,7 +2,7 @@
 type: entity
 tags: [rp6502, vga, video, firmware, pico2, hstx, dvi, tmds]
 related: [[rp6502-ria]], [[pix-bus]], [[xreg]], [[xram]], [[sdk-architecture]], [[hstx]]
-sources: [[rp6502-vga-docs]], [[pico-c-sdk]], [[rp2350-datasheet]]
+sources: [[rp6502-vga-docs]], [[pico-c-sdk]], [[rp2350-datasheet]], [[youtube-playlist]]
 created: 2026-04-15
 updated: 2026-04-17
 ---
@@ -56,8 +56,80 @@ Config register block for modes 1–5: `MODE, OPTIONS, CONFIG, PLANE, BEGIN, END
 
 Full-color ANSI terminal with C0 controls (BS, HT, LF, FF, CR, ESC), Fe escapes (CSI, RIS), standard CSI sequences (CUU/CUD/CUF/CUB/DCH/CUP/ED/EL/SGR/DSR/SCP/RCP/DECTCEM), SGR 30–37/40–47/90–97/100–107, bold, blink. Does not need hardware flow control at 115200.
 
+## Graphics system details (from Ep8, Ep13)
+
+> **Sources**: [[yt-ep08-vga-pix-bus]] (Ep8), [[yt-ep13-graphics-programming]] (Ep13), [[yt-ep15-asset-management]] (Ep15).
+
+### Color model
+
+- **16-bit color** = RGB555 + 1 alpha bit. The alpha bit is binary: opaque or fully transparent (not a blend). This is why 16-bit systems often advertised "32,767 colors" — the 16th bit is the transparency flag.
+- Transparency enables each plane to composite cleanly over lower planes.
+
+### Canvas and mode config registers
+
+Extended registers at device `$1`, channel `$0`:
+
+| Addr | Register | Usage |
+|---|---|---|
+| `$1:0:00` | CANVAS | Selects resolution (0 = console only; 2 = 320×180) |
+| `$1:0:01` | MODE | Mode select (0 = console, 3 = bitmap, etc.) |
+| `$1:0:02` | OPTIONS | Bit depth and other mode options |
+| `$1:0:03` | CONFIG | XRAM address of mode config structure |
+| `$1:0:04` | PLANE | Plane number for this mode block |
+| `$1:0:05` | BEGIN | First scanline of this mode block |
+| `$1:0:06` | END | Last scanline (exclusive) of this mode block |
+
+The `xreg()` OS call is variadic — can set multiple consecutive registers in one call.
+
+### Mode config structure (bitmap example)
+
+Placed in XRAM at any address (must be in extended RAM, not 6502 system RAM):
+
+| Field | Meaning |
+|---|---|
+| `width` | Bitmap width in pixels |
+| `height` | Bitmap height in pixels |
+| `x` | Horizontal scroll offset (change live for scrolling) |
+| `y` | Vertical scroll offset (change live for scrolling) |
+| `data` | XRAM address of pixel data |
+| `palette` | XRAM address of palette; `$FFFF` = built-in ANSI palette |
+
+### Scanline-partitioned screens
+
+The `PLANE`, `BEGIN`, and `END` registers allow any scanline range of a plane to use a different mode. Example from Ep13:
+- Scanlines 0–139: bitmap mode (plane 0)
+- Scanlines 140–179: console/text mode (plane 1)
+
+This technique enables RPG dialogue boxes, HUDs, visual novel lower thirds, and SCUMM-style verb areas — all on a single display frame without sprite/overlay tricks.
+
+### Live X/Y updates during VBLANK
+
+The `x` and `y` fields of the config structure can be changed at any time. For smooth animation, update them inside the VSYNC window (the ~500 µs vertical blanking interval, triggered by the `vsync` register incrementing at 60 Hz). Applications for this:
+- Horizontal/vertical scrolling playfields (shooters, platformers)
+- Screen shake effects on player hit
+- Tiled infinite-repeat backgrounds
+
+### Tiling
+
+Set the tile enable bits in OPTIONS to make the canvas image repeat horizontally and/or vertically. Combined with X/Y scrolling, this creates seamless infinite playfields from a small source image.
+
+### ANSI terminal upgrade (from Ep13)
+
+Console mode (mode 0) was upgraded to **16-bit color** (256-color ANSI palette). Previously 16-color. The 256-color ANSI palette is built in and accessible via `palette = $FFFF`.
+
+### Sprite capabilities (from Ep15)
+
+Mode 4 and Mode 5 sprites support **affine transforms**:
+- Scale (zoom in/out)
+- Rotation (arbitrary angle)
+- Translation (position)
+- Occlusion (sprites layer correctly over other sprites and planes)
+
+Up to 24 sprites at 128×128 px; more sprites possible with smaller sizes.
+
 ## Related pages
 
 - [[rp6502-ria]] · [[pix-bus]] · [[xreg]] · [[xram]]
 - [[sdk-architecture]] — CMake INTERFACE model, RP2350 platform, builder pattern used in VGA firmware
 - [[hstx]] — the RP2350 HSTX peripheral used to generate DVI/TMDS video output on Pi Pico 2
+- [[yt-ep08-vga-pix-bus]] · [[yt-ep13-graphics-programming]] · [[yt-ep15-asset-management]]

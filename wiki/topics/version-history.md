@@ -17,6 +17,8 @@ updated: 2026-04-16
 
 The first versioned release established a working 65C02 + RIA firmware on Pi Pico 1. No VGA, no audio — just the bus interface, monitor, and basic I/O.
 
+> **"More than a dozen working devices"** — from [[yt-ep12-fonts-vsync]] (Ep12): version 0.1 was released when the community had grown to more than a dozen working devices and people were starting to explore writing software. This was the trigger for formal versioning.
+
 ---
 
 ## Era 2 — VGA and input (v0.2–v0.7, Oct 2023–Feb 2024)

@@ -2,7 +2,7 @@
 type: concept
 tags: [rp6502, os, process, launcher]
 related: [[rp6502-os]], [[rp6502-ria]], [[rom-file-format]]
-sources: [[rp6502-os-docs]], [[release-notes]]
+sources: [[rp6502-os-docs]], [[release-notes]], [[youtube-playlist]]
 created: 2026-04-15
 updated: 2026-04-16
 ---
@@ -49,6 +49,39 @@ This indirection gives you:
 
 > **Version history**: launcher mechanism introduced in v0.21; Alt-F4 keystroke formalized in v0.23. See [[release-notes]].
 
+## Boot BASIC example (from [[yt-ep17-basics-of-basic]])
+
+> **Source**: [[yt-ep17-basics-of-basic]] (Ep17). A concrete demonstration of the `set boot` launcher pattern.
+
+### Setting BASIC as the boot target
+
+```
+install basic.rp6502    ; copy EhBASIC ROM into Pi Pico flash
+SET BOOT BASIC          ; configure it as the boot ROM
+REBOOT                  ; restart the RIA — now boots into BASIC
+```
+
+After this setup, every power-on or reboot drops directly into BASIC — the "instant on" experience of classic 8-bit home computers.
+
+### Reset vs. Reboot in this context
+
+This is where the reboot/reset distinction (see [[reset-model]]) becomes user-visible:
+
+| Action | Effect on BASIC |
+|---|---|
+| **REBOOT** (or hardware reset button) | Full RIA restart → BASIC reloads from flash, clean slate |
+| **RESET** (from monitor `RESET` command) | 6502 reset only → BASIC interpreter **and any loaded program stay in RAM** |
+
+**Practical workflow for disk access from BASIC**:
+
+1. Press Ctrl+Alt+Del from BASIC → returns to monitor (BASIC + program preserved in RAM).
+2. Use `LS`, `CD`, etc. to manage files.
+3. Type `RESET` at the monitor prompt → BASIC interpreter restarts from `$0800` (or wherever it's mapped), finds its program still in RAM, and continues.
+
+> *"You can stop BASIC at any time, use the monitor to manage disk access, and return to BASIC at any time without losing work."* — [[yt-ep17-basics-of-basic]]
+
 ## Related pages
 
 - [[rp6502-os]] · [[rp6502-ria]] · [[rom-file-format]] · [[release-notes]]
+- [[reset-model]] — reboot vs. reset detailed
+- [[yt-ep17-basics-of-basic]] — BASIC setup walkthrough

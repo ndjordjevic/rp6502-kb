@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [rp2040, rp2350, clocks, pll, xosc, rosc, lposc, hstx, timer, watchdog, rtc, rp6502-ria]
-related: [[pio-architecture]], [[gpio-pinout]], [[rp6502-ria]], [[dma-controller]], [[dual-core-sio]]
+related: [[pio-architecture]], [[gpio-pinout]], [[rp6502-ria]], [[dma-controller]], [[dual-core-sio]], [[hstx]]
 sources: [[quadros-rp2040]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-16
 updated: 2026-04-18
@@ -49,7 +49,7 @@ For example, 256 MHz = VCO 1536 MHz / (3 × 2). The SDK function `check_sys_cloc
 
 Both PLLs are *Phase Locked Loops* that multiply the XOSC (or an external clock at XIN) to produce a faster output. The USB PLL targets 48 MHz; the System PLL targets `clk_sys`. Changing the System PLL frequency is how the RP2040/RP2350 is overclocked. See [PLL parameter model](#pll-parameter-model) above.
 
-**RP2350 change**: Added interrupt on PLL loss-of-lock (`CS.LOCK_N`). Flexible PLL routing — e.g., USB clock can come from system PLL (144 MHz / 3 = 48 MHz), freeing USB PLL for HSTX or GPOUT.
+**RP2350 change**: Added interrupt on PLL loss-of-lock (`CS.LOCK_N`). Flexible PLL routing — e.g., USB clock can come from system PLL (144 MHz / 3 = 48 MHz), freeing USB PLL for [[hstx|HSTX]] or GPOUT.
 
 ### `hardware_pll` SDK functions
 

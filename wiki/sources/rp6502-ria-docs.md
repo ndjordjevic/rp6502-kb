@@ -33,8 +33,8 @@ Raw: [RP6502-RIA](<../../raw/web/picocomputer.github.io/RP6502-RIA — Picocompu
 | Pico Information Exchange (PIX) | [[pix-bus]] |
 | PIX Extended RAM (XRAM) | [[xram]] |
 | Keyboard / Mouse / Gamepad XREG blocks | [[rp6502-ria]] |
-| PSG (8× 24 kHz oscillators, ADSR) | [[rp6502-ria]] § PSG |
-| YM3812 OPL2 FM (256 registers) | [[rp6502-ria]] § OPL2 |
+| PSG (8× 24 kHz oscillators, ADSR) | [[programmable-sound-generator]] |
+| YM3812 OPL2 FM (256 registers) | [[opl2-fm-synth]] |
 | Console / VCP / NFC | [[rp6502-ria]] |
 | ROM file format | [[rom-file-format]] |
 
@@ -43,7 +43,7 @@ Raw: [RP6502-RIA](<../../raw/web/picocomputer.github.io/RP6502-RIA — Picocompu
 - PIX is **double-data-rate** over PHI2; 32-bit frames in 4 PHI2 cycles. Bit 28 is always-on framing; bits 31-29 are device ID.
 - PIX **device 0** = RIA (and "XRAM broadcast"). **Device 1** = VGA. **Devices 2-6** user. **Device 7** = sync.
 - Mouse poll is VSync-locked by default; for precision use an ISR at ≥125 Hz.
-- OPL2 status/timers/interrupts are **not supported** (not needed on a computer that has its own timers).
+- [[opl2-fm-synth|OPL2]] status/timers/interrupts are **not supported** (not needed on a computer that has its own timers).
 - Input/audio are enabled by **mapping into XRAM** via [[xreg]] writes — writing `0xFFFF` as the address disables.
 - NFC: PN532 over USB; cards store filenames as NDEF text and auto-`load` the ROM on tap.
 

@@ -1,7 +1,7 @@
 ---
 type: topic
 tags: [rp6502, overview]
-updated: 2026-04-17 (rp2350-datasheet all 14 sessions complete — added HSTX, USB PHY_ISO, DMA 16-ch, errata E1–E28)
+updated: 2026-04-17
 ---
 
 # RP6502 Wiki — Overview
@@ -56,6 +56,15 @@ There are three Pico firmwares, all from the same monorepo:
 - The OS supports a **[[launcher]]** mechanism: a small ROM can register itself as the persistent shell that the process manager re-runs whenever any other ROM exits. This is the foundation for fault-tolerant boot of a native 6502 OS on top.
 - **NFC**: tap a programmed NTAG215 card and the named ROM file loads. Implemented with a PN532 over USB.
 
+## Audio
+
+Two coexisting synthesizers run inside the RIA firmware, sharing the same PWM → RC filter → audio jack path:
+
+- **[[programmable-sound-generator]]** — 8 channels, 5 waveforms, ADSR envelope, stereo pan. Introduced v0.6.
+- **[[opl2-fm-synth]]** — YM3812-compatible FM synthesis (AdLib / Sound Blaster). Added v0.16. Firmware-only — no hardware change needed.
+
+Both are driven through [[xreg]] + an XRAM-resident register image; programs write into XRAM and the RIA streams the audio on its side.
+
 ## RP2350 silicon notes (Pi Pico 2)
 
 The RP6502 VGA module uses the Pi Pico 2 (RP2350), and the RIA-W uses the Pi Pico 2 W. Key RP2350 differences from RP2040 relevant to RP6502 development:
@@ -69,13 +78,13 @@ The RP6502 VGA module uses the Pi Pico 2 (RP2350), and the RIA-W uses the Pi Pic
 
 1. **W65C02S WAI / STP** — does the RIA polling loop interact usefully with the CPU's wait-for-interrupt instruction? The `ria_write` PIO generates PHI2 continuously; WAI would just stall the 6502 in-place until IRQ fires.
 2. **Maximum stable PHI2 margin** — the firmware sets 8 MHz as the max (`CPU_PHI2_MAX_KHZ 8000`). PIO timing comments say "good range narrows as PHI2 increases" — the exact electrical limit isn't documented.
-3. **`cc65` vs. `llvm-mos` entity pages** — both toolchains have first-class support (separate `lseek` op-codes 0x1A vs 0x1D, separate errno-opt) but no wiki pages yet.
+3. **`cc65` and `llvm-mos` toolchain pages** — ✅ Created in Sessions 3–9. Both have first-class support (separate `lseek` op-codes 0x1A vs 0x1D, separate errno-opt); see [[cc65]] and [[llvm-mos]].
 4. **VIA pinout / J1 GPIO header** — not in web docs or repo source; needs the schematic PDF.
 5. **VGA GPIO full pinout** — only GPIO 11 (PHI2 in) and GPIO 0–3 (PIX in) confirmed from VGA source. DAC output pins, sync signals not yet read.
 
 ## Hub pages
 
-- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]]
-- **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]] · [[rp2350]]
-- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]]
-- **Topics**: [[version-history]] · [[known-issues]]
+- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[youtube-playlist]]
+- **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]] · [[rp2350]] · [[cc65]] · [[llvm-mos]]
+- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]] · [[code-pages]] · [[programmable-sound-generator]] · [[opl2-fm-synth]]
+- **Topics**: [[version-history]] · [[known-issues]] · [[development-history]]

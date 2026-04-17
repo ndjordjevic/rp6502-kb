@@ -2,7 +2,7 @@
 type: concept
 tags: [rp6502, rom, file-format]
 related: [[rp6502-ria]], [[rp6502-os]], [[xram]]
-sources: [[rp6502-ria-docs]], [[release-notes]]
+sources: [[rp6502-ria-docs]], [[release-notes]], [[youtube-playlist]]
 created: 2026-04-15
 updated: 2026-04-16
 ---
@@ -77,6 +77,62 @@ rp6502_asset(your_project help    src/help.txt)    # named asset
 
 > **Added in v0.18**: Named asset support in ROM files was introduced in v0.18 (Feb 2026). Earlier versions only supported null-named memory chunks. The CMake tooling was also simplified in v0.18 — `rp6502_asset()` automatically includes the asset in the executable without needing to list it separately in `rp6502_executable()`.
 
+## CMake asset workflow (from [[yt-ep15-asset-management]])
+
+> **Source**: [[yt-ep15-asset-management]] (Ep15). This workflow was introduced alongside the completion of all graphics modes.
+
+### CMake commands
+
+```cmake
+# Package a binary file as a ROM asset chunk
+rp6502_asset(target 0x10000 path/to/image.bin)    # loads into XRAM at $10000
+rp6502_asset(target 0x11000 path/to/palette.bin)  # loads into XRAM at $11000
+
+# Link code + all declared assets into a single .rp6502 file
+rp6502_executable(target)
+```
+
+**Address convention**: a 5-digit address starting with `1` (e.g., `0x10000`) places the data in extended RAM ([[xram]]). A standard 16-bit address (`0x0200`) places it in 6502 system RAM.
+
+### How it works at boot
+
+When the ROM loads:
+1. Each asset chunk is copied to its declared address in XRAM or system RAM.
+2. When the 6502 program starts, all asset data is already at its final location.
+3. No `memcpy` needed — just reference the XRAM addresses directly.
+
+### Help text asset
+
+A help-text file is the ROM format itself — no `rp6502_asset` packaging needed:
+
+```
+#!RP6502
+# My Application v1.0
+# A brief description of what this does.
+# Usage: LOAD myapp.rp6502
+```
+
+Add directly to `rp6502_executable()`:
+```cmake
+rp6502_executable(target help_text.rp6502)
+```
+
+The monitor `HELP myapp` and `INFO myapp` commands will display this text.
+
+### rp6502.py upload command
+
+`rp6502.py upload <file>` sends any file to the Picocomputer over USB without unplugging — works for ROM files and also arbitrary data files (sprites, palettes, levels) that will be loaded from disk at runtime.
+
+### Installing ROMs into flash
+
+```
+LOAD /game.rp6502      # load and run from USB (temporary)
+install /game.rp6502   # copy to Pi Pico flash via littlefs
+```
+
+Installed ROMs appear in `HELP` and persist across power cycles with no USB drive required.
+
 ## Related pages
 
 - [[rp6502-ria]] · [[rp6502-os]] · [[xram]] · [[release-notes]]
+- [[yt-ep15-asset-management]] — live walkthrough of the CMake workflow

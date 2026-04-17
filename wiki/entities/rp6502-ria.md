@@ -58,12 +58,26 @@ Full YM3812 register set (256 bytes). **Timers / interrupts / status register ar
 - VCP: USB-to-serial adapters open as `"VCP0:115200,8N1"` etc. Drivers for FTDI, CP210X, CH34X, PL2303, CDC ACM.
 - NFC: PN532 over USB. Cards store NDEF text with a ROM filename and arguments, tap-to-launch. Applications can take over with `open("NFC:")`.
 
+## Audio subsystem
+
+The RIA firmware includes two audio synthesizers, both accessible via [[xreg]] + [[xram]]:
+
+| Synthesizer | XREG | Config size | First available |
+|---|---|---|---|
+| **[[programmable-sound-generator]]** (PSG) | `$0:1:00` | 64 bytes (8 × 8-byte oscillators) | v0.6 |
+| **[[opl2-fm-synth]]** (Yamaha YM3812-compatible) | `$0:1:01` | 256 bytes (must be page-aligned) | v0.16 |
+
+Both synthesizers coexist and can be active simultaneously. Audio output is PWM → RC filter → 3.5mm audio jack. Upgraded to 10-bit DAC resolution in v0.17.
+
+No hardware change required to enable audio — firmware-only. See [[programmable-sound-generator]] and [[opl2-fm-synth]] for details.
+
 ## Related pages
 
 - [[rp6502-os]] — the OS that runs inside this firmware
 - [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[gpio-pinout]]
 - [[pix-bus]] · [[xram]] · [[xreg]]
 - [[reset-model]] · [[rom-file-format]]
+- [[programmable-sound-generator]] · [[opl2-fm-synth]]
 - [[usb-controller]] — USB 1.1 controller; RIA uses it in host mode for HID + VCP + NFC
 - [[rp2040-clocks]] — clock subsystem: 256 MHz System PLL overclock, clk_peri (UART/SPI), timer, watchdog
 - [[rp2040-uart]] — UART1 console on GPIO 4–5, 115200 8N1; SDK API and interrupt model

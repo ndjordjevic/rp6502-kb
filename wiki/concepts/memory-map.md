@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [rp6502, memory, address-space, rp2350]
-related: [[w65c02s]], [[w65c22s]], [[rp6502-ria]], [[xram]], [[rp2350]], [[rp2040-memory]]
+related: [[w65c02s]], [[w65c22s]], [[rp6502-ria]], [[xram]], [[rp2350]], [[rp2040-memory]], [[pio-architecture]], [[hstx]]
 sources: [[rp6502-os-docs]], [[rp2350-datasheet]]
 created: 2026-04-15
 updated: 2026-04-17
@@ -62,10 +62,10 @@ The RP2350 (the MCU running the RIA and VGA firmware) has a separate 32-bit addr
 |---|---|---|
 | DMA | `0x50000000` | 12-channel DMA controller |
 | USB | `0x50100000` | USB 1.1 DPRAM + registers |
-| PIO0 | `0x50200000` | PIO block 0 (4 SMs) |
+| PIO0 | `0x50200000` | [[pio-architecture\|PIO]] block 0 (4 SMs) |
 | PIO1 | `0x50300000` | PIO block 1 (4 SMs) |
 | PIO2 | `0x50400000` | PIO block 2 (4 SMs) — RP2350 only |
-| HSTX FIFO | `0x50600000` | High-speed transmit data FIFO |
+| HSTX FIFO | `0x50600000` | [[hstx\|High-speed transmit]] data FIFO |
 
 ### APB peripherals (min 3 cycles read, 4 write)
 

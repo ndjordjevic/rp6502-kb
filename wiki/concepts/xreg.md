@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [rp6502, xreg, pix, configuration]
-related: [[pix-bus]], [[xram]], [[rp6502-ria]], [[rp6502-vga]], [[rp6502-os]]
+related: [[pix-bus]], [[xram]], [[rp6502-ria]], [[rp6502-vga]], [[rp6502-os]], [[programmable-sound-generator]], [[opl2-fm-synth]]
 sources: [[rp6502-ria-docs]], [[rp6502-vga-docs]], [[rp6502-os-docs]]
 created: 2026-04-15
 updated: 2026-04-15
@@ -51,6 +51,8 @@ xreg(0, 0, 0x02, xaddr); // gamepads (4× 10 bytes)
 xreg(0, 1, 0x00, xaddr); // PSG (64-byte config, int-aligned, no page cross)
 xreg(0, 1, 0x01, xaddr); // OPL2 (256-byte register image, page-aligned)
 ```
+
+See [[programmable-sound-generator]] and [[opl2-fm-synth]] for the audio register layouts.
 
 ### Configure a VGA video mode (device 1)
 
