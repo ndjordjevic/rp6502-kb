@@ -76,7 +76,7 @@ The RP6502 VGA module uses the Pi Pico 2 (RP2350), and the RIA-W uses the Pi Pic
 
 ## Key open questions
 
-1. **W65C02S WAI / STP** — does the RIA polling loop interact usefully with the CPU's wait-for-interrupt instruction? The `ria_write` PIO generates PHI2 continuously; WAI would just stall the 6502 in-place until IRQ fires.
+1. **W65C02S WAI / STP** — the datasheet ([[w65c02s-datasheet]], Ch. 7) confirms WAI pulls RDY low and releases on any interrupt; the RIA currently busy-polls via a 32-byte `RIA_SPIN` stub. A WAI-based ABI could reduce power but would need an IRQB source on every RIA completion, which RP6502 firmware doesn't currently wire. The `ria_write` PIO generates PHI2 continuously; WAI would stall the 6502 in-place until IRQ fires.
 2. **Maximum stable PHI2 margin** — the firmware sets 8 MHz as the max (`CPU_PHI2_MAX_KHZ 8000`). PIO timing comments say "good range narrows as PHI2 increases" — the exact electrical limit isn't documented.
 3. **`cc65` and `llvm-mos` toolchain pages** — ✅ Created in Sessions 3–9. Both have first-class support (separate `lseek` op-codes 0x1A vs 0x1D, separate errno-opt); see [[cc65]] and [[llvm-mos]].
 4. **VIA pinout / J1 GPIO header** — not in web docs or repo source; needs the schematic PDF.
@@ -84,7 +84,7 @@ The RP6502 VGA module uses the Pi Pico 2 (RP2350), and the RIA-W uses the Pi Pic
 
 ## Hub pages
 
-- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[youtube-playlist]]
+- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[w65c02s-datasheet]] · [[youtube-playlist]]
 - **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]] · [[rp2350]] · [[cc65]] · [[llvm-mos]]
-- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]] · [[code-pages]] · [[programmable-sound-generator]] · [[opl2-fm-synth]]
+- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[65c02-instruction-set]] · [[65c02-addressing-modes]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]] · [[code-pages]] · [[programmable-sound-generator]] · [[opl2-fm-synth]]
 - **Topics**: [[version-history]] · [[known-issues]] · [[development-history]]

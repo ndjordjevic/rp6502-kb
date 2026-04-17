@@ -7,6 +7,16 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-17] ingest | w65c02s-datasheet | full PDF (32 pp., WDC Feb 2024)
+
+- `wiki/sources/w65c02s-datasheet.md`: CREATED — source page with Scope table (Ch.1–7, 10 ingested; Ch.8/9 hard-core/RTL skipped), key facts, NMOS-vs-CMOS caveats summary, pin-function highlights, packages
+- `wiki/concepts/65c02-instruction-set.md`: CREATED — all 70 mnemonics (Table 5-1), new CMOS instructions list, new addressing modes per opcode, opcode matrix highlights, reserved-NOP table (Ch.7), flag semantics, RP6502 toolchain notes
+- `wiki/concepts/65c02-addressing-modes.md`: CREATED — all 16 modes with cycles/bytes (Table 4-1), per-mode descriptions, new-vs-NMOS summary
+- `wiki/entities/w65c02s.md`: expanded from stub — part-number decode (W65C02S6TPG-14), architecture/registers, full pin table, interrupt vector table, VDD-vs-fmax table, WDC enhancements summary; added `[[w65c02s-datasheet]]` and new concept pages to related/sources
+- `wiki/index.md`: added 1 source entry + 2 concept entries
+- `wiki/overview.md`: added W65C02S to hub pages; updated open-question #1 (WAI/STP) with datasheet-confirmed behavior
+- `PROGRESS.md`: W65C02S datasheet flipped 👉 → ✅; wiki size updated
+
 ## [2026-04-17] ingest | rp2350-datasheet S14 | Appendix C+E: revision history + errata (PDF pp.1354–1376)
 
 - `wiki/topics/known-issues.md`: added full **RP2350 silicon errata** section — all 28 errata (E1–E28) with summaries, affected revisions, and workarounds; grouped into: critical (E12, E5, E8), SIO/interpolator (E1, E2), CPU errata (E6, E7), XIP (E11), OTP (E17), bootrom-fixed (E3, E9, E10, E13–E15, E18–E23), security (E16, E20, E21, E24–E28); updated frontmatter tags/related/sources

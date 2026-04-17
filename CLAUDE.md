@@ -88,6 +88,7 @@ When the user adds a source to `raw/` and asks you to ingest it:
 8. Append to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <source name> | <what changed>`.
 9. If the new source contradicts an existing page, flag with a `> **Conflict:**` block citing both sources.
 10. Update `PROGRESS.md`: flip the ingested source from `👉` → `✅` (with a brief result note), promote the next `⬜` item to `👉`, and update the **Current wiki size** table.
+11. Update `CLAUDE.md` if the ingest introduces new source categories, raw-folder conventions, domain vocabulary, or workflow changes that future sessions need to know about.
 
 A single source may touch 10–15 wiki pages. That is normal.
 
