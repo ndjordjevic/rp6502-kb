@@ -179,17 +179,29 @@ documentation, but the *background knowledge* the agent needs to write correct c
 
 ### 3c — Session-start hook (automatic context injection)
 
-Using Claude Code hooks (configured in `settings.json`):
+Using Claude Code hooks (configured in `.claude/settings.json` — project-scoped — or
+`~/.claude/settings.json` for all projects):
 
 ```json
 {
   "hooks": {
-    "SessionStart": [{
-      "command": "cat rp6502-kb/wiki/overview.md rp6502-kb/wiki/index.md"
-    }]
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cat wiki/overview.md wiki/index.md"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
+
+The hook runs from the project root (the folder containing `.claude/`), so paths are
+relative to that root. If `rp6502-kb` is a second workspace folder, use its absolute
+path instead.
 
 Every new coding session injects `overview.md` (the living synthesis of everything the
 wiki knows) and `index.md` (the page catalog) into the context automatically. The agent
@@ -197,7 +209,9 @@ is oriented before you type a single message.
 
 ### 3d — Slash commands for in-session queries
 
-Custom commands in `.claude/commands/`:
+`.claude/commands/` is empty in this repo today — these are commands you can define
+(drop a markdown file per command into `.claude/commands/`; the filename becomes the
+slash-command name). Suggested starter set:
 
 | Command | What it does |
 |---|---|
@@ -205,7 +219,7 @@ Custom commands in `.claude/commands/`:
 | `/wiki-ingest <file>` | Ingest a new raw source into the wiki mid-session |
 | `/wiki-lint` | Run a health check for orphans, contradictions, data gaps |
 
-During a coding session you can ask mid-task:
+Once defined, you can ask mid-task:
 
 ```
 /wiki-query what are the XRAM addressing rules for buffers above $8000
