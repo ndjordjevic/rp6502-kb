@@ -2,7 +2,7 @@
 type: concept
 tags: [rp2040, rp2350, clocks, pll, xosc, rosc, lposc, hstx, timer, watchdog, rtc, rp6502-ria]
 related: [[pio-architecture]], [[gpio-pinout]], [[rp6502-ria]], [[dma-controller]], [[dual-core-sio]]
-sources: [[quadros-rp2040]], [[pico-c-sdk]]
+sources: [[quadros-rp2040]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-16
 updated: 2026-04-18
 ---
@@ -17,9 +17,9 @@ updated: 2026-04-18
 
 | Source | Chip | Typical Frequency | Characteristics |
 |---|---|---|---|
-| **ROSC** (Ring Oscillator) | RP2040/RP2350 | ~6 MHz (typical) | On-chip, no external component, little power. Imprecise: guaranteed range 1.8–12 MHz. Used at boot. |
-| **XOSC** (Crystal Oscillator) | RP2040/RP2350 | 12 MHz (reference design) | Requires external crystal (1–15 MHz range). Stable and accurate; preferred for clk_ref and clk_rtc. |
-| **LPOSC** (Low Power Oscillator) | RP2350 only | ~32 kHz | On-chip ultra-low-power oscillator. Can feed clk_ref on RP2350 (not available on RP2040). |
+| **ROSC** (Ring Oscillator) | RP2040/RP2350 | ~11 MHz (RP2350 boot) | On-chip, no external component, little power. Imprecise: RP2040 guaranteed 1.8–12 MHz; **RP2350 guaranteed 4.6–19.6 MHz**. Used at boot. |
+| **XOSC** (Crystal Oscillator) | RP2040/RP2350 | 12 MHz (reference design) | Requires external crystal. RP2040: 1–15 MHz range. **RP2350: 1–50 MHz range**. Stable and accurate; preferred for clk_ref. |
+| **LPOSC** (Low Power Oscillator) | RP2350 only | ~32 kHz | On-chip ultra-low-power oscillator. Starts automatically in the **always-on power domain** even when switched-core is off. Provides AON Timer tick and clk_pow. Tunable to ~1% accuracy. Can optionally drive clk_ref + clk_sys for low-power CPU-on mode. |
 | **External clocks** | RP2040/RP2350 | up to 50 MHz | GPIO20/GPIO22 (GPIN0/1). Can feed clk_ref or clk_sys aux mux. |
 | **USB PLL** | RP2040/RP2350 | 48 MHz | Multiplies XOSC to generate the 48 MHz clock required for USB and ADC. |
 | **System PLL** | RP2040/RP2350 | 125 MHz (default) | Multiplies XOSC to generate `clk_sys`. Can be overclocked — **the RIA firmware sets it to 256 MHz**. |
@@ -28,17 +28,28 @@ updated: 2026-04-18
 
 The System (and USB) PLL is programmed with three values:
 
-- **VCO freq** — the voltage-controlled oscillator target (must be in the valid VCO range, typically 750–1600 MHz).
+- **VCO freq** — the voltage-controlled oscillator target (must be in the valid VCO range, 750–1600 MHz).
 - **post_div1** — first post-divider (1–7). Applied after the VCO.
 - **post_div2** — second post-divider (1–7). Applied after post_div1. Must be ≤ post_div1.
 
-`output = vco_freq / (post_div1 × post_div2)`.
+Full formula: `FOUTPOSTDIV = (FREF / REFDIV) × FBDIV / (POSTDIV1 × POSTDIV2)`
 
-For example, 256 MHz = VCO 1536 MHz / (3 × 2). The SDK function `check_sys_clock_hz()` validates a target and returns the three PLL parameters if attainable.
+PLL constraints:
+- FREF / REFDIV ≥ 5 MHz (minimum reference into VCO)
+- VCO (FOUTVCO) must be in 750–1600 MHz
+- FBDIV (feedback divider) must be in 16–320
+- POSTDIV1 and POSTDIV2 each in 1–7
+- System PLL max output: **150 MHz** (RP2350); USB PLL: **48 MHz**
+
+For example, 256 MHz = VCO 1536 MHz / (3 × 2). The SDK function `check_sys_clock_hz()` validates a target and returns the three PLL parameters if attainable. Use `vcocalc.py` (`pico-sdk/src/rp2_common/hardware_clocks/scripts/vcocalc.py`) for parameter search.
+
+**Jitter vs power**: Higher VCO → lower jitter but more power. E.g., `1500 MHz / 6 / 2 = 125 MHz` (low jitter) vs `750 MHz / 6 / 1 = 125 MHz` (low power).
 
 ### PLL mechanics
 
 Both PLLs are *Phase Locked Loops* that multiply the XOSC (or an external clock at XIN) to produce a faster output. The USB PLL targets 48 MHz; the System PLL targets `clk_sys`. Changing the System PLL frequency is how the RP2040/RP2350 is overclocked. See [PLL parameter model](#pll-parameter-model) above.
+
+**RP2350 change**: Added interrupt on PLL loss-of-lock (`CS.LOCK_N`). Flexible PLL routing — e.g., USB clock can come from system PLL (144 MHz / 3 = 48 MHz), freeing USB PLL for HSTX or GPOUT.
 
 ### `hardware_pll` SDK functions
 
@@ -50,9 +61,47 @@ The `hardware_pll` library exposes low-level PLL control. Normally called indire
 | `pll_deinit(pll)` | Power off a PLL. **Does not check if PLL is in use** — call only when you know the PLL output is no longer needed. |
 | `PLL_RESET_NUM(pll)` | Macro → returns the `reset_num_t` value for reset-controller integration. Resolves at compile time. |
 
-The two SDK handles: `pll_sys` (system clock PLL, up to 133 MHz on RP2040, higher with overclocking) and `pll_usb` (USB reference clock PLL, 48 MHz fixed).
+The two SDK handles: `pll_sys` (system clock PLL, up to 133 MHz on RP2040, 150 MHz on RP2350) and `pll_usb` (USB reference clock PLL, 48 MHz fixed).
 
 > **Caution**: `pll_deinit` powers off the PLL immediately. If any peripheral or clock domain still references it, the system will hang. The RIA firmware sets `pll_sys` to 256 MHz at boot via `clock_configure`; never call `pll_deinit(pll_sys)` while the 6502 is running.
+
+---
+
+## XOSC Details
+
+- Disabled at chip startup; RP2350 boots from ROSC. Must be explicitly enabled via `CTRL_ENABLE`.
+- Uses `STARTUP_DELAY` register to hold chip in reset until crystal is stable (`STATUS_STABLE` flag).
+- Required crystal frequency ≥ 5 MHz for PLL use.
+- RP2350 range: **1–50 MHz** (vs RP2040 1–15 MHz). Reference design: 12 MHz.
+- **DORMANT mode**: Write special value to `DORMANT` register to stop XOSC for ultra-low-power sleep. On wakeup, XOSC restarts (>1 ms startup delay). Configure wake interrupt before entering DORMANT.
+- SDK counter: `COUNT` register counts down at XOSC frequency — useful for software delays without depending on core clock.
+- **Changes from RP2040**: Maximum crystal frequency extended from 15 MHz to 50 MHz.
+
+## ROSC Details
+
+- Ring oscillator, 8 stages, each with programmable drive strength (0–3 bits set per stage).
+- Frequency range settings: LOW (8 stages), MEDIUM (6), HIGH (4), TOOHIGH (2 — do not use).
+- A3 silicon: randomization enabled by default (`DS0_RANDOM` / `DS1_RANDOM` bits set), DIV halved to 2. Result: `clk_sys` guaranteed 18.4–96 MHz; `clk_ref` maintained at nominal 11 MHz with higher divisor. Improves glitch detector sensitivity to protect boot ROM.
+- **ROSC as RNG**: When cores clock from XOSC, read `RANDOMBIT` register once per bit. Not cryptographically secure.
+- **COUNT register**: Write a value; counts down to zero at ROSC frequency. Good for frequency-independent software delays.
+- **Changes from RP2040**: Frequency randomisation feature added.
+
+## LPOSC Details
+
+- Nominal 32.768 kHz, RC oscillator, no external components. Base address: `POWMAN_BASE` (0x40100000).
+- Starts automatically when core power supply is available and POR released. Stabilises in ~1 ms.
+- Initial accuracy: ±20%. Can be trimmed to **±1.5%** using TRIM field (63 trim steps, each 1–3% of initial freq).
+- Frequency drift: ±14% with temperature, ±20% with supply voltage.
+- External 32.768 kHz input alternative: GPIO 12, 14, 20, or 22 (also supports 1 kHz or 1 Hz tick input).
+- Used by: AON Timer tick, `clk_pow`, optional `clk_ref`/`clk_sys` for low-power CPU-on mode.
+
+## Tick Generators
+
+- Base address: `TICKS_BASE` = `0x40108000`.
+- Use `clk_ref` as reference; divide it to produce 1 µs tick for timers.
+- For 12 MHz `clk_ref`: set cycle count to **12** → 1 µs tick.
+- Destinations: TIMER0, TIMER1 (system timers), RISC-V platform timer, Cortex-M33 SysTick (core 0 + 1), Watchdog.
+- Each destination has independent cycle-count setting. Stop tick generator (`TIMER0_CTRL.ENABLE = 0`) before changing cycle count.
 
 ---
 
@@ -80,9 +129,21 @@ Ten clock generators each select one of the sources (via muxes) and apply a divi
 | Change | Detail |
 |---|---|
 | **`clk_rtc` removed** | RP2350 has no hardware RTC peripheral; use POWMAN for time-keeping instead. |
-| **`clk_hstx` added** | New HSTX (High-Speed Transmit) peripheral clock. |
+| **`clk_hstx` added** | New HSTX (High-Speed Transmit) peripheral clock, nominal 150 MHz. |
 | **`clk_ref` can use LPOSC** | RP2350 adds `CLOCKS_CLK_REF_CTRL_SRC_VALUE_LPOSC_CLKSRC` as a main source. |
 | **Clock divisor range** | RP2350 supports 1.0→65536.0 in steps of 1/65536 (16-bit fraction). RP2040 supports exactly 1.0 or 2.0→16777216.0 in steps of 1/256 (8-bit fraction). |
+| **A3 silicon reset change** | RP2350 A3 changed CLK_SYS_CTRL.SRC default from 0→1 (select AUX) and CLK_SYS_CTRL.AUXSRC from 0→2 (ROSC as AUX source). Boot ROM changed accordingly. A2 hardware required explicit clock setup from ROSC before any PLL config; A3+ hardware starts with clk_sys already running from ROSC via AUX. |
+
+**RP2350 clock generator nominal frequencies** (from datasheet Table 541):
+
+| Clock | Nominal Freq | Notes |
+|---|---|---|
+| `clk_ref` | 6–12 MHz | Always running (not in DORMANT); ROSC at boot |
+| `clk_sys` | 150 MHz | Always running; switched to PLL after boot |
+| `clk_peri` | 12–150 MHz | UART, SPI peripheral clock |
+| `clk_hstx` | 150 MHz | HSTX peripheral — RP2350 only |
+| `clk_usb` | 48 MHz | Must be exactly 48 MHz |
+| `clk_adc` | 48 MHz | Must be exactly 48 MHz |
 
 **RP2350 enum**: `clk_gpout0–3`, `clk_ref`, `clk_sys`, `clk_peri`, `clk_hstx`, `clk_usb`, `clk_adc` (10 total, no `clk_rtc`).
 

@@ -2,7 +2,7 @@
 type: concept
 tags: [rp2040, rp2350, spi, serial, rp6502-ria]
 related: [[gpio-pinout]], [[rp6502-ria]], [[rp2040-clocks]], [[dma-controller]]
-sources: [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]]
+sources: [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-16
 updated: 2026-04-17
 ---
@@ -64,6 +64,8 @@ Two SPI peripherals (SPI0, SPI1):
 - Interrupt and DMA support
 - Also supports TI synchronous serial and National Semiconductor Microwire (not commonly needed)
 
+> **RP2350 change**: The SSPTXD output enable (nSSPOE) is now connected to the pad and controlled automatically — the peripheral tristates TX when deselected in slave mode. In RP2040, nSSPOE was not connected and software had to manage output enable manually for multi-slave shared-bus setups.
+
 ---
 
 ## Clock Generation (Master Mode)
@@ -73,6 +75,8 @@ The SPI clock is derived from `clk_peri` through a **two-stage integer divisor**
 2. Stage 2: divides the result by a value from 1 to 256
 
 `spi_init()` / `spi_set_baudrate()` compute the closest achievable frequency automatically and return the actual value.
+
+**RP2350 peak bit rates** (at 150 MHz `clk_peri`, CPSDVSR=2, SCR=0): master mode **70.5 Mb/s**; slave mode **12.5 Mb/s** (limited by 12× SSPCLK ≥ SSPCLKIN constraint).
 
 ---
 

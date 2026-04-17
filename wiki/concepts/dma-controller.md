@@ -2,7 +2,7 @@
 type: concept
 tags: [rp2040, rp2350, dma, pio2, xram, pio, peripheral, errata]
 related: [[rp2040-memory]], [[pio-architecture]], [[xram]], [[rp6502-ria]]
-sources: [[quadros-rp2040]], [[pico-c-sdk]]
+sources: [[quadros-rp2040]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-16
 updated: 2026-04-17 (S5 ingest: RP2350 DREQ table, encoded_transfer_count, self-trigger/endless DMA, new functions, errata IDs)
 ---
@@ -30,7 +30,7 @@ The DMA controller moves data between memory and memory-mapped peripherals witho
 
 ## Channel architecture
 
-The RP2040 has **12 independent DMA channels** (`DMA_BASE` = `0x50000000`). Each channel operates independently and has four control registers:
+The RP2040 has **12 independent DMA channels** (`DMA_BASE` = `0x50000000`); RP2350 expands this to **16 channels**. Each channel operates independently and has four control registers:
 
 | Register | Role |
 |---|---|
@@ -46,6 +46,7 @@ The RP2040 has **12 independent DMA channels** (`DMA_BASE` = `0x50000000`). Each
 - `INCR_WRITE` — increment write address after each transfer.
 - `RING_SEL` — which address the ring affects (1 = write, 0 = read).
 - `RING_SIZE` — address wrap: 0 = off; N > 0 = only the lower N bits are incremented (creates a power-of-2 address ring).
+- `INCR_READ_REV` / `INCR_WRITE_REV` (**RP2350 only**) — decrement instead of increment, or increment by 2.
 
 > Always set READ_ADDR, WRITE_ADDR, and TRANS_COUNT at the start of each transfer sequence. If you don't, the channel reuses the values left over from the previous sequence.
 
@@ -161,11 +162,16 @@ A channel can fire an interrupt when:
 - `irq_quiet = false` (default): interrupt fires after every completed sequence.
 - `irq_quiet = true`: interrupt fires **only** on null trigger — useful for suppress-all-but-last in a control-block chain.
 
-Two system IRQ lines (routed to either core):
+**RP2040**: Two system IRQ lines (routed to either core):
 - `DMA_IRQ_0` (ARM IRQ 11)
 - `DMA_IRQ_1` (ARM IRQ 12)
 
 All 12 channels share 2 IRQ lines → use `dma_channel_get_irq0_status()` to identify the triggering channel.
+
+**RP2350**: Four system IRQ lines (`DMA_IRQ_0`–`DMA_IRQ_3`), each with independent channel-enable masks (`INTE0`–`INTE3`). All 16 channels can be independently routed to any IRQ. This allows:
+- Routing time-critical channels to a dedicated higher-priority IRQ
+- Sending different channel interrupts to different processor cores in multicore setups
+- Assigning IRQs to security domains (Secure / Non-secure)
 
 ---
 

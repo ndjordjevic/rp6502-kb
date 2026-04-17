@@ -2,7 +2,7 @@
 type: concept
 tags: [rp6502, ria, vga, pio, rp2350, hardware, firmware]
 related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[gpio-pinout]], [[reset-model]], [[pioasm]], [[hardware-irq]]
-sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]]
+sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-16
 updated: 2026-04-17
 
@@ -136,7 +136,23 @@ These features are only available when using `.pio_version 1` (or targeting RP23
 5. **IRQ PREV/NEXT** — `IRQ PREV <n>` / `IRQ NEXT <n>` sets/clears an IRQ flag on the adjacent lower/higher PIO block. Enables synchronisation between PIO blocks without involving the Cortex.
 6. **All 8 IRQ flags** can assert system-level interrupts. On v0, only flags 0–3 are routable to the NVIC; v1 lifts this restriction.
 
+**New pioasm directives (v1 only)**:
+- `.fifo txput` — 4 entries TX + 4 entries for random `MOV rxfifo[idx], ISR` writes (implements status registers readable by CPU)
+- `.fifo txget` — 4 entries TX + 4 entries for random `MOV OSR, rxfifo[idx]` reads (implements control registers writable by CPU)
+- `.fifo putget` — 4 entries for put + 4 entries for get (SM random access, CPU random access disabled)
+- `.mov_status irq (prev|next) set <n>` — STATUS source based on an IRQ flag being set (cross-PIO)
+
 See [[pioasm]] for the full assembler directive reference and `.fifo` mode descriptions.
+
+### RP2350-specific register additions (v1 hardware)
+
+| Register | Description |
+|---|---|
+| `DBG_CFGINFO.VERSION` | PIO ISA version — 0 for RP2040 (v0), 1 for RP2350 (v1). Use for runtime feature detection. |
+| `GPIOBASE` | Shifts the 32-GPIO window for each PIO block. RP2350B has 48 GPIOs; set `GPIOBASE` to 16 to work with GPIOs 16–47. All GPIO indices in PIO programs are relative to `GPIOBASE`. |
+| `CTRL.NEXT_PIO_MASK` / `.PREV_PIO_MASK` | Propagate CTRL operations (SM enable/disable, clkdiv restart) to state machines in the next-higher/next-lower PIO block simultaneously. Enables perfectly synchronised multi-block PIO startup. |
+| `SM0_SHIFTCTRL.IN_COUNT` | Masks unneeded IN-mapped pins to zero — useful for `MOV x, PINS` which previously always returned a full 32-bit rotated value. |
+| `RXF0_PUTGET0`–`RXF3_PUTGET3` | Expose each RX FIFO's internal 4×32-bit storage registers for random read/write from the system bus (not just push/pop order). Used by `.fifo txput/txget/putget` modes. |
 
 **Delay/side-set tradeoff**: 5 bits are shared between delay and side-set count. With no side-set, up to 31 delay cycles per instruction. With 1 side-set pin: max 15 delay cycles. Each additional side-set pin costs 1 delay bit.
 
@@ -156,7 +172,7 @@ Each SM configures five independent pin groups:
 
 8 shared IRQ flags (0–7). All 8 are accessible to all state machines — used for inter-SM synchronization. The `rel` qualifier makes the IRQ number relative to the SM index, so the same program can run on multiple SMs without collision.
 
-The lower 4 PIO IRQ flags (0–3) can be routed to two ARM NVIC interrupt lines per PIO block:
+The lower 4 PIO IRQ flags (0–3) can be routed to two ARM NVIC interrupt lines per PIO block on RP2040 (v0). On RP2350 (v1), **all 8 flags** can be routed:
 
 | NVIC IRQ | ARM IRQ# | Triggered by |
 |---|---|---|
@@ -186,7 +202,19 @@ Use these with `pio_set_irq0_source_mask_enabled` (bitmask variant) for efficien
 Inter-core related:
 - `SIO_IRQ_PROC0` (IRQ15) / `SIO_IRQ_PROC1` (IRQ16): fired when the inter-core FIFO has data. Relevant to RIA's dual-core architecture where one core handles PIO bus capture and the other runs the OS dispatcher.
 
-### MOV STATUS type
+### GPIO output priority
+
+When multiple state machines write the same GPIO on the same cycle, **higher-numbered SM wins**. This applies separately to output level and output enable (direction) writes. A state machine that doesn't write a GPIO on a given cycle leaves its current value unchanged.
+
+If a side-set and an OUT/SET from the same SM target the same GPIO on the same cycle, **side-set takes precedence**.
+
+### Input synchronisers
+
+Each GPIO input has a **2-flipflop synchroniser** to prevent metastability issues. This adds **2 cycles of input latency** to PIO — important for timing-sensitive programs. The synchroniser ensures IN PINS always reads a clean 0 or 1, never a metastable intermediate.
+
+The synchroniser can be **bypassed per-GPIO** via `INPUT_SYNC_BYPASS` register, reducing latency by 2 cycles. Only suitable for synchronous interfaces where the state machine won't sample during transitions. Bypassing for UART RX or other asynchronous interfaces **will cause incorrect reads**.
+
+
 
 The `pio_mov_status_type` enum controls what the `STATUS` source returns in a `MOV dest, STATUS` instruction:
 
@@ -269,6 +297,19 @@ pio_sm_set_consecutive_pindirs(pio0, sm, base, count, is_out);   // set output/i
 pio_sm_init(pio0, sm, offset, &c);
 pio_sm_set_enabled(pio0, sm, true);
 ```
+
+**RP2350 GPIO-range-aware variant** (preferred for portability):
+
+```c
+// Automatically selects a PIO block that can address the required GPIO range.
+// Required on RP2350B (GPIOs >= 32) or when GPIOBASE must be set correctly.
+PIO pio; uint sm; uint offset;
+bool success = pio_claim_free_sm_and_add_program_for_gpio_range(
+    &myprog_program, &pio, &sm, &offset, first_gpio, gpio_count, true);
+hard_assert(success);
+```
+
+This function replaces the manual `pio_add_program` + `pio_claim_unused_sm` sequence with an auto-selection that checks PIO GPIO range compatibility. Use this in new RP2350 code.
 
 ### GPIO pin group configuration
 

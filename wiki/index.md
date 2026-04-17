@@ -20,6 +20,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO, DMA, USB, clocks, UART, SPI (all planned chapters ingested) |
 | [[fairhead-pico-c]] | "Programming the Raspberry Pi Pico/W in C" (Fairhead, 3rd ed. 2025): SDK programming — PIO, GPIO, multicore, FreeRTOS, WiFi, SPI, UART (all planned chapters ingested) |
 | [[pico-c-sdk]] | Raspberry Pi Pico-series C/C++ SDK (RP-009085-KB-1, 2025): official API reference — function signatures, PIOASM encoding, RP2040/RP2350 compat table; all 14 sessions ingested ✅ |
+| [[rp2350-datasheet]] | RP2350 datasheet (RP-008373-DS-2, 2025-07-29): authoritative RP2350 hardware reference — SIO/TMDS, clocks/LPOSC, GPIO F0–F11, PIO v1, DMA (16-ch), USB, UART, SPI, HSTX, errata E1–E28; all 14 sessions ingested ✅ |
 
 ## Entities
 
@@ -34,6 +35,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp6502-ria-w]] | Wireless RIA superset: WiFi 4 + BLE HID + Hayes modem |
 | [[rp6502-vga]] | Optional Pi Pico 2 + VGA firmware video adapter |
 | [[rp6502-os]] | 32-bit protected OS running inside the RIA (POSIX-like API) |
+| [[rp2350]] | RP2350 microcontroller: dual Cortex-M33 @ 150 MHz, 520 KB SRAM, 3 PIO blocks, TMDS encoder, HSTX; powers Pi Pico 2 |
 
 ## Concepts
 
@@ -57,12 +59,13 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[hardware-irq]] | `hardware_irq` SDK: NVIC per-core semantics, IRQ number tables (RP2040 + RP2350), three handler-install patterns, priority model, user (software) IRQs |
 | [[dual-core-sio]] | Two-core ARM model, SIO FIFOs (RP2040: 8 deep, RP2350: 4 deep), lockout mechanism, doorbell API (RP2350), hardware spinlocks (32 locks, number assignment table, RP2350-E2 erratum), memory barriers, processor events, interrupt control, atomic GPIO, full `pico_multicore` + `pico_sync` SDK (critical_section, mutex, recursive_mutex, semaphore with all timeout variants) |
 | [[rp2040-memory]] | RP2040 memory types (ROM/SRAM/Flash), SRAM banking, XIP, full APB/AHB address map |
-| [[dma-controller]] | 12-channel DMA: RP2040/RP2350 DREQ tables, control blocks, chaining, CRC sniffing, RP2350 encoded_transfer_count/endless/self-trigger, SDK API |
-| [[usb-controller]] | RP2040 USB 1.1 controller: host/device modes, HID boot protocol (keyboard/gamepad), CDC VCP, TinyUSB API, RIA host usage |
+| [[dma-controller]] | 16-channel DMA (RP2350) / 12-channel (RP2040): DREQ tables, control blocks, chaining, CRC sniffing, RP2350 encoded_transfer_count/endless/self-trigger/4-IRQ-lines, SDK API |
+| [[usb-controller]] | RP2040/RP2350 USB 1.1 controller: host/device modes, HID boot protocol, CDC VCP, TinyUSB API, RIA host usage; RP2350 PHY_ISO startup requirement |
 | [[rp2040-clocks]] | RP2040/RP2350 clock subsystem: ROSC/XOSC/LPOSC/PLLs, clock domains, divisor precision, resus; 256 MHz overclock; `pll_init`/`pll_deinit` SDK functions; Timer (RP2350 two instances, 64-bit µs, full alarm API, compile-time macros); full `pico_time` API (absolute_time_t, sleep/busy_wait, alarm pools, repeating timers); Watchdog, RTC |
 | [[rp2040-uart]] | RP2040 UARTs: framing, 32-entry FIFOs + error flags, fractional baud rate, interrupts, hardware flow control, full SDK API (incl. macros `UART_FUNCSEL_NUM` etc.), `uart_deinit`; RIA uses UART1/GPIO4-5/115200 |
 | [[rp2040-spi]] | RP2040 SPI: master/slave, 4–16-bit words, CPOL/CPHA modes, manual SS in master mode, DMA DREQ macros, full SDK API (`spi_init`/`spi_deinit`/`spi_get_baudrate`/`spi_get_index`/blocking transfer variants); RIA uses USB MSC (not SPI) for storage |
 | [[sdk-architecture]] | Pico SDK build model: CMake INTERFACE libraries, library tiers, hardware claiming, builder pattern, RP2040/RP2350 platform split |
+| [[hstx]] | RP2350 HSTX peripheral: DDR serial output up to 300 Mb/s/pin, async FIFO, output shift register, bit crossbar, clock generator, command expander (RAW/TMDS/REPEAT opcodes), PIO-coupled mode, DVI/TMDS example; used by RP6502 VGA firmware |
 
 ## Inbox
 
@@ -85,4 +88,4 @@ When answering a query, read this file first to find relevant pages, then drill 
 | --- | --- |
 | [[overview]] | Living synthesis across all sources (revised after every ingest) |
 | [[version-history]] | Narrative history from v0.1 (2023) to v0.23 (2026), organized by era |
-| [[known-issues]] | Bugs, workarounds, and things to watch out for — from release notes |
+| [[known-issues]] | Bugs, workarounds, and things to watch out for — from release notes + full RP2350 silicon errata (E1–E28) |

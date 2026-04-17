@@ -1,15 +1,15 @@
 ---
 type: topic
-tags: [rp6502, bugs, workarounds, known-issues]
-related: [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[release-notes]]
-sources: [[release-notes]]
+tags: [rp6502, bugs, workarounds, known-issues, rp2350, errata]
+related: [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[release-notes]], [[dma-controller]], [[usb-controller]]
+sources: [[release-notes]], [[rp2350-datasheet]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-17
 ---
 
 # Known Issues
 
-**Summary**: Bugs, workarounds, and things to watch out for — sourced from release notes v0.1–v0.23.
+**Summary**: Bugs, workarounds, and things to watch out for — sourced from release notes v0.1–v0.23 and the RP2350 silicon errata (Appendix E of the RP2350 datasheet).
 
 ---
 
@@ -48,6 +48,91 @@ Only **Bluetooth LE (BLE)** is supported for wireless HID (keyboards, joysticks,
 
 ---
 
+## RP2350 silicon errata
+
+The RP2350 (Pi Pico 2) has a published silicon errata (Appendix E of the RP2350 datasheet). Below are all errata ordered by relevance to RP6502 development, with workaround notes. Errata IDs link to the affected silicon revision.
+
+> **Silicon revisions**: A2 → A3 → A4. Check `CHIP_ID.REVISION` (0x4 = A2, 0x6 = A3, 0x8 = A4). Most A2-only errata are fixed in A3+.
+
+### RP2350-E12 — USB: inadequate synchronisation of USB status signals ⚠️
+**Affects**: A2, A3, A4 (mitigated on A3 bootrom)
+**Critical for RP6502**: `clk_sys` must be **> 48 MHz** (not equal) when USB is active. The RP2350 VGA firmware must meet this requirement. The A3 bootrom mitigates the synchronisation issue for signals used during boot, but application software must not rely on the bootrom mitigation.
+See also: [[usb-controller]] § RP2350 Changes.
+
+### RP2350-E5 — DMA: CHAIN_TO fires unexpectedly during ABORT ⚠️
+**Affects**: A2, A3, A4 (documentation only — no hardware fix)
+**Summary**: Aborting an active DMA channel can trigger its `CHAIN_TO` target to fire unexpectedly. A re-trigger on the last ABORT cycle is also possible.
+**Workaround**: Before aborting a channel, clear the `EN` bit (`CHx_CTRL_TRIG.EN`) of both the aborted channel *and* any channel it chains to.
+See also: [[dma-controller]] § Channels and Control.
+
+### RP2350-E8 — DMA: CHAIN_TO may not fire for zero-length transfers
+**Affects**: A2, A3, A4 (documentation only)
+**Summary**: If a DMA channel completes a transfer of zero bytes, the `CHAIN_TO` chaining may not trigger.
+**Workaround**: Do not use `CHAIN_TO` with zero-length transfers. Replace zero-length transfers in control block lists with dummy transfers.
+
+### RP2350-E1 — SIO: Interpolator OVERF bits broken by right-rotate behaviour
+**Affects**: A2, A3, A4 (documentation only)
+**Summary**: The interpolator overflow detection (`OVERF0`/`OVERF1`) does not work correctly when right-rotate is used (a new RP2350 feature).
+**Workaround**: Compute overflow manually by checking `ACCUM0`/`ACCUM1` MSBs, or precompute bounds in advance.
+
+### RP2350-E2 — SIO: SPINLOCK writes mirrored at +0x80 offset
+**Affects**: A2, A3, A4 (documentation only)
+**Summary**: Writing to a `SIO_SPINLOCK` register also writes to the spinlock 16 positions higher (due to address decode mirroring).
+**Workaround**: Use processor atomic instructions instead of SIO spinlocks. The SDK `hardware_sync_spin_lock` library does this automatically.
+
+### RP2350-E6 — Hazard3 RISC-V: PMPCFGx RWX fields are transposed
+**Affects**: A2, A3, A4 (documentation only)
+**Summary**: In the Hazard3 RISC-V CPU, the bit ordering of R, W, X in PMP configuration registers is reversed from the RISC-V spec.
+**Workaround**: Use the bit order as-implemented. The SDK `hardware/regs/rvcsr.h` header provides correct bitfield definitions for RP2350.
+*Note*: The RP6502 firmware runs the RP2040-compatible Arm Cortex-M33 cores, not Hazard3, so this primarily affects custom RISC-V firmware on the RIA.
+
+### RP2350-E7 — Hazard3 RISC-V: U-mode doesn't ignore mstatus.mie
+**Affects**: A2, A3, A4 (documentation only)
+**Summary**: When in U-mode, `mstatus.mie` incorrectly affects interrupt masking (per RISC-V spec, U-mode should ignore `mie`).
+**Workaround**: When returning to U-mode via `mret` with `mstatus.mpp == 0`, ensure `mstatus.mpie` is set so interrupts will be enabled.
+
+### RP2350-E11 — XIP: cache clean by set/way corrupts dirty line tags
+**Affects**: A2, A3, A4 (documentation only)
+**Summary**: The "clean by set/way" XIP cache operation modifies dirty line tags, potentially causing spurious cache hits after cleaning.
+**Workaround**: Choose cleaning addresses that cannot alias with cached QMI data. The SDK `xip_cache_clean_range()` function uses the correct workaround.
+
+### RP2350-E17 — OTP: guarded read of single ECC row faults if adjacent row is invalid
+**Affects**: A2, A3, A4 (documentation only)
+**Summary**: A guarded (error-checked) read of a single ECC OTP row causes a fault if the adjacent row (in the same pair) contains invalid ECC data.
+**Workaround**: Never mix ECC and RAW rows within the same pair (even-starting row pair). Never store two ECC rows in the same pair if only reading one.
+
+### Bootrom-only errata (fixed in A3/A4 bootrom)
+
+The following errata are present in A2 silicon but are **fixed or mitigated by the A3+ bootrom**. If you use A3/A4 silicon you generally don't need to work around these in application code:
+
+| ID | Summary | Fixed in |
+|----|---------|----------|
+| RP2350-E10 | UF2 drag-and-drop doesn't work with partition tables | A3 bootrom |
+| RP2350-E13 | Invalid IMAGE_DEF before valid IMAGE_DEF fails to boot | A3 bootrom |
+| RP2350-E14 | `connect_internal_flash()` ignores CS1 pin config | A3 bootrom |
+| RP2350-E15 | `otp_access()` wrong permissions for pages 62/63 | A3 bootrom |
+| RP2350-E18 | Forever boot failure on invalid FLASH_PARTITION_SLOT_SIZE ECC | A4 bootrom |
+| RP2350-E19 | Reboot hangs when certain FRCE_OFF bits are set | A3 bootrom |
+| RP2350-E22 | Malformed lollipop block causes hang | A3 bootrom |
+| RP2350-E23 | PICOBOOT GET_INFO returns zero for PACKAGE_SEL | A3 bootrom |
+| RP2350-E3 | QFN-60: GPIO_NSMASK controls wrong PADS registers | A3 hardware |
+| RP2350-E9 | Increased GPIO leakage when pad input enabled | A3 hardware |
+
+### Security errata (physical attack vectors)
+
+| ID | Summary | Affects |
+|----|---------|---------|
+| RP2350-E16 | USB_OTP_VDD disruption → corrupt OTP read | A2 (mitigated A3) |
+| RP2350-E20 | Physical glitch → unsigned code on secured device via `reboot()` | A2 (mitigated A3) |
+| RP2350-E21 | Physical glitch → extract OTP data in BOOTSEL mode | A2 (mitigated A3) |
+| RP2350-E24 | Physical glitch → unsigned code execution | A2, A3 (mitigated A4) |
+| RP2350-E25 | LOAD_MAP with non-word size doesn't error | A2, A3 (fixed A4) |
+| RP2350-E26 | RCP random delays create side-channel | A2, A3, A4 (mitigation in bootrom) |
+| RP2350-E27 | Bus priority controls apply to wrong managers | A2, A3, A4 |
+| RP2350-E28 | OTP keys for pages 62/63 applied to all lock words | A2, A3, A4 |
+
+---
+
 ## Resolved issues (historical reference)
 
 | Version | Issue | Resolution |
@@ -73,3 +158,6 @@ Only **Bluetooth LE (BLE)** is supported for wireless HID (keyboards, joysticks,
 ## Related pages
 
 - [[release-notes]] · [[rp6502-ria-w]] · [[rp6502-ria]] · [[rp6502-vga]]
+- [[dma-controller]] — RP2350 DMA errata E5, E8
+- [[usb-controller]] — RP2350 USB errata E12
+

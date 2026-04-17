@@ -7,6 +7,92 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-17] ingest | rp2350-datasheet S14 | Appendix C+E: revision history + errata (PDF pp.1354–1376)
+
+- `wiki/topics/known-issues.md`: added full **RP2350 silicon errata** section — all 28 errata (E1–E28) with summaries, affected revisions, and workarounds; grouped into: critical (E12, E5, E8), SIO/interpolator (E1, E2), CPU errata (E6, E7), XIP (E11), OTP (E17), bootrom-fixed (E3, E9, E10, E13–E15, E18–E23), security (E16, E20, E21, E24–E28); updated frontmatter tags/related/sources
+- `wiki/sources/rp2350-datasheet.md`: S14 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S14 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S13 | §12.11 HSTX (PDF pp.1202–1211)
+
+- `wiki/concepts/hstx.md`: CREATED — comprehensive HSTX reference: overview, DDR output (300 Mb/s/pin), async FIFO, output shift register, bit crossbar, clock generator, command expander (RAW/TMDS/REPEAT opcodes), PIO-to-HSTX coupled mode, DVI/TMDS example config
+- `wiki/entities/rp6502-vga.md`: added `[[hstx]]` to tags/related/related pages section; added `[[rp2350-datasheet]]` to sources
+- `wiki/sources/rp2350-datasheet.md`: S13 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S13 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S12 | §12.7 USB (PDF pp.1141–1158)
+
+- `wiki/concepts/usb-controller.md`: added RP2350 Changes section — PHY_ISO startup requirement; RP2350-E12 clk_sys > 48 MHz; DPRAM base address 0x50100000; list of RP2040 USB errata fixed; new features (GPIO DP/DM, NAK-stop); updated `sources:` frontmatter
+- `wiki/sources/rp2350-datasheet.md`: S12 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S12 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S11 | §12.6 DMA (PDF pp.1094–1111)
+
+- `wiki/concepts/dma-controller.md`: updated channel count to 16 (RP2350); updated interrupt section — 4 IRQ lines on RP2350 with per-channel independent routing; added INCR_READ_REV/WRITE_REV to address increment section; updated `sources:` frontmatter
+- `wiki/sources/rp2350-datasheet.md`: S11 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S11 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S10 | §12.3 SPI (PDF pp.1046–1059)
+
+- `wiki/concepts/rp2040-spi.md`: added RP2350 nSSPOE automatic tristate change note; added peak bit rate at 150 MHz (master 70.5 Mb/s, slave 12.5 Mb/s); updated `sources:` frontmatter
+- `wiki/sources/rp2350-datasheet.md`: S10 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S10 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S9 | §12.1 UART (PDF pp.961–971)
+
+- `wiki/concepts/rp2040-uart.md`: confirmed PL011 details match existing page; added RP2350 note — only combined UARTINTR connected; updated `sources:` frontmatter to include `[[rp2350-datasheet]]`
+- `wiki/sources/rp2350-datasheet.md`: S9 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S9 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S8 | §11.6 PIO examples (PDF pp.915–938)
+
+- `wiki/concepts/pio-architecture.md`: added `pio_claim_free_sm_and_add_program_for_gpio_range()` to setup section with example and note about RP2350B GPIO range selection
+- `wiki/sources/rp2350-datasheet.md`: S8 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S8 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S7 | §11.4.8–11.5 PIO pt.2 (PDF pp.896–914)
+
+- `wiki/concepts/pio-architecture.md`: added GPIO output priority section (highest-numbered SM wins per-cycle); added input synchroniser section (2-flipflop, 2-cycle latency, INPUT_SYNC_BYPASS register, warning for async interfaces)
+- `wiki/sources/rp2350-datasheet.md`: S7 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S7 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S6 | §11.1–11.4.6 PIO pt.1 (PDF pp.876–895)
+
+- `wiki/concepts/pio-architecture.md`: expanded v1 ISA additions section with new pioasm directives (.fifo txput/txget/putget, .mov_status irq); added RP2350-specific registers table (DBG_CFGINFO.VERSION, GPIOBASE, CTRL.NEXT_PIO_MASK, IN_COUNT, RXF0_PUTGET0); updated IRQ routing note to mention v1 exposes all 8 flags
+- `wiki/sources/rp2350-datasheet.md`: S6 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S6 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S5 | §9.1–9.10 GPIO (PDF pp.587–603)
+
+- `wiki/concepts/gpio-pinout.md`: added RP2350 pad isolation latches section (ISO bit, `gpio_set_function()` auto-clear, power domain relationship); added bus keeper mode section (PDE+PUE simultaneously); added RP2350 interrupt changes (12 outputs, Secure/NS split, summary registers); added VOLTAGE_SELECT section; added GPIO coprocessor port section
+- `wiki/sources/rp2350-datasheet.md`: S5 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S5 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S4 | §8.2–8.6 XOSC/ROSC/LPOSC/Tick/PLL (PDF pp.554–583)
+
+- `wiki/concepts/rp2040-clocks.md`: expanded PLL section with full formula and constraints; added XOSC detail section (1–50 MHz range, DORMANT, startup delay); added ROSC detail section (8-stage architecture, A3 randomization change, RNG, COUNT); added LPOSC detail section (trim accuracy, external clock option); added Tick Generators section (TICKS_BASE, 1 µs tick configuration)
+- `wiki/sources/rp2350-datasheet.md`: S4 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S4 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S3 | §8.1 Clocks overview (PDF pp.513–528)
+
+- `wiki/concepts/rp2040-clocks.md`: corrected ROSC range (RP2350: 4.6–19.6 MHz), XOSC range (RP2350: 1–50 MHz), LPOSC details (32 kHz, starts in always-on domain, tunable to 1%, AON timer tick); added RP2350 A3 silicon reset change note (CLK_SYS_CTRL AUXSRC default changed); added nominal clock frequency table for RP2350
+- `wiki/sources/rp2350-datasheet.md`: S3 → `[x] ingested`
+- `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S3 → `[x]`
+
+## [2026-04-17] ingest | rp2350-datasheet S2 | §3.1 SIO programmer's model (PDF pp.36–53)
+
+- `wiki/concepts/dual-core-sio.md`: corrected SIO overview table (integer divider absent on RP2350; added TMDS encoder, RISC-V timer, updated FIFO/Doorbell IRQ numbers); added SIO Secure/Non-secure banking note to CPUID section; updated FIFO IRQ numbers (SIO_IRQ_FIFO=25, NS=27); updated Doorbell IRQ numbers (SIO_IRQ_BELL=26, NS=28); added **TMDS encoder** section (DVI 1.0 TMDS encoding, TMDS_CTRL/WDATA/PEEK_SINGLE/POP_SINGLE, security assignment); added **Interpolators** section (INTERP0 blend mode, INTERP1 clamp mode, 3-result outputs, use cases); added **RISC-V platform timer** section (MTIME/MTIMECMP, SIO_IRQ_MTIMECMP); updated RIA connections table
+- `wiki/sources/rp2350-datasheet.md`: S2 row → `[x] ingested`
+
+## [2026-04-17] ingest | rp2350-datasheet S1 | Ch.1 Introduction + §2.1–2.2 bus fabric/address map (PDF pp.13–34)
+
+- `wiki/entities/rp2350.md`: **created** — RP2350 family table (A/B/4A/4B variants), version history (A0–A4), key feature comparison vs RP2040, architecture overview, SRAM layout (520 KB in 10 banks), atomic register access, full address map table, RP6502 relevance notes
+- `wiki/sources/rp2350-datasheet.md`: **created** — source page with full scope table (14 sessions), key facts, wiki pages map, comparison with prior sources
+- `wiki/concepts/memory-map.md`: added **RP2350 peripheral address map** section with AHB (DMA, USB, PIO0–2, HSTX FIFO) and APB (CLOCKS, GPIO, XOSC, PLL, UART, SPI, TIMER, HSTX_CTRL, ROSC, TICKS) base addresses; atomic access alias notes; updated frontmatter tags/sources/related
+- `wiki/concepts/rp2040-memory.md`: added **RP2350 SRAM** section — 10-bank layout, striping model, non-striped SRAM8–9, power domains, note on RP2040 vs RP2350 striped region differences; updated frontmatter
+- `wiki/concepts/gpio-pinout.md`: added **GPIO Bank 1** section — USB DP/DM and QSPI pin function table from datasheet §1.2.4; note that Erratum E9 does not affect Bank 1
+
 ## [2026-04-17] ingest | pico-c-sdk S14 | §5.2.13 pico_time (PDF pp.412–433)
 
 - `wiki/concepts/rp2040-clocks.md`: replaced brief pico_time section with full reference — `absolute_time_t` type note (SDK 2.0+ defaults to uint64_t; `PICO_OPAQUE_ABSOLUTE_TIME_T=1` for type-checked mode); `at_the_end_of_time`/`nil_time` sentinels; full timestamp API (14 functions); sleep API with WFE/alarm-pool requirement + `best_effort_wfe_or_timeout()`; busy_wait variants; default pool config macros (`PICO_TIME_DEFAULT_ALARM_POOL_DISABLED`, `_HARDWARE_ALARM_NUM=3`, `_MAX_TIMERS=16`); `alarm_callback_t` return-value semantics (<0=reschedule from prev target, >0=reschedule from now, 0=cancel); `alarm_id_t` note; full pool management (create/destroy/query); `alarm_pool_add_alarm_at_force_in_context()`; default-pool convenience wrappers; repeating_timer API with delay sign convention (+ve=gap, -ve=fixed-rate)

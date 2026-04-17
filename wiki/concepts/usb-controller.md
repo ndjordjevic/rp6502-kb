@@ -2,9 +2,9 @@
 type: concept
 tags: [rp2040, usb, hid, cdc, tinyusb, ria, keyboard, gamepad]
 related: [[rp6502-ria]], [[gpio-pinout]], [[dual-core-sio]], [[ria-registers]]
-sources: [[quadros-rp2040]]
+sources: [[quadros-rp2040]], [[rp2350-datasheet]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-17
 ---
 
 # USB Controller
@@ -201,6 +201,25 @@ The 32-byte keyboard bit array maps directly to HID keycodes: bit N is set if ke
 ### RIA-W BLE HID
 
 The [[rp6502-ria-w]] additionally supports Bluetooth HID pairing (`ble pair` command), allowing wireless keyboards and mice without a USB OTG adapter.
+
+---
+
+## RP2350 Changes
+
+> **Critical startup difference**: On RP2350, `MAIN_CTRL.PHY_ISO` resets to 1 (PHY isolated). You **must** clear this bit before using USB, including after power-down events. RP2040 software that goes directly to `usb_hw->main_ctrl = CONTROLLER_EN_BITS` will hang on RP2350. Add `usb_hw_clear->muxing = USB_USB_MUXING_SOFTCON_BITS` and clear PHY_ISO first.
+
+**Clock requirement (RP2350-E12)**: `clk_sys` must be > 48 MHz when USB is in use (not just `clk_usb = 48 MHz`).
+
+**DPSRAM base address**: `0x50100000` (`USBCTRL_DPRAM_BASE`) — 4 KB of dual-port SRAM for endpoint control and data buffers. USB controller registers begin at `0x50110000` (`USBCTRL_REGS_BASE`).
+
+**Errata fixed in RP2350** (all RP2040 USB errata resolved):
+- **RP2040-E2**: USB device endpoint abort not cleared
+- **RP2040-E3**: Host interrupt endpoint buffer done flag set with incorrect buffer select
+- **RP2040-E4**: USB host writes to upper half of buffer status in single buffered mode
+- **RP2040-E5**: USB device fails to exit RESET state on busy USB bus
+- **RP2040-E15**: Device controller hangs on certain bus errors during IN transfer
+
+**New RP2350 features**: USB DP/DM pins can now be used as regular GPIOs (see GPIO function table); NAK-stop feature for bulk host endpoints (stops bulk transaction on NAK in hardware, preventing dropped data); enhanced hub inter-packet timeouts.
 
 ---
 

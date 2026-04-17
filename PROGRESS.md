@@ -40,9 +40,8 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **Quadros** — "Knowing the RP2040" (all 10 selected chapters; 9 new concept pages: [[pio-architecture]], [[gpio-pinout]], [[dual-core-sio]], [[rp2040-memory]], [[dma-controller]], [[usb-controller]], [[rp2040-clocks]], [[rp2040-uart]], [[rp2040-spi]])
 - ✅ Ingest **Fairhead** — "Programming The Raspberry Pi Pico/W In C" (all planned chapters ingested: PIO, GPIO, multicore, FreeRTOS, WiFi, SPI, UART)
 - ⏭ ~~Ingest RP2040 datasheet~~ — skipped; no RP2040 in RP6502; covered architecturally by Quadros + Fairhead
-- 👉 Ingest **RP2350 datasheet** — plan in `wiki/inbox/rp2350-datasheet-ingest-plan.md` (14 sessions: SIO/TMDS, PIO, GPIO, clocks, DMA, USB, SPI, UART, HSTX, errata; also verifies the nine `rp2040-*.md` pages)
-- ✅ Ingest **Pico C SDK reference** (`RP-009085-KB-1`) — all 14 sessions complete: SDK arch, PIO getting-started, PIOASM/ISA, hardware_clocks, hardware_dma, hardware_gpio pt.1+2, hardware_irq + hardware_pio pt.1+2+end + hardware_pll, hardware_spi + hardware_sync, hardware_timer + hardware_uart, pico_multicore + pico_sync, pico_time; ingest plan deleted
-- ⬜ Ingest W65C02S datasheet — instruction set, timing, pinout
+- ✅ Ingest **RP2350 datasheet** — all 14 sessions complete: SIO/TMDS, PIO, GPIO, clocks, DMA, USB, SPI, UART, HSTX, errata (E1–E28); 1 new concept page ([[hstx]]), 9 concept pages updated with RP2350 differences, full errata table in [[known-issues]]; ingest plan deleted
+- 👉 Ingest **W65C02S datasheet** — instruction set, timing, pinout
 - ⬜ Ingest YouTube captions (if collected)
 - ⬜ Ingest Discord export (if collected)
 
@@ -63,12 +62,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 11 |
-| Entities | 7 |
-| Concepts | 22 |
+| Sources | 12 |
+| Entities | 8 |
+| Concepts | 23 |
 | Topics | 3 (overview, version-history, known-issues) |
-| Inbox | 1 (rp2350-datasheet-ingest-plan) |
-| **Total pages** | **~44** |
+| Inbox | 0 |
+| **Total pages** | **~46** |
 
 ---
 

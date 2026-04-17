@@ -2,7 +2,7 @@
 type: concept
 tags: [rp2040, rp2350, uart, serial, rp6502-ria]
 related: [[gpio-pinout]], [[rp6502-ria]], [[rp2040-clocks]], [[dma-controller]]
-sources: [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]]
+sources: [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-16
 updated: 2026-04-18
 ---
@@ -98,6 +98,8 @@ A single combined IRQ per UART with five independently maskable sources:
 | **UARTRTINTR** (RX timeout) | No new data for 32 bit-times while FIFO non-empty | Draining FIFO, or writing UARTICR |
 | **UARTEINTR** | Error: OE, BE, PE, or FE | Writing UARTICR |
 | **UARTMSINTR** | Modem status change (CTS) | Writing UARTICR |
+
+> **RP2350 note**: Only the combined interrupt output **UARTINTR** (OR of all individual masked sources) is connected to the processor interrupt controller. Individual interrupt lines are still visible in status registers but only the combined IRQ fires.
 
 The **RX timeout** interrupt is used alongside UARTRXINTR: set UARTRXINTR threshold > 1 so it only fires on batches, but UARTRTINTR ensures the last few bytes don't stay in the FIFO unprocessed.
 

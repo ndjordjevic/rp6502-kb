@@ -1,10 +1,10 @@
 ---
 type: concept
-tags: [rp2040, memory, sram, flash, rom, xip, address-map]
-related: [[dma-controller]], [[pio-architecture]], [[rp6502-ria]], [[xram]]
-sources: [[quadros-rp2040]]
+tags: [rp2040, rp2350, memory, sram, flash, rom, xip, address-map]
+related: [[dma-controller]], [[pio-architecture]], [[rp6502-ria]], [[xram]], [[rp2350]]
+sources: [[quadros-rp2040]], [[rp2350-datasheet]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-17
 ---
 
 # RP2040 Memory and Address Map
@@ -166,3 +166,22 @@ XIP address sub-regions:
 - [[pio-architecture]]
 - [[xram]]
 - [[rp6502-ria]]
+- [[rp2350]] — RP2350 successor chip
+
+---
+
+## RP2350 SRAM (vs RP2040)
+
+The RP2350 expands SRAM to **520 KB in 10 banks**:
+
+| Region | Banks | Size | Base address | Layout |
+|---|---|---|---|---|
+| SRAM0–3 | 4 | 4×64 KB | `0x20000000` | Word-striped (bits [3:2]) |
+| SRAM4–7 | 4 | 4×64 KB | `0x20040000` | Word-striped (bits [3:2]) |
+| SRAM8–9 | 2 | 2×4 KB | `0x20080000` | Non-striped |
+
+SRAM0–3 are in power domain SRAM0; SRAM4–9 are in SRAM1. The two small non-striped banks (SRAM8–9) are useful for hoisting processor stacks to avoid bank conflicts with DMA-heavy SRAM0–7.
+
+> **RP2350 vs RP2040 SRAM note**: RP2350 striped SRAM spans `0x20000000`–`0x2007ffff` (512 KB) with both 256 KB halves striped over 4 banks each. The RP2040's striped/non-striped regions at `0x21000000` do not exist on RP2350 — it only has the main striped access at `0x20000000`.
+
+RP2350 address map (key bases) also in [[memory-map]].

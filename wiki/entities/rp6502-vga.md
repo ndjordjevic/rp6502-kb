@@ -1,8 +1,8 @@
 ---
 type: entity
-tags: [rp6502, vga, video, firmware, pico2]
-related: [[rp6502-ria]], [[pix-bus]], [[xreg]], [[xram]], [[sdk-architecture]]
-sources: [[rp6502-vga-docs]], [[pico-c-sdk]]
+tags: [rp6502, vga, video, firmware, pico2, hstx, dvi, tmds]
+related: [[rp6502-ria]], [[pix-bus]], [[xreg]], [[xram]], [[sdk-architecture]], [[hstx]]
+sources: [[rp6502-vga-docs]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-15
 updated: 2026-04-17
 ---
@@ -60,3 +60,4 @@ Full-color ANSI terminal with C0 controls (BS, HT, LF, FF, CR, ESC), Fe escapes 
 
 - [[rp6502-ria]] · [[pix-bus]] · [[xreg]] · [[xram]]
 - [[sdk-architecture]] — CMake INTERFACE model, RP2350 platform, builder pattern used in VGA firmware
+- [[hstx]] — the RP2350 HSTX peripheral used to generate DVI/TMDS video output on Pi Pico 2

@@ -1,8 +1,8 @@
 ---
 type: concept
-tags: [rp6502, ria, rp2040, rp2350, multicore, sio, firmware]
-related: [[rp6502-ria]], [[pio-architecture]], [[reset-model]], [[xram]]
-sources: [[quadros-rp2040]], [[rp6502-github-repo]], [[fairhead-pico-c]], [[pico-c-sdk]]
+tags: [rp6502, ria, rp2040, rp2350, multicore, sio, firmware, tmds, interpolator]
+related: [[rp6502-ria]], [[pio-architecture]], [[reset-model]], [[xram]], [[rp2350]], [[hstx]]
+sources: [[quadros-rp2040]], [[rp6502-github-repo]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-16
 updated: 2026-04-17
 ---
@@ -54,13 +54,18 @@ The SIO lives at `0xD0000000` (the IOPORT address). Both cores have single-cycle
 | **CPUID** | Yes (0/1) | Identifies which core is executing |
 | **Inter-processor FIFOs** | Shared | 2 × 8-word queues (RP2040) / 2 × 4-word queues (RP2350) for core-to-core messaging |
 | **Hardware spinlocks ×32** | Shared | Atomic test-and-set flags for short critical sections |
-| **Integer divider** | Yes | Hardware 32-bit divide per core |
-| **Interpolators 0/1** | Yes | Linear interpolation hardware (graphics/DSP use) |
+| **Integer divider** | Yes (RP2040 only) | Hardware 32-bit divide — **not present on RP2350** (Cortex-M33 has native divide instructions) |
+| **Interpolators 0/1** | Yes | Linear interpolation hardware (graphics/DSP; blend mode on INTERP0, clamp mode on INTERP1) |
 | **GPIO registers** | Shared | Atomic SET/CLR/XOR for race-free GPIO state changes |
+| **TMDS encoder** | Yes (RP2350 only) | Hardware DVI 1.0 TMDS pixel encode — used by VGA firmware for DVI output |
+| **Doorbells** | Per-direction (RP2350 only) | 8 flags each direction; cross-core lightweight interrupt, no data transfer |
+| **RISC-V platform timer** | Shared (RP2350 only) | 64-bit MTIME/MTIMEH counter; per-core comparison MTIMECMP/MTIMECMPH |
 
 ### CPUID
 
 `SIO->CPUID` returns 0 on core 0 and 1 on core 1. Lets shared code identify which core it is running on in a single read — no SDK calls needed.
+
+> **RP2350 SIO banking**: Most SIO hardware is duplicated into **Secure** and **Non-secure** banks. Secure code accesses SIO at `0xd0000000` (SIO_BASE); it can also access the NS view at `0xd0020000` (SIO_NONSEC_BASE). Spinlocks, FIFOs, and doorbells are all independently banked so NS code cannot interfere with Secure message passing. GPIO registers are **shared** (not banked) but subject to a Non-secure access mask per-pin via ACCESSCTRL. The TMDS encoder and interpolators are assigned to Secure SIO at reset and can be moved to NS via `PERI_NONSEC`.
 
 ### Inter-processor FIFOs
 
@@ -74,7 +79,8 @@ Data availability triggers an interrupt on the *reading* core. The IRQ number de
 
 ```c
 // RP2040: SIO_IRQ_PROC0 (fires on core 0), SIO_IRQ_PROC1 (fires on core 1)
-// RP2350: both cores share SIO_IRQ_PROC but with different SIO outputs routed per core
+// RP2350: SIO_IRQ_FIFO (interrupt 25) — same IRQ number on each core (core-local)
+//         Non-secure variant: SIO_IRQ_FIFO_NS (interrupt 27)
 // Portable:
 irq_num_t irq = SIO_FIFO_IRQ_NUM(get_core_num());
 ```
@@ -102,6 +108,8 @@ This enables zero-polling communication: the sending core pushes a word; the rec
 ### Doorbell interrupts (RP2350 only)
 
 RP2350 adds a **doorbell** mechanism: named interrupt signals a core can raise on itself or the other core, without using the FIFOs. Each doorbell is just an IRQ trigger; no data is transferred.
+
+IRQ: **`SIO_IRQ_BELL`** (interrupt 26) per core; Non-secure variant `SIO_IRQ_BELL_NS` (interrupt 28).
 
 | Function | Description |
 |---|---|
@@ -138,6 +146,42 @@ Setup: the *victim* core calls `multicore_lockout_victim_init()` to hook the FIF
 | `multicore_lockout_end_timeout_us(us)` | Release with timeout; returns false if the lockout mutex could not be acquired |
 
 Note: `lockout_start_*` functions are not nestable; must be paired with a corresponding `lockout_end_*`.
+
+### TMDS encoder (RP2350 only)
+
+Each core has a hardware implementation of the **TMDS encode algorithm** defined in the DVI 1.0 specification (§3). This enables software-driven DVI output without the HSTX peripheral (though [[hstx]] offers lower overhead for most use cases).
+
+**Configuration**:
+- `TMDS_CTRL` — select pixel format: 16-bit RGB565 down to 1-bit monochrome
+- `TMDS_WDATA` — write 32 bits of colour data (encoding is immediate, no stalls)
+- `TMDS_PEEK_SINGLE` / `TMDS_POP_SINGLE` — read encoded 10-bit TMDS symbols; POP variant advances the DC balance counter and shifts the colour data register; PEEK does not
+
+Depending on pixel format, multiple TMDS symbol reads may be needed per `TMDS_WDATA` write. Maximum throughput: one 32-bit read or write per cycle per core.
+
+> **Security**: TMDS encoder is assigned to the Secure SIO at reset. Can be moved to Non-secure SIO via `PERI_NONSEC` register. Not duplicated like spinlocks/FIFOs — it is assignable, not banked.
+
+The VGA firmware almost certainly uses the TMDS encoder (or [[hstx]]) for its DVI output path. See [[rp6502-vga]].
+
+### Interpolators (both RP2040 and RP2350)
+
+Two interpolators per core: **INTERP0** (supports blend mode) and **INTERP1** (supports clamp mode). Each has two accumulators (ACCUM0, ACCUM1), three base registers (BASE0, BASE1, BASE2), and three result outputs (PEEK0/1/2 — non-destructive, POP0/1/2 — advance state).
+
+**Lane operations** (each lane independently): right-shift by 0–31 bits, mask bits MSB:LSB, optional sign-extension from top of mask.
+
+**Modes**:
+- **Normal**: result = shifted/masked lane value + corresponding BASE
+- **Blend** (INTERP0 only): linear interpolation between BASE0 and BASE1 using 8-bit alpha from lane 1
+- **Clamp** (INTERP1 only): PEEK0/POP0 = lane value clamped between BASE0 and BASE1
+
+**Uses**: table-indexed texture mapping (2D affine), audio upscaling via linear interp, fixed-point coordinate stepping, quantization, dithering.
+
+> **RP2350 note**: Interpolators are assignable to Secure or Non-secure SIO via `PERI_NONSEC`, same as TMDS encoders.
+
+### RISC-V platform timer (RP2350 only)
+
+A 64-bit standard RISC-V platform timer (`MTIME`/`MTIMEH`), usable by both Arm and RISC-V cores. Located in Secure SIO only (Machine-mode peripheral on RISC-V). Per-core comparison registers: `MTIMECMP`/`MTIMECMPH` (each core has its own copy at the same address). Timer interrupt: `SIO_IRQ_MTIMECMP` (system-level per-core interrupt).
+
+Use 1 µs time base for compatibility with most RISC-V software.
 
 ### Hardware spinlocks
 
@@ -413,10 +457,11 @@ int count = sem_available(&sem);               // query current available count
 |---|---|
 | `multicore_launch_core1()` | Starts `api_task()` OS dispatcher on core 1 |
 | Inter-processor FIFOs | Primary signaling path between PIO bus capture (core 0) and OS dispatcher (core 1) |
-| `SIO_FIFO_IRQ_NUM(core)` | Portable IRQ number for FIFO interrupt on given core (RP2040: distinct per core; RP2350: shared `SIO_IRQ_PROC`) |
+| `SIO_FIFO_IRQ_NUM(core)` | Portable IRQ number: RP2040 uses `SIO_IRQ_PROC0/1`; RP2350 uses `SIO_IRQ_FIFO` (interrupt 25, core-local) |
 | Atomic GPIO SET/CLR/XOR | Race-free `RESB` / `IRQB` control from either core |
 | Hardware spinlocks | Short critical sections protecting shared OS call state |
 | CPUID | Entry functions can identify which core they are running on |
+| TMDS encoder | VGA firmware likely uses for DVI pixel encoding; see [[rp6502-vga]] |
 
 > **RP2350 note**: The RIA runs on an RP2350 (Pi Pico 2), which uses Cortex-M33 cores rather than Cortex-M0+. The SIO block is architecturally identical; the inter-processor FIFOs, spinlocks, and atomic GPIO aliases work the same way.
 
@@ -485,4 +530,4 @@ The Raspberry Pi Foundation distributes an SMP (Symmetric Multi-Processing) port
 
 ## Related pages
 
-- [[pio-architecture]] · [[reset-model]] · [[rp6502-ria]] · [[xram]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[rp6502-ria-w]]
+- [[pio-architecture]] · [[reset-model]] · [[rp6502-ria]] · [[xram]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[rp6502-ria-w]] · [[rp2350]] · [[hstx]]

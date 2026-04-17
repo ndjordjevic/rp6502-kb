@@ -1,7 +1,7 @@
 ---
 type: topic
 tags: [rp6502, overview]
-updated: 2026-04-17 (pico-c-sdk S14 ingest — rp2040-clocks.md: replaced brief pico_time section with full reference: absolute_time_t sentinels, 14-function timestamp API, sleep/best_effort_wfe_or_timeout, busy_wait alternatives, default alarm pool macros, alarm_callback_t return semantics, alarm_id_t note, full pool management API, alarm_pool_add_alarm_at_force_in_context, default-pool wrappers, repeating_timer with delay sign convention)
+updated: 2026-04-17 (rp2350-datasheet all 14 sessions complete — added HSTX, USB PHY_ISO, DMA 16-ch, errata E1–E28)
 ---
 
 # RP6502 Wiki — Overview
@@ -56,6 +56,15 @@ There are three Pico firmwares, all from the same monorepo:
 - The OS supports a **[[launcher]]** mechanism: a small ROM can register itself as the persistent shell that the process manager re-runs whenever any other ROM exits. This is the foundation for fault-tolerant boot of a native 6502 OS on top.
 - **NFC**: tap a programmed NTAG215 card and the named ROM file loads. Implemented with a PN532 over USB.
 
+## RP2350 silicon notes (Pi Pico 2)
+
+The RP6502 VGA module uses the Pi Pico 2 (RP2350), and the RIA-W uses the Pi Pico 2 W. Key RP2350 differences from RP2040 relevant to RP6502 development:
+
+- **HSTX** ([[hstx]]): new RP2350 peripheral for high-speed serial video output. Drives DDR serial at up to 300 Mb/s/pin via a bit crossbar and hardware TMDS encoder. Used by the RP6502-VGA firmware for DVI output.
+- **DMA**: 16 channels (vs 12) and 4 IRQ lines (vs 2). New `TRANS_COUNT` MODE field and `INCR_READ/WRITE_REV` for bit-reversal. See [[dma-controller]].
+- **USB PHY_ISO**: `MAIN_CTRL.PHY_ISO` resets to 1 on RP2350 — must clear before any USB use. RP2040 code that immediately enables the USB controller will hang. `clk_sys` must be **> 48 MHz** (not equal) when USB is active (RP2350-E12). See [[usb-controller]].
+- **Silicon errata**: 28 documented errata (E1–E28). Most critical: E12 (USB), E5/E8 (DMA CHAIN_TO/ABORT), E2 (SIO spinlock), E1 (interpolator OVERF). Full list with workarounds: [[known-issues]] § RP2350 silicon errata.
+
 ## Key open questions
 
 1. **W65C02S WAI / STP** — does the RIA polling loop interact usefully with the CPU's wait-for-interrupt instruction? The `ria_write` PIO generates PHI2 continuously; WAI would just stall the 6502 in-place until IRQ fires.
@@ -66,7 +75,7 @@ There are three Pico firmwares, all from the same monorepo:
 
 ## Hub pages
 
-- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]]
-- **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]]
-- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]]
+- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]]
+- **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]] · [[rp2350]]
+- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]]
 - **Topics**: [[version-history]] · [[known-issues]]

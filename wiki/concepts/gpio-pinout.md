@@ -2,7 +2,7 @@
 type: concept
 tags: [rp6502, ria, vga, hardware, gpio, pinout, rp2350, hstx]
 related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[pio-architecture]], [[rp6502-board]]
-sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]]
+sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
 created: 2026-04-16
 updated: 2026-04-17
 ---
@@ -136,7 +136,41 @@ SDK functions (library `hardware_gpio`):
 
 **Schmitt trigger thresholds** (at 3.3V supply): input must rise above 2.0V to read as 1; must fall below 1.8V to read back as 0 (0.2V hysteresis). Prevents false transitions from slow-rising bus signals.
 
-### RP2350 Erratum E9 — Pull-down latch bug
+### RP2350 pad isolation latches (new vs RP2040)
+
+> **Note**: Non-SDK applications ported from RP2040 must clear the ISO bit before using a GPIO. The SDK handles this automatically via `gpio_set_function()`.
+
+RP2350 adds an `ISO` bit per pad (e.g., `GPIO0.ISO`). At reset (and after any power-on/brownout/SW-DP reset), all ISO bits are set to 1 — pads are **isolated**: pad outputs hold their pre-reset state via latches rather than reflecting internal logic. This ensures well-defined pad states during power domain transitions.
+
+- **To use a GPIO**: clear `ISO` (via `gpio_set_function()` which does this automatically). Latches become transparent; peripheral drives pad.
+- **On low-power entry**: when switched-core domain powers down, isolation latches latch the current output state. On power-up, ISO bits reset to 1 again.
+- **Reset sources that restore ISO latches**: power-on, brownout, RUN pin, SW-DP CDBGRSTREQ, RP-AP rescue reset.
+
+The SDK's `gpio_set_function()` clears ISO automatically. Direct register access must call `gpio_set_function()` or manually clear the ISO bit in `padsbank0_hw->io[gpio]`.
+
+### RP2350 bus keeper mode
+
+Setting both `GPIO0.PDE` (pull-down enable) and `GPIO0.PUE` (pull-up enable) simultaneously enables **bus keeper mode**: the pad weakly retains its current logical state when the output buffer is disabled and no external driver is present (pulled up when high, pulled down when low). Requires switched-core domain to be powered.
+
+### RP2350 GPIO interrupt changes
+
+- **12 interrupt outputs** total (vs 6 in RP2040): IO Bank 0 and QSPI bank each split into Secure/Non-secure variants for each destination (dormant-wake, proc0, proc1).
+- **Interrupt summary registers**: `IRQSUMMARY_PROC0_NONSECURE0` etc. — read to quickly identify which GPIOs have pending interrupts without scanning all enable/status registers.
+
+### RP2350 VOLTAGE_SELECT
+
+IOVDD can be 1.8V–3.3V. Default input thresholds valid for 2.5–3.3V. For 1.8V operation, set `VOLTAGE_SELECT` register to 1 (per IO bank, Bank 0 and QSPI bank must match). **Warning**: using IOVDD > 1.8V with 1.8V thresholds may damage the chip.
+
+### RP2350 GPIO coprocessor port
+
+Cortex-M33 coprocessor port 0 provides fast SIO GPIO access from Arm assembly:
+- Any SIO GPIO register access = single instruction (no need to materialise 32-bit address)
+- Indexed write to single GPIO = single instruction
+- 64-bit read/write = single instruction
+
+Both Secure and Non-secure code can access the coprocessor. Non-secure code sees a restricted view per `ACCESSCTRL GPIO_NSMASK0/1`. Useful for minimising GPIO overhead in interrupt handlers.
+
+
 
 > **Critical for RIA firmware**: This affects all user GPIO lines in all modes including PIO.
 
@@ -519,6 +553,27 @@ On the **Pico W**, these internal functions are relocated to the CYW43439 WiFi c
 
 ---
 
+## GPIO Bank 1 (QSPI and USB pins)
+
+*From [[rp2350-datasheet]] §1.2.4.*
+
+RP2350 has a **second GPIO bank** (Bank 1) on the six dedicated QSPI pins and the two USB DP/DM pins. These pins may be used as general-purpose GPIOs when not needed for their primary function (e.g., if booting from OTP instead of external flash, QSPI pins become available).
+
+| Pin | F0 | F1 | F2 | F3 | F4 | F5 (SIO) |
+|---|---|---|---|---|---|---|
+| USB_DP | — | UART1 TX | I2C0 SDA | — | — | SIO |
+| USB_DM | — | UART1 RX | I2C0 SCL | — | — | SIO |
+| QSPI_SCK | QMI SCK | UART1 CTS | I2C1 SDA | — | — | SIO |
+| QSPI_CSn | QMI CS0n | UART1 RTS | I2C1 SCL | — | — | SIO |
+| QSPI_SD0 | QMI SD0 | UART0 TX | I2C0 SDA | — | — | SIO |
+| QSPI_SD1 | QMI SD1 | UART0 RX | I2C0 SCL | — | — | SIO |
+| QSPI_SD2 | QMI SD2 | UART0 CTS | I2C1 SDA | — | — | SIO |
+| QSPI_SD3 | QMI SD3 | UART0 RTS | I2C1 SCL | — | — | SIO |
+
+> Note: Errata E9 (GPIO pull-down latch) does **not** affect QSPI bank or USB pins.
+
+---
+
 ## Related pages
 
-- [[pio-architecture]] · [[pix-bus]] · [[rp6502-ria]] · [[rp6502-board]] · [[reset-model]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[dual-core-sio]]
+- [[pio-architecture]] · [[pix-bus]] · [[rp6502-ria]] · [[rp6502-board]] · [[reset-model]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[dual-core-sio]] · [[rp2350]]
