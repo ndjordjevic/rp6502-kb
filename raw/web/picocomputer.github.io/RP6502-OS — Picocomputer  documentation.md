@@ -3,7 +3,7 @@ title: "RP6502-OS — Picocomputer  documentation"
 source: "https://picocomputer.github.io/os.html"
 author:
 published:
-created: 2026-04-15
+created: 2026-04-18
 description:
 tags:
   - "clippings"
@@ -49,7 +49,7 @@ The ABI for calling the operating system is based on fastcall from the [cc65 int
 
 A and X are the 6502 registers. The pseudo register AX combines them for 16 bits. AXSREG allows 32 bits with the 16 additional SREG bits. Let’s look at how to make an OS call through the RIA registers. All OS calls are specified as a C declaration like so:
 
-int doit(int arg0, int arg1);[¶](#c.doit "Link to this definition")  
+int doit(int arg0, int arg1);[¶](#c.doit "Link to this definition")
 
 The RIA has registers called `RIA_A`, `RIA_X`, and `RIA_SREG`. An int is 16 bits, so we set the `RIA_A` and `RIA_X` registers with arg1. I’ll use “A” for the 6502 register and “RIA\_A” for the RIA register in this explanation.
 
@@ -148,7 +148,7 @@ The OS is built around FAT filesystems, the de facto standard for unsecured USB 
 
 ### ZXSTACK
 
-void zxstack(void);[¶](#c.zxstack "Link to this definition")  
+void zxstack(void);[¶](#c.zxstack "Link to this definition")
 
 Abandon the xstack by resetting the xstack pointer. This is the only operation that doesn’t require waiting for completion. You do not need to call this for failed operations. It can be useful if you want to quickly ignore part of a returned structure.
 
@@ -162,9 +162,9 @@ rp6502.h
 
 ### XREG
 
-int xreg(char device, char channel, unsigned char address,...);[¶](#c.xreg "Link to this definition")  
+int xreg(char device, char channel, unsigned char address,...);[¶](#c.xreg "Link to this definition")
 
-int xregn(char device, char channel, unsigned char address, unsigned count,...);[¶](#c.xregn "Link to this definition")  
+int xregn(char device, char channel, unsigned char address, unsigned count,...);[¶](#c.xregn "Link to this definition")
 
 Using xreg() from C is preferred to avoid making a counting error. Count doesn’t need to be sent in the ABI so both prototypes are correct.
 
@@ -197,7 +197,7 @@ EINVAL, EIO
 
 ### ARGV
 
-int \_argv(char \*argv, int size) [¶](#c._argv "Link to this definition")  
+int \_argv(char \*argv, int size) [¶](#c._argv "Link to this definition")
 
 The virtual \_argv is called by C initialization to provide argc and argv for main(). It returns an array of zero terminated string indexes followed by the strings. e.g. \[“ABC”, “DEF”\] is 06 00 0A 00 00 00 41 42 43 00 44 45 46 00 The returned data is guaranteed to be valid.
 
@@ -225,11 +225,11 @@ will not fail
 
 ### EXEC
 
-int ria\_execl(const char \*path,...) [¶](#c.ria_execl "Link to this definition")  
+int ria\_execl(const char \*path,...) [¶](#c.ria_execl "Link to this definition")
 
-int ria\_execv(const char \*path, char \*const argv\[\]) [¶](#c.ria_execv "Link to this definition")  
+int ria\_execv(const char \*path, char \*const argv\[\]) [¶](#c.ria_execv "Link to this definition")
 
-int \_exec(const char \*argv, int size) [¶](#c._exec "Link to this definition")  
+int \_exec(const char \*argv, int size) [¶](#c._exec "Link to this definition")
 
 The virtual \_exec is called by ria\_execl() and ria\_execv(). Be aware of the one difference from the execl() and execv() you may be used to. Because RAM is precious, the path is only supplied once, not again in argv\[0\]. The launched ROM will see argv\[0\] as the filename.
 
@@ -253,7 +253,7 @@ EINVAL
 
 ### ATTR\_GET
 
-long ria\_attr\_get(unsigned char id) [¶](#c.ria_attr_get "Link to this definition")  
+long ria\_attr\_get(unsigned char id) [¶](#c.ria_attr_get "Link to this definition")
 
 Returns the current value of a RIA attribute. See for attribute IDs and descriptions.
 
@@ -283,7 +283,7 @@ EINVAL
 
 ### ATTR\_SET
 
-int ria\_attr\_set(long val, unsigned char id) [¶](#c.ria_attr_set "Link to this definition")  
+int ria\_attr\_set(long val, unsigned char id) [¶](#c.ria_attr_set "Link to this definition")
 
 Sets the value of a RIA attribute. See for attribute IDs and descriptions.
 
@@ -314,7 +314,7 @@ EINVAL
 
 ### CLOCK
 
-unsigned long clock(void) [¶](#c.clock "Link to this definition")  
+unsigned long clock(void) [¶](#c.clock "Link to this definition")
 
 Obtain the value of a monotonic clock that updates 100 times per second. Wraps approximately every 497 days.
 
@@ -336,7 +336,7 @@ will not fail
 
 ### CLOCK\_GETRES
 
-int clock\_getres(clockid\_t clock\_id, struct timespec \*res) [¶](#c.clock_getres "Link to this definition")  
+int clock\_getres(clockid\_t clock\_id, struct timespec \*res) [¶](#c.clock_getres "Link to this definition")
 
 ```c
 struct timespec {
@@ -373,9 +373,9 @@ EINVAL
 
 ### TZSET
 
-void tzset(void);[¶](#c.tzset "Link to this definition")  
+void tzset(void);[¶](#c.tzset "Link to this definition")
 
-int \_tzset(struct \*tz) [¶](#c._tzset "Link to this definition")  
+int \_tzset(struct \*tz) [¶](#c._tzset "Link to this definition")
 
 ```c
 struct _tzset
@@ -407,9 +407,9 @@ EINVAL
 
 ### TZQUERY
 
-struct tm \*localtime(const time\_t \*timep);[¶](#c.localtime "Link to this definition")  
+struct tm \*localtime(const time\_t \*timep);[¶](#c.localtime "Link to this definition")
 
-int \_tzquery(uint32\_t time, struct \*dst) [¶](#c._tzquery "Link to this definition")  
+int \_tzquery(uint32\_t time, struct \*dst) [¶](#c._tzquery "Link to this definition")
 
 ```c
 struct _tzquery
@@ -438,7 +438,7 @@ will not fail
 
 ### CLOCK\_GETTIME
 
-int clock\_gettime(clockid\_t clock\_id, struct timespec \*tp) [¶](#c.clock_gettime "Link to this definition")  
+int clock\_gettime(clockid\_t clock\_id, struct timespec \*tp) [¶](#c.clock_gettime "Link to this definition")
 
 Obtains the current time.
 
@@ -468,7 +468,7 @@ EINVAL, EUNKNOWN
 
 ### CLOCK\_SETTIME
 
-int clock\_settime(clockid\_t clock\_id, const struct timespec \*tp) [¶](#c.clock_settime "Link to this definition")  
+int clock\_settime(clockid\_t clock\_id, const struct timespec \*tp) [¶](#c.clock_settime "Link to this definition")
 
 Sets the current time.
 
@@ -498,7 +498,7 @@ EINVAL, EUNKNOWN
 
 ### OPEN
 
-int open(const char \*path, int oflag) [¶](#c.open "Link to this definition")  
+int open(const char \*path, int oflag) [¶](#c.open "Link to this definition")
 
 Create a connection between a file and a file descriptor. Up to 8 files may be open at once.
 
@@ -559,7 +559,7 @@ If O\_CREAT and O\_EXCL are set, fail if the file exists.
 
 ### CLOSE
 
-int close(int fildes) [¶](#c.close "Link to this definition")  
+int close(int fildes) [¶](#c.close "Link to this definition")
 
 Finish pending writes and release the file descriptor. File descriptor will rejoin the pool available for use by open().
 
@@ -589,7 +589,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_INVALID\_OBJECT, FR\_TIMEOUT
 
 ### READ
 
-int read(int fildes, void \*buf, unsigned count) [¶](#c.read "Link to this definition")  
+int read(int fildes, void \*buf, unsigned count) [¶](#c.read "Link to this definition")
 
 Read count bytes from a file to a buffer. This is implemented in the compiler library as a series of calls to.
 
@@ -621,7 +621,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_DENIED, FR\_INVALID\_OBJECT, FR\_TIMEOU
 
 ### READ\_XSTACK
 
-int read\_xstack(void \*buf, unsigned count, int fildes) [¶](#c.read_xstack "Link to this definition")  
+int read\_xstack(void \*buf, unsigned count, int fildes) [¶](#c.read_xstack "Link to this definition")
 
 Read count bytes from a file to xstack.
 
@@ -653,7 +653,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_DENIED, FR\_INVALID\_OBJECT, FR\_TIMEOU
 
 ### READ\_XRAM
 
-int read\_xram(unsigned buf, unsigned count, int fildes) [¶](#c.read_xram "Link to this definition")  
+int read\_xram(unsigned buf, unsigned count, int fildes) [¶](#c.read_xram "Link to this definition")
 
 Read count bytes from a file to xram.
 
@@ -685,7 +685,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_DENIED, FR\_INVALID\_OBJECT, FR\_TIMEOU
 
 ### WRITE
 
-int write(int fildes, const void \*buf, unsigned count) [¶](#c.write "Link to this definition")  
+int write(int fildes, const void \*buf, unsigned count) [¶](#c.write "Link to this definition")
 
 Write count bytes from buffer to a file. This is implemented in the compiler library as a series of calls to.
 
@@ -717,7 +717,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_DENIED, FR\_INVALID\_OBJECT, FR\_TIMEOU
 
 ### WRITE\_XSTACK
 
-int write\_xstack(const void \*buf, unsigned count, int fildes) [¶](#c.write_xstack "Link to this definition")  
+int write\_xstack(const void \*buf, unsigned count, int fildes) [¶](#c.write_xstack "Link to this definition")
 
 Write count bytes from xstack to a file.
 
@@ -749,7 +749,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_DENIED, FR\_INVALID\_OBJECT, FR\_TIMEOU
 
 ### WRITE\_XRAM
 
-int write\_xram(unsigned buf, unsigned count, int fildes) [¶](#c.write_xram "Link to this definition")  
+int write\_xram(unsigned buf, unsigned count, int fildes) [¶](#c.write_xram "Link to this definition")
 
 Write count bytes from xram to a file.
 
@@ -781,9 +781,9 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_DENIED, FR\_INVALID\_OBJECT, FR\_TIMEOU
 
 ### LSEEK
 
-static long f\_lseek(long offset, char whence, int fildes) [¶](#c.f_lseek "Link to this definition")  
+static long f\_lseek(long offset, char whence, int fildes) [¶](#c.f_lseek "Link to this definition")
 
-off\_t lseek(int fildes, off\_t offset, int whence) [¶](#c.lseek "Link to this definition")  
+off\_t lseek(int fildes, off\_t offset, int whence) [¶](#c.lseek "Link to this definition")
 
 Move the read/write pointer. The OS uses the ABI format of f\_seek(). An lseek() compatible wrapper is provided with the compiler library.
 
@@ -824,7 +824,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_INVALID\_OBJECT, FR\_TIMEOUT
 
 ### UNLINK
 
-int unlink(const char \*name) [¶](#c.unlink "Link to this definition")  
+int unlink(const char \*name) [¶](#c.unlink "Link to this definition")
 
 Removes a file or directory from the volume.
 
@@ -850,7 +850,7 @@ FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NO\_FILE, FR\_NO\_PATH, FR\_INV
 
 ### RENAME
 
-int rename(const char \*oldname, const char \*newname) [¶](#c.rename "Link to this definition")  
+int rename(const char \*oldname, const char \*newname) [¶](#c.rename "Link to this definition")
 
 Renames and/or moves a file or directory.
 
@@ -877,7 +877,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NO\_FILE, FR\_NO\_PATH,
 
 ### SYNCFS
 
-int syncfs(int fildes) [¶](#c.syncfs "Link to this definition")  
+int syncfs(int fildes) [¶](#c.syncfs "Link to this definition")
 
 Finish pending writes for the file descriptor.
 
@@ -907,7 +907,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_INVALID\_OBJECT, FR\_TIMEOUT
 
 ### STAT
 
-int f\_stat(const char \*path, f\_stat\_t \*dirent) [¶](#c.f_stat "Link to this definition")  
+int f\_stat(const char \*path, f\_stat\_t \*dirent) [¶](#c.f_stat "Link to this definition")
 
 ```c
 typedef struct {
@@ -951,7 +951,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NO\_FILE, FR\_NO\_PATH,
 
 ### OPENDIR
 
-int f\_opendir(const char \*name) [¶](#c.f_opendir "Link to this definition")  
+int f\_opendir(const char \*name) [¶](#c.f_opendir "Link to this definition")
 
 Create a connection between a directory and a directory descriptor. Up to 8 directories may be open at once.
 
@@ -981,7 +981,7 @@ EINVAL, EMFILE, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NO\_PATH, FR\_I
 
 ### READDIR
 
-int f\_readdir(f\_stat\_t \*dirent, int dirdes) [¶](#c.f_readdir "Link to this definition")  
+int f\_readdir(f\_stat\_t \*dirent, int dirdes) [¶](#c.f_readdir "Link to this definition")
 
 Returns directory entry info for the current read position of a directory descriptor, then advances the read position.
 
@@ -1012,7 +1012,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_INVALID\_OBJECT, FR\_TIMEOUT, FR\_NOT\_
 
 ### CLOSEDIR
 
-int f\_closedir(int dirdes) [¶](#c.f_closedir "Link to this definition")  
+int f\_closedir(int dirdes) [¶](#c.f_closedir "Link to this definition")
 
 Release the directory descriptor. Directory descriptor will rejoin the pool available for use by f\_opendir().
 
@@ -1042,7 +1042,7 @@ EINVAL, FR\_INT\_ERR, FR\_INVALID\_OBJECT, FR\_TIMEOUT
 
 ### TELLDIR
 
-long f\_telldir(int dirdes) [¶](#c.f_telldir "Link to this definition")  
+long f\_telldir(int dirdes) [¶](#c.f_telldir "Link to this definition")
 
 Returns the read position of the directory descriptor.
 
@@ -1072,7 +1072,7 @@ EINVAL, EBADF
 
 ### SEEKDIR
 
-int f\_seekdir(long offs, int dirdes) [¶](#c.f_seekdir "Link to this definition")  
+int f\_seekdir(long offs, int dirdes) [¶](#c.f_seekdir "Link to this definition")
 
 Set the read position for the directory descriptor. Internally, the FatFs directory read position can only move forward by one, so use this for convenience, not performance.
 
@@ -1102,7 +1102,7 @@ EINVAL, EBADF, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_INVALID\_OBJECT, FR\_TIMEOUT, FR
 
 ### REWINDDIR
 
-int f\_rewinddir(int dirdes) [¶](#c.f_rewinddir "Link to this definition")  
+int f\_rewinddir(int dirdes) [¶](#c.f_rewinddir "Link to this definition")
 
 Rewind the read position of the directory descriptor.
 
@@ -1132,7 +1132,7 @@ EINVAL, EBADF, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_INVALID\_OBJECT, FR\_TIMEOUT, FR
 
 ### CHMOD
 
-int f\_chmod(const char \*path, unsigned char attr, unsigned char mask) [¶](#c.f_chmod "Link to this definition")  
+int f\_chmod(const char \*path, unsigned char attr, unsigned char mask) [¶](#c.f_chmod "Link to this definition")
 
 Change the attributes of a file or directory.
 
@@ -1172,7 +1172,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NO\_FILE, FR\_NO\_PATH,
 
 ### UTIME
 
-int f\_utime(const char \*path, unsigned fdate, unsigned ftime, unsigned crdate, unsigned crtime) [¶](#c.f_utime "Link to this definition")  
+int f\_utime(const char \*path, unsigned fdate, unsigned ftime, unsigned crdate, unsigned crtime) [¶](#c.f_utime "Link to this definition")
 
 Update the date and time stamps of a file or directory. A date of 0 (invalid) leaves the date and time unchanged.
 
@@ -1216,7 +1216,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NO\_FILE, FR\_NO\_PATH,
 
 ### MKDIR
 
-int f\_mkdir(const char \*name) [¶](#c.f_mkdir "Link to this definition")  
+int f\_mkdir(const char \*name) [¶](#c.f_mkdir "Link to this definition")
 
 Make a new directory entry.
 
@@ -1246,7 +1246,7 @@ FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NO\_PATH, FR\_INVALID\_NAME, FR
 
 ### CHDIR
 
-int chdir(const char \*name) [¶](#c.chdir "Link to this definition")  
+int chdir(const char \*name) [¶](#c.chdir "Link to this definition")
 
 Change to a directory entry.
 
@@ -1276,7 +1276,7 @@ FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NO\_PATH, FR\_INVALID\_NAME, FR
 
 ### CHDRIVE
 
-int f\_chdrive(const char \*name) [¶](#c.f_chdrive "Link to this definition")  
+int f\_chdrive(const char \*name) [¶](#c.f_chdrive "Link to this definition")
 
 Change the current drive. Valid names are `USB0:`– `USB9:` with shortcuts `0:`– `9:`.
 
@@ -1306,7 +1306,7 @@ FR\_INVALID\_DRIVE
 
 ### GETCWD
 
-int f\_getcwd(char \*name, int size) [¶](#c.f_getcwd "Link to this definition")  
+int f\_getcwd(char \*name, int size) [¶](#c.f_getcwd "Link to this definition")
 
 Get the current working directory. Size is ignored by the OS but the C wrapper will use it.
 
@@ -1332,7 +1332,7 @@ ENOMEM, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_NOT\_ENABLED, FR\_NO\_F
 
 ### SETLABEL
 
-int f\_setlabel(const char \*name) [¶](#c.f_setlabel "Link to this definition")  
+int f\_setlabel(const char \*name) [¶](#c.f_setlabel "Link to this definition")
 
 Change the volume label. Max 11 characters.
 
@@ -1362,7 +1362,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_INVALID\_NAME, FR\_WRIT
 
 ### GETLABEL
 
-int f\_getlabel(const char \*path, char \*label) [¶](#c.f_getlabel "Link to this definition")  
+int f\_getlabel(const char \*path, char \*label) [¶](#c.f_getlabel "Link to this definition")
 
 Get the volume label. Label must have room for (22+1) bytes.
 
@@ -1393,7 +1393,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_INVALID\_DRIVE, FR\_NOT
 
 ### GETFREE
 
-int f\_getfree(const char \*name, unsigned long \*free, unsigned long \*total) [¶](#c.f_getfree "Link to this definition")  
+int f\_getfree(const char \*name, unsigned long \*free, unsigned long \*total) [¶](#c.f_getfree "Link to this definition")
 
 ```c
 struct {
@@ -1432,7 +1432,7 @@ EINVAL, FR\_DISK\_ERR, FR\_INT\_ERR, FR\_NOT\_READY, FR\_INVALID\_DRIVE, FR\_NOT
 
 ### EXIT
 
-void exit(int status) [¶](#c.exit "Link to this definition")  
+void exit(int status) [¶](#c.exit "Link to this definition")
 
 Halt the 6502 and return the console to RP6502 monitor control. This is the only operation that does not return. The OS pulls RESB low before the next instruction can execute. The status argument is currently unused but reserved for future use.
 

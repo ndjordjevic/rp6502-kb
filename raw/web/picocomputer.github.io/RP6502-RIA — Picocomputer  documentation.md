@@ -3,7 +3,7 @@ title: "RP6502-RIA — Picocomputer  documentation"
 source: "https://picocomputer.github.io/ria.html"
 author:
 published:
-created: 2026-04-15
+created: 2026-04-18
 description:
 tags:
   - "clippings"
