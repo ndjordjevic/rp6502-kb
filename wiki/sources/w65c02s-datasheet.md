@@ -65,7 +65,7 @@ The W65C02S is binary-compatible with the NMOS 6502 but adds instructions, addre
 
 ## Pin-function highlights
 
-See [[65c02-pinout]] for the full table. RP6502-relevant signals:
+See [[w65c02s]]#pin-function-highlights for the full table. RP6502-relevant signals:
 
 - **PHI2** — driven by the [[rp6502-ria]] (never by a crystal on the RP6502). PHI1O/PHI2O are not used; RIA generates PHI2 via PIO.
 - **RESB** — state-held low by the RIA during reset windows; see [[reset-model]].

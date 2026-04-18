@@ -7,9 +7,9 @@ created: 2026-04-16
 updated: 2026-04-17 (S5 ingest: RP2350 DREQ table, encoded_transfer_count, self-trigger/endless DMA, new functions, errata IDs)
 ---
 
-# DMA Controller (RP2040)
+# DMA Controller
 
-**Summary**: The RP2040 DMA controller has 12 independent channels and can sustain one 32-bit read + one 32-bit write per clock cycle — faster than a single CPU core — making it the primary engine for bulk data movement in RIA firmware (XRAM ↔ 65C02 bus).
+**Summary**: The RP2040 has 12 independent DMA channels; the RP2350 (used in current RIA firmware) expands this to 16. Each channel can sustain one 32-bit read + one 32-bit write per clock cycle — faster than a single CPU core — making DMA the primary engine for bulk data movement in RIA firmware (XRAM ↔ 65C02 bus).
 
 ---
 

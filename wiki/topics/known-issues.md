@@ -42,7 +42,7 @@ See also: [[development-history]] Era A; [[rp6502-board]] BOM notes.
 
 ## Active known issues (as of v0.23)
 
-### cc65 requires a fork
+### [[cc65]] requires a fork
 v0.14 overhauled the errno system. The upstream `cc65` compiler does not yet include the matching changes — a [PR is pending](https://github.com/cc65/cc65/pull/2844). Until it merges, use the official fork at `github.com/picocomputer/cc65`.
 
 ### PHI2 may reset to 100 after upgrade from old firmware
@@ -98,7 +98,7 @@ See also: [[dma-controller]] § Channels and Control.
 **Affects**: A2, A3, A4 (documentation only)
 **Summary**: In the Hazard3 RISC-V CPU, the bit ordering of R, W, X in PMP configuration registers is reversed from the RISC-V spec.
 **Workaround**: Use the bit order as-implemented. The SDK `hardware/regs/rvcsr.h` header provides correct bitfield definitions for RP2350.
-*Note*: The RP6502 firmware runs the RP2040-compatible Arm Cortex-M33 cores, not Hazard3, so this primarily affects custom RISC-V firmware on the RIA.
+*Note*: The RP6502 firmware runs the Arm Cortex-M33 cores ([[rp2350]]), not Hazard3, so this primarily affects custom RISC-V firmware on the RIA.
 
 ### RP2350-E7 — Hazard3 RISC-V: U-mode doesn't ignore mstatus.mie
 **Affects**: A2, A3, A4 (documentation only)
@@ -258,7 +258,7 @@ Minimum reliable value is **5 ms** on RP2350 A2 boards. (@ndjordjevic5067 + @rum
 
 **Fix**: Update llvm-mos-sdk to a commit after `6d99981`. (@tonyvr0759, 2026-02-24)
 
-### cc65 from package managers (Homebrew, apt, etc.) will not work
+### [[cc65]] from package managers (Homebrew, apt, etc.) will not work
 
 Package manager versions of cc65 (including v2.18 from Homebrew on macOS) are years out of date and lack RP6502 platform support. You **must** build cc65 from the picocomputer fork source or use a picocomputer-provided snapshot. (@rumbledethumps, 2026-04-17)
 

@@ -9,7 +9,7 @@ updated: 2026-04-17
 
 # USB Controller
 
-**Summary**: The RP2040 integrates a USB 1.1 controller that can operate as a host or device, supporting full-speed (12 Mbps) and low-speed (1.5 Mbps) modes. The RP6502-RIA uses it exclusively in **host mode** to drive keyboards, mice, gamepads, and VCP serial adapters.
+**Summary**: The RP2040/RP2350 integrate a USB 1.1 controller that can operate as a host or device, supporting full-speed (12 Mbps) and low-speed (1.5 Mbps) modes. The RP6502-RIA uses it exclusively in **host mode** to drive keyboards, mice, gamepads, and VCP serial adapters.
 
 ---
 

@@ -88,7 +88,7 @@ The OS had no name at this point; declaring it an OS was described as "mostly a 
 - **"All I ask for is 32 bytes"** — the RIA's entire footprint in the 6502 address space (`$FFE0–$FFFF`). The last 256 bytes are for I/O; everything else is free user RAM.
 - **Protection via isolation** — because all kernel calls go through the RIA register interface, a crashing 6502 program cannot bring down the kernel. No memory manager needed; the hardware boundary is the protection mechanism.
 - **OS size vs. visibility** — over 1 MB with networking and code pages linked in, but "completely vanishes" from the 6502's perspective when not called.
-- **Kernel built from third-party code** — FatFs, littlefs, TinyUSB, and other libraries are the bulk of the OS. "There's other people who have more code in the Picocomputer than me and they probably don't even know."
+- **Kernel built from third-party code** — [[fatfs|FatFs]], littlefs, TinyUSB, and other libraries are the bulk of the OS. "There's other people who have more code in the Picocomputer than me and they probably don't even know."
 
 ### Memory model clarified
 

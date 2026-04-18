@@ -167,7 +167,7 @@ Where `clock_hz` is the SPI clock frequency (e.g. `1000000` for 1 MHz → `sleep
 
 ## RIA Firmware Note
 
-The ingest plan listed "SPI: SD card storage" but the actual RIA firmware uses **USB Mass Storage Class (USB MSC) + FatFS** for all file storage. USB thumb drives (or devices exposing MSC) are mounted automatically. The SPI peripheral is not used by the current RIA firmware — `clk_peri` drives it but the SPI hardware sits idle.
+The ingest plan listed "SPI: SD card storage" but the actual RIA firmware uses **USB Mass Storage Class (USB MSC) + [[fatfs|FatFS]]** for all file storage. USB thumb drives (or devices exposing MSC) are mounted automatically. The SPI peripheral is not used by the current RIA firmware — `clk_peri` drives it but the SPI hardware sits idle.
 
 See [[usb-controller]] for the TinyUSB MSC host implementation and [[rp2040-clocks]] for `clk_peri` details.
 

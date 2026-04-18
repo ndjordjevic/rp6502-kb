@@ -221,7 +221,7 @@ On the RP6502, the RIA manages both `IRQB` and `NMIB` lines. User programs typic
 
 ## 6522 VIA unbuffered interrupt-driven I/O (PINTIO pattern)
 
-Leventhal 1982 Ch. 11B documents a complete interrupt-driven I/O system for the **6522 VIA** with single-character buffers. This is the most RP6502-relevant interrupt pattern because the W65C22S VIA is the hardware interrupt source on the board.
+Leventhal 1982 Ch. 11B documents a complete interrupt-driven I/O system for the **6522 VIA** with single-character buffers. This is the most RP6502-relevant interrupt pattern because the [[w65c22s|W65C22S VIA]] is the hardware interrupt source on the board.
 
 ### Architecture: 6 subroutines, 194 bytes, 7 bytes data
 

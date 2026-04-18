@@ -65,7 +65,7 @@ PSG is **disabled** when native OPL2 is active — only one sound card at a time
 
 ## FPGA OPL2 extension (community hardware)
 
-jasonr1100 built an FPGA OPL2 expansion card connecting to the [[pix-bus]] at addresses `$1FF00–$1FF01` for register writes, using a 6522 VIA IRQ for timing. This experiment directly inspired the native OPL2 firmware implementation.
+jasonr1100 built an FPGA OPL2 expansion card connecting to the [[pix-bus]] at addresses `$1FF00–$1FF01` for register writes, using a [[w65c22s|6522 VIA]] IRQ for timing. This experiment directly inspired the native OPL2 firmware implementation.
 
 ---
 

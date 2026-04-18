@@ -85,12 +85,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 46 + 1 (adventure) = **47** |
-| Entities | **13** (llvm-mos updated) |
-| Concepts | **45** |
-| Topics | **8** (toolchain-setup updated) |
+| Sources | **48** (includes ehbasic-repo, adventure, community-wiki, etc.) |
+| Entities | **13** |
+| Concepts | **47** |
+| Topics | **7** |
 | Inbox | **0** — all ingest plans complete 🎉 |
-| **Total pages** | **~112** |
+| **Total pages** | **~118** |
 
 ---
 

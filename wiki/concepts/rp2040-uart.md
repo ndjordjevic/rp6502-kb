@@ -9,7 +9,7 @@ updated: 2026-04-18
 
 # RP2040 UARTs
 
-**Summary**: The RP2040 has two UARTs (UART0, UART1) based on the ARM PL011 design; UART1 on GPIO 4–5 is the RIA's console at 115200 8N1, driven by `clk_peri`.
+**Summary**: The RP2040/RP2350 each have two UARTs (UART0, UART1) based on the ARM PL011 design; UART1 on GPIO 4–5 is the RIA's console at 115200 8N1, driven by `clk_peri`.
 
 ---
 

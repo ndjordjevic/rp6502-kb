@@ -34,7 +34,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[vscode-llvm-mos]] | Official llvm-mos VSCode project template: setup steps, PATH conflict fix, CMake structure |
 | [[vscode-cc65]] | Official cc65 VSCode project template: setup steps (Linux/Windows), CMake macros, hello-world C + ASM |
 | [[pico-extras]] | picocomputer fork of raspberrypi/pico-extras: two mode-change bug fixes (memory leak + debug printf) for RP6502-VGA |
-| [[ehbasic]] | picocomputer/ehbasic repo: EhBASIC 2.22p5 port — OS glue layer, memory layout, LOAD/SAVE, IRQ pattern |
+| [[ehbasic-repo]] | picocomputer/ehbasic repo: EhBASIC 2.22p5 port — OS glue layer, memory layout, LOAD/SAVE, IRQ pattern |
 | [[examples]] | Official picocomputer/examples repo: ~20 C programs covering VGA modes, audio PSG, gamepad, NFC, FatFS, exec, benchmarking |
 | [[yt-ep01-8bit-retro-computer]] | Ep1: series intro, breadboard with 12 glue chips, USB/VGA working |
 | [[yt-ep02-pio-and-dma]] | Ep2: dual-Pico pivot; PIO+DMA 6502 read path; 8 MHz achieved |

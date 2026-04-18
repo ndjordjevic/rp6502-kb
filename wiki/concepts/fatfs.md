@@ -40,7 +40,7 @@ fread(buf, 1, sizeof(buf), f);
 fclose(f);
 ```
 
-Both cc65 and llvm-mos toolchains map `fopen`/`fread`/`fwrite`/`fclose` to the RIA OS calls, which drive FatFs on the RIA RP2350.
+Both [[cc65]] and [[llvm-mos]] toolchains map `fopen`/`fread`/`fwrite`/`fclose` to the RIA OS calls, which drive FatFs on the RIA RP2350.
 
 ## Code pages and FAT short names
 

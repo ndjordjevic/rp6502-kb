@@ -159,7 +159,7 @@ All invalid opcodes on the W65C02S execute as **deterministic NOPs** with docume
 
 The RP6502's [[rp6502-abi]] leverages WDC enhancements:
 - `JSR RIA_SPIN` spins on `RIA_BUSY` — small, since the spin stub fits in 32 bytes of zero-page.
-- `cc65` and `llvm-mos` both target the **W65C02S** instruction set (not plain 6502), so STZ/BRA/PHX/PHY/etc. are emitted freely.
+- `[[cc65]]` and `[[llvm-mos]]` both target the **W65C02S** instruction set (not plain 6502), so STZ/BRA/PHX/PHY/etc. are emitted freely.
 - `WAI` is not currently used by RIA-served programs but is available; see open question in [[w65c02s]].
 
 ## Related pages
@@ -393,5 +393,5 @@ The 65C02 is **pin-compatible** with NMOS 6502 and handles all documented softwa
 1. Code using undocumented NMOS opcodes (now reassigned on 65C02)
 2. Timing-sensitive code designed around NMOS timing (65C02 is slightly different on some operations)
 
-For RP6502, all toolchain-generated code (cc65, llvm-mos) targets documented 65C02 instructions — no compatibility concerns.
+For RP6502, all toolchain-generated code ([[cc65]], [[llvm-mos]]) targets documented 65C02 instructions — no compatibility concerns.
 

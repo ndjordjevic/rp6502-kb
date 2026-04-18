@@ -2,7 +2,7 @@
 type: entity
 tags: [rp6502, basic, ehbasic, interpreter, language]
 related: [[rp6502-os]], [[ria-registers]], [[rp6502-abi]], [[launcher]], [[rom-file-format]], [[cc65]]
-sources: [[ehbasic]], [[rumbledethumps-discord]], [[yt-ep17-basics-of-basic]]
+sources: [[ehbasic-repo]], [[rumbledethumps-discord]], [[yt-ep17-basics-of-basic]]
 created: 2026-04-18
 updated: 2026-04-18
 ---

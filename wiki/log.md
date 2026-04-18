@@ -918,3 +918,34 @@ Key facts captured:
 #### Housekeeping
 - `wiki/index.md` — added rumbledethumps-discord source row; updated known-issues and version-history descriptions; added community-projects topic row
 - `PROGRESS.md` — Discord ingest flipped 👉 → ✅; next item promoted; wiki size table updated
+
+## [2026-04-18] lint | deep wiki health check | 118 pages scanned
+
+### Contradictions fixed
+- `wiki/concepts/xram.md:53` — "RP2040's six SRAM banks" corrected to "RP2350's SRAM banks"; added [[rp2350]] wikilink
+- `wiki/topics/known-issues.md:101` — removed incorrect "RP2040-compatible" from Cortex-M33 description; added [[rp2350]] link
+- `wiki/concepts/dma-controller.md` — title and summary updated to clarify RP2040 (12 ch) vs RP2350 (16 ch, live firmware)
+- `wiki/concepts/rp2040-uart.md`, `rp2040-clocks.md`, `usb-controller.md` — summary lines updated from "RP2040 has" to "RP2040/RP2350 have"
+
+### Broken links fixed
+- `wiki/sources/w65c02s-datasheet.md:68` — broken `[[65c02-pinout]]` replaced with `[[w65c02s]]#pin-function-highlights`
+
+### Naming collision resolved
+- `wiki/sources/ehbasic.md` renamed to `wiki/sources/ehbasic-repo.md` to eliminate disambiguation ambiguity with `wiki/entities/ehbasic.md`
+- Updated `wiki/index.md`, `wiki/overview.md`, `wiki/entities/ehbasic.md` to use `[[ehbasic-repo]]` for source references
+
+### Missing wikilinks added (MR1–MR12)
+- `wiki/concepts/65c02-instruction-set.md` — `cc65`/`llvm-mos` inline mentions now linked
+- `wiki/concepts/fatfs.md` — `cc65`/`llvm-mos` linked
+- `wiki/concepts/rp2040-spi.md` — FatFS linked
+- `wiki/overview.md` — "65C22 VIA" linked to [[w65c22s]]
+- `wiki/concepts/6502-interrupt-patterns.md` — "W65C22S VIA" linked
+- `wiki/topics/development-history.md` — FatFs linked
+- `wiki/topics/version-history.md` — PIX bus linked
+- `wiki/concepts/pio-architecture.md` — bare `pioasm` at lines 431/482 linked
+- `wiki/concepts/exec-api.md` — "code page" heading linked to [[code-pages]]
+- `wiki/concepts/opl2-fm-synth.md` — "6522 VIA" linked to [[w65c22s]]
+- `wiki/topics/known-issues.md` — section headings mentioning cc65 now linked
+
+### PROGRESS.md updated
+- Wiki size table corrected: Sources 48, Concepts 47, Topics 7, Total ~118

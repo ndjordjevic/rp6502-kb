@@ -23,7 +23,7 @@ The first versioned release established a working 65C02 + RIA firmware on Pi Pic
 
 ## Era 2 — VGA and input (v0.2–v0.7, Oct 2023–Feb 2024)
 
-**v0.2** was the first major architectural release: the PIX bus, programmable VGA, and 16-bit color ANSI terminal. This was an ABI-breaking release.
+**v0.2** was the first major architectural release: the [[pix-bus]], programmable VGA, and 16-bit color ANSI terminal. This was an ABI-breaking release.
 
 **v0.3–v0.4** rapidly filled in the VGA mode set (modes 0–4) and added direct keyboard/mouse HID input, `stdin`/`fgets`, and filesystem write calls (`unlink`, `rename`).
 

@@ -9,7 +9,7 @@ updated: 2026-04-18
 
 # RP2040 Clock Generation, Timer, Watchdog and RTC
 
-**Summary**: The RP2040 has a flexible multi-source clock subsystem feeding ten clock domains; three peripherals built on top of it — a 64-bit microsecond Timer, a Watchdog, and a Real-Time Clock — are directly relevant to how the RIA firmware times OS calls, drives UART/SPI, and overclocks to 256 MHz.
+**Summary**: The RP2040/RP2350 have a flexible multi-source clock subsystem feeding multiple clock domains; three peripherals built on top of it — a 64-bit microsecond Timer, a Watchdog, and a Real-Time Clock — are directly relevant to how the RIA firmware times OS calls, drives UART/SPI, and overclocks to 256 MHz.
 
 ---
 

@@ -428,7 +428,7 @@ pico_generate_pio_header(my_target ${CMAKE_CURRENT_LIST_DIR}/myprogram.pio)
 target_link_libraries(my_target hardware_pio)
 ```
 
-The build system runs `pioasm` → generates `myprogram.pio.h` containing:
+The build system runs `[[pioasm]]` → generates `myprogram.pio.h` containing:
 - `static const uint16_t myprogram_program_instructions[]` — binary opcodes
 - `static const struct pio_program myprogram_program` — struct with pointer, length, origin
 - `static inline pio_sm_config myprogram_program_get_default_config(uint offset)` — default config factory
@@ -479,7 +479,7 @@ uint offset = pio_add_program(pio, &prog);
 uint16_t wait_instr = pio_encode_wait_gpio(trigger_level, trigger_pin);
 ```
 
-`pio_encode_*` variants cover all PIO opcodes. The generated 16-bit words are identical to what `pioasm` produces for the same instruction.
+`pio_encode_*` variants cover all PIO opcodes. The generated 16-bit words are identical to what `[[pioasm]]` produces for the same instruction.
 
 #### Composition helpers (not standalone instructions)
 

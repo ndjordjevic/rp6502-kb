@@ -79,7 +79,7 @@ The OS [[launcher]] provides a persistent host ROM that can watch for child prog
 
 ---
 
-## term.c — device paths and code page
+## term.c — device paths and [[code-pages|code page]]
 
 The `term.c` example shows two more useful patterns:
 
