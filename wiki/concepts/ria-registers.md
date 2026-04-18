@@ -58,7 +58,7 @@ EhBASIC's `V_INPT` and `V_OUTP` use this ACIA simulation for all console I/O. Wh
 | `$FFE0` | UART status | R | bit 7 = TX ready, bit 6 = RX data available |
 | `$FFE1` | UART TX | W | Write a byte to transmit on the console UART |
 | `$FFE2` | UART RX | R | Read a received byte from the console UART |
-| `$FFE3` | — | — | *(unassigned)* |
+| `$FFE3` | `RIA_VSYNC` | R | VSYNC frame counter — incremented once per VGA frame (~60 Hz); preserved across soft resets; read-only from 6502 side |
 | `$FFE4` | `RIA_RW0` | R/W | [[xram|XRAM]] read/write window 0 — reads/writes `xram[RIA_ADDR0]`; auto-increments `RIA_ADDR0` by `RIA_STEP0` |
 | `$FFE5` | `RIA_STEP0` | R/W | Signed int8 auto-increment for window 0 (default 1; set to 0 for no increment, negative for decrement) |
 | `$FFE6–$FFE7` | `RIA_ADDR0` | R/W | 16-bit XRAM address for window 0 (little-endian) |

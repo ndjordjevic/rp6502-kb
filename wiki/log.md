@@ -7,6 +7,58 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] synthesis | hardware TRNG | new page wiki/syntheses/trng.md
+
+New: `wiki/syntheses/trng.md` — RP2350 hardware TRNG mechanics (`get_rand_64()` via Pico SDK), `RIA_ATTR_LRAND` (0x04) attribute, cc65 `_randomize()` + `rand()` PRNG seeding pattern, llvm-mos `lrand()` true-random-per-call pattern, 65C02 assembly access, comparison table, and EhBASIC RND pitfall.
+Updated: `wiki/index.md` — [[trng]] entry added to Syntheses; `PROGRESS.md` — TRNG item marked ✅.
+
+---
+
+## [2026-04-18] ingest | WDC W65C22S datasheet (wdc_w65c22s_mar_2004.pdf) | new source page + 5 wiki updates
+
+New: `wiki/sources/wdc-w65c22s-datasheet.md` — full 46-page datasheet ingested.
+Updated: `wiki/entities/w65c22s.md` — IRQB totem-pole, reset exception, bus holding, speed/voltage.
+Updated: `wiki/entities/6522-via.md` — added "W65C22S-specific caveats" section: IRQB no wire-OR, T2 rollover, T1 N+2 timing, reset exception, shift direction, output current limits.
+Updated: `wiki/concepts/via-programming.md` — added hardware caveats section.
+Updated: `raw/pdfs/README.md` and `wiki/index.md` — added datasheet entry.
+
+Key facts not previously in wiki: IRQB is totem-pole (cannot wire-OR), T1 fires at N+1.5/N+2 cycles, T2 rolls over to $FFFF after timeout, RESB does not clear T1/T2/SR, no output current limiting on PA/PB.
+
+## [2026-04-18] lint + guide update | wiki-wide lint + learning-guide revision | 3 fixes, guide updated with Phase 4 pages
+
+- **Factual error fixed**: `game-loop-patterns.md` had wrong VSYNC register address (`$FFF8` → `$FFE3`). Confirmed from source: `REGS(0xFFE3) = vga_vsync_frame` (ria/sys/vga.c:91) + `if (i != 3) // Skip VSYNC` (api/api.c:105).
+- **Data gap fixed**: `ria-registers.md` marked `$FFE3` as "unassigned". Corrected to `RIA_VSYNC` (VSYNC frame counter, increments ~60 Hz, preserved across soft resets).
+- **Broken wikilink fixed**: `razemos.md` had `[[hass]]` linking to non-existent page. Replaced with plain text "HASS assembler (native 65C02 on-device assembler)".
+- **Learning guide updated** (`wiki/syntheses/learning-guide.md`): added all Phase 4 pages — `cc65-rp6502-platform` (D3), `monitor-reference` (C2), `via-programming` (D11), `game-loop-patterns` (D10), `ria-w-networking` (C19), `hardware-build-guide` (B3), `razemos`/`rptracker` (community section); added three orientation syntheses section; expanded Track B to 11 steps, Track C to 20, Track D to 21; added wireless learning sub-path.
+- **Lint findings summary**: 1 broken wikilink (`[[hass]]`), 2 factual errors (VSYNC address + $FFE3 description). All fixed. Pages with low inbound links are now referenced from the updated learning guide.
+
+## [2026-04-18] research + gap-fill | online research session | v0.24 update + 11 new pages
+
+Deep online research (12+ web searches), v0.24 release verified, 11 new pages written, cc65 platform docs clipped.
+
+**Updated existing pages:**
+- `wiki/sources/release-notes.md`: Added v0.24 row to timeline table; expanded Networking and Monitor/UX sections; fixed stale "telnet planned" note → "added v0.24"
+- `wiki/index.md`: Added 10 new page entries; updated release-notes count to 24; added Syntheses section entries
+- `PROGRESS.md`: Phase 3b marked complete; Phase 4 gap-fill added; wiki size updated (129 total)
+
+**New raw source:**
+- `raw/web/cc65.github.io/Picocomputer 6502 — cc65 documentation.md` — clipped 2026-04-18
+- `raw/web/README.md`: Added cc65.github.io section
+
+**New wiki pages (11):**
+- `wiki/sources/cc65-rp6502-platform.md` — cc65 RP6502 platform docs (binary format, memory layout, rp6502.h)
+- `wiki/syntheses/what-does-ria-do.md` — RIA's three roles: hardware control, bus interface, protected OS
+- `wiki/syntheses/getting-started.md` — hardware → firmware → toolchain → first C program
+- `wiki/syntheses/cc65-vs-llvm-mos.md` — feature table, performance, binary size, decision guide
+- `wiki/concepts/monitor-reference.md` — complete monitor command reference (LOAD/INSTALL/SET/filesystem/history)
+- `wiki/concepts/ria-w-networking.md` — WiFi config, NTP, BLE, telnet console, Hayes modem AT commands
+- `wiki/concepts/via-programming.md` — practical VIA: GPIO, T1/T2 interrupts, shift register, RTC
+- `wiki/concepts/game-loop-patterns.md` — VSYNC polling, interrupt sync, frame budget, double-buffering
+- `wiki/entities/rptracker.md` — OPL2 music tracker by jasonr1100 (9ch, 256 patches, effects)
+- `wiki/entities/razemos.md` — razemOS native 65C02 OS by voidas_pl (v0.01/v0.02, HASS, multitasking roadmap)
+- `wiki/topics/hardware-build-guide.md` — PCB sourcing, BOM, assembly sequence, firmware flashing, first-boot verification
+- `wiki/topics/roadmap.md` — planned features, community wishes, design philosophy
+
 ## [2026-04-18] ingest | picocomputer/adventure (git clone, commit 6ac165f) | New: 1 page (sources/adventure); Updated: raw/github/README.md (added adventure row), wiki/index.md, PROGRESS.md; Key facts: named ROM asset pattern (DATADIR "ROM:", 4 advent*.txt files), porting pattern for existing C programs, tools/ is identical to vscode-cc65 template, BIG ROM commit (2026-02-26) converted to v0.18 named-asset format
 
 ## [2026-04-18] ingest | picocomputer/vscode-llvm-mos (git clone, commit 17af418) | New: 1 page (sources/vscode-llvm-mos); Updated: topics/toolchain-setup (llvm-mos section + full cc65 vs llvm-mos comparison table), entities/llvm-mos (VSCode setup section added); Key facts: PATH conflict fix via cmake.environment, CMake kit = [Unspecified], DATA file RESET file addresses; Ingest plan deleted

@@ -9,7 +9,7 @@ updated: 2026-04-16
 
 # Release Notes
 
-**Summary**: Synthesis of all 23 release notes (v0.1–v0.23, Aug 2023–Apr 2026) from `raw/github/picocomputer/rp6502/releases/`. Canonical record of when features were introduced and breaking changes made.
+**Summary**: Synthesis of all 24 release notes (v0.1–v0.24, Aug 2023–Apr 2026) from `raw/github/picocomputer/rp6502/releases/`. Canonical record of when features were introduced and breaking changes made.
 
 ---
 
@@ -40,6 +40,7 @@ updated: 2026-04-16
 | v0.21 | 2026-03 | **ria_get_attr/ria_set_attr; launcher; ria_execl/execv; argv; NFC launch; CON:/TTY:** |
 | v0.22 | 2026-04 | MSC 8× faster; nfc.rp6502 tool; BLE fixes; HID parser rewrite |
 | v0.23 | 2026-04 | **Mode 5 sprites**; scanvideo rewrite (no HDMI resync); Alt-F4 launcher shortcut |
+| v0.24 | 2026-04-18 | **Telnet console** (`SET PORT`/`SET KEY`); Hayes modem over TCP/Telnet; 10 profiles; 4 simultaneous modems |
 
 ---
 
@@ -87,6 +88,7 @@ updated: 2026-04-16
 - **v0.12**: WiFi, NTP, Hayes modem (raw TCP only); `term.rp6502` BBS terminal
 - **v0.13**: BLE HID input
 - **v0.14**: NTP fixed (only syncs at first WiFi connect + every 24 h)
+- **v0.24**: Telnet console (monitor + 6502 over telnet); Hayes modem over TCP **and** Telnet; 10 persistent modem profiles with phonebooks; up to 4 simultaneous modems (`AT:`–`AT9:`)
 
 ### Process / ROM management
 - **v0.18**: ROM asset filesystem (named assets embedded in `.rp6502`)
@@ -98,6 +100,7 @@ updated: 2026-04-16
 - **v0.18**: Command history (3 lines, up/down arrows)
 - **v0.20**: Console parser supports quoted and escaped strings
 - **v0.23**: Alt-F4 = stop ROM → launcher; Ctrl-Alt-Del = stop ROM → monitor
+- **v0.24**: `SET PORT` / `SET KEY` commands; `rp6502.py` supports telnet upload (~56 KB/s) in addition to serial
 
 ---
 
@@ -109,7 +112,7 @@ See [[known-issues]] for the full operational list. Key warnings:
 - **v0.16**: PHI2 setting may reset to 100 after upgrade. Fix with `SET PHI2 8000`.
 - **v0.13**: Non-W RIA no longer released. Plain RIA builds require building from source.
 - **v0.14**: Requires cc65 fork (`picocomputer/cc65`) until PR #2844 is merged upstream.
-- **v0.12**: Modem is raw TCP only. Telnet layer is a planned future feature.
+- **v0.12**: Modem was raw TCP only. Telnet layer added in v0.24.
 - **v0.13**: Bluetooth BR/EDR not supported (BLE only). TinyUSB XInput was re-enabled in v0.18.
 
 ---

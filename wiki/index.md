@@ -17,12 +17,14 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp6502-vga-docs]] | VGA module: 3-plane scanline video, 6 modes, control channel, ANSI terminal |
 | [[rp6502-os-docs]] | Protected OS: memory map, ABI, full POSIX-flavored API surface |
 | [[rp6502-github-repo]] | Monorepo source at commit 368ed8e: complete API op-codes, register map, GPIO pinout, PIO layout |
-| [[release-notes]] | All 23 releases v0.1–v0.23: feature introduction dates, breaking changes, known issues |
+| [[release-notes]] | All 24 releases v0.1–v0.24: feature introduction dates, breaking changes, known issues |
+| [[cc65-rp6502-platform]] | Official cc65 RP6502 platform docs: binary format, memory layout, `rp6502.h` header |
 | [[quadros-rp2040]] | "Knowing the RP2040" (Quadros, 2022): hardware reference — architecture, PIO ISA, GPIO, interrupts, dual-core/SIO, DMA, USB, clocks, UART, SPI (all planned chapters ingested) |
 | [[fairhead-pico-c]] | "Programming the Raspberry Pi Pico/W in C" (Fairhead, 3rd ed. 2025): SDK programming — PIO, GPIO, multicore, FreeRTOS, WiFi, SPI, UART (all planned chapters ingested) |
 | [[pico-c-sdk]] | Raspberry Pi Pico-series C/C++ SDK (RP-009085-KB-1, 2025): official API reference — function signatures, PIOASM encoding, RP2040/RP2350 compat table; all 14 sessions ingested ✅ |
 | [[rp2350-datasheet]] | RP2350 datasheet (RP-008373-DS-2, 2025-07-29): authoritative RP2350 hardware reference — SIO/TMDS, clocks/LPOSC, GPIO F0–F11, PIO v1, DMA (16-ch), USB, UART, SPI, HSTX, errata E1–E28; all 14 sessions ingested ✅ |
 | [[w65c02s-datasheet]] | W65C02S datasheet (WDC, Feb 2024, 32 pp.): official CPU reference — 70 instructions, 16 addressing modes, 212 opcodes, pin functions, AC/DC timing, NMOS-vs-CMOS caveats |
+| [[wdc-w65c22s-datasheet]] | W65C22S VIA datasheet (WDC, March 2004, 46 pp.): authoritative VIA reference — register functions, timer timing (N+1.5/N+2), T2 rollover, IRQB totem-pole caveat, reset exceptions, AC timing at 8 MHz |
 | [[leventhal-6502-assembly]] | *6502 Assembly Language Programming, 2nd Ed.* (Leventhal, 1986): definitive 6502 programmer's reference — 65C02 enhancements (Ch.17), interrupts, subroutines, string/arithmetic/table idioms |
 | [[leventhal-subroutines]] | *6502 Assembly Language Subroutines* (Leventhal & Saville, 1982): emulating missing instructions, common errors, 16-bit arithmetic, 6522 VIA reference, subroutine library (60 routines w/ cycle counts) |
 | [[wagner-assembly-lines]] | *Assembly Lines: The Complete Book* (Wagner/Torrence, 2014): pedagogical 6502 teaching scaffold — loops, branches, addressing modes, stack, arithmetic, shift/logical operators, BCD, relocatable code, 65C02 enhancements |
@@ -77,6 +79,8 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[llvm-mos]] | llvm-mos: LLVM fork for 6502 — C++/floats/64-bit; second supported Picocomputer toolchain; stronger optimization |
 | [[ezpsg]] | ezpsg library: high-level tracker + polyphonic scheduler on top of the 8-channel RIA PSG |
 | [[ehbasic]] | EhBASIC 2.22p5: BASIC interpreter for RP6502 — LOAD/SAVE via OS, ACIA simulation I/O, SET BOOT |
+| [[rptracker]] | Native OPL2 music tracker: 9 channels, 256 patches, effects (arpeggio, portamento, vibrato, delay), CP437, save/load |
+| [[razemos]] | razemOS — community 65C02 native OS by voidas_pl; kernel below $8000, HASS assembler, multitasking roadmap |
 
 ## Concepts
 
@@ -131,6 +135,10 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[learning-6502-assembly]] | Beginner 6502 scaffold: registers, Status Register flags, binary numbers, counter/loop patterns (BNE/BEQ), all branch instructions, addressing modes overview; X vs Y non-interchangeability |
 | [[6502-stack-and-subroutines]] | 6502 stack mechanics: LIFO page-1 stack ($0100–$01FF), PHA/PLA rules, PHX/PHY/PLX/PLY (65C02), JSR/RTS operation (PC−1 quirk), register save/restore idioms, stack depth limits |
 | [[6502-relocatable-and-self-modifying]] | Techniques for position-independent 6502 code: forced branch (CLV+BVC, BRA on 65C02), JSR simulation, indirect JMP dispatch tables, JMP page-boundary bug (NMOS) fixed on 65C02, self-modifying code patterns |
+| [[monitor-reference]] | Complete RP6502 monitor command reference: LOAD/INSTALL/LIST/SET/filesystem commands; version history of monitor features |
+| [[ria-w-networking]] | All RIA-W network features: WiFi config, NTP, BLE HID, telnet console, Hayes modem AT commands |
+| [[via-programming]] | Practical VIA programming: GPIO setup, T1/T2 timer interrupts, shift register, real-time clock patterns |
+| [[game-loop-patterns]] | 60 Hz game loop: VSYNC polling, interrupt-driven sync, frame budget, double-buffering, VIA timing |
 
 ## Inbox
 
@@ -145,6 +153,11 @@ When answering a query, read this file first to find relevant pages, then drill 
 
 | Page | Description |
 | --- | --- |
+| [[learning-guide]] | Structured reading path through the wiki — what to read and in what order to learn 6502 and RP6502 programming |
+| [[what-does-ria-do]] | Synthesis: the RIA's three roles — hardware control, memory bus interface, and protected OS |
+| [[getting-started]] | Synthesis: hardware assembly → firmware flash → toolchain → first C program |
+| [[cc65-vs-llvm-mos]] | Synthesis: feature comparison, performance, binary size, installation gotchas, decision table |
+| [[trng]] | Synthesis: RP2350 hardware TRNG, `_randomize()` / `lrand()`, cc65 vs llvm-mos random number patterns |
 
 ## Topics
 
@@ -160,3 +173,5 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[community-projects]] | Notable games, demos, tools, and hardware expansions built by community members |
 | [[usb-compatibility]] | USB and BLE device compatibility: known-incompatible categories + recommended controllers |
 | [[performance]] | Storage and CPU throughput benchmarks: USB MSC read/write speeds, XRAM load rates, PHI2 clock scaling |
+| [[hardware-build-guide]] | Practical build guide: PCB sourcing, BOM, assembly sequence, firmware flashing, first-boot verification |
+| [[roadmap]] | Planned features, community wishes, and design philosophy — shaped by release notes + Discord |

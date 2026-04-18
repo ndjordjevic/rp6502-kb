@@ -25,6 +25,12 @@ Source site: [picocomputer.github.io](https://picocomputer.github.io/). Clipped:
 | `picocomputer.github.io/RP6502-VGA — Picocomputer  documentation.md` | VGA firmware API | https://picocomputer.github.io/vga.html |
 | `picocomputer.github.io/RP6502-OS — Picocomputer  documentation.md` | OS API reference | https://picocomputer.github.io/os.html |
 
+Source site: [cc65.github.io](https://cc65.github.io/). Clipped: 2026-04-18.
+
+| File | Page | URL |
+| --- | --- | --- |
+| `cc65.github.io/Picocomputer 6502 — cc65 documentation.md` | cc65 RP6502 platform docs (memory layout, binary format, headers) | https://cc65.github.io/doc/rp6502.html |
+
 ## Refresh procedure
 
 Re-clip a page with Obsidian Web Clipper when the upstream docs are updated. Add a new row to the ## Files table if a new page is clipped, and update `raw/README.md`.

@@ -64,9 +64,10 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 ### 3b — Learn the wiki
 
-- 👉 Open in Obsidian; explore graph view, backlinks, frontmatter filters
-- ⬜ Ask Claude questions; get a feel for what the wiki knows and doesn't
-- ⬜ File first synthesis page (`wiki/syntheses/`) — suggested: "What does the RIA actually do?"
+- ✅ Open in Obsidian; explore graph view, backlinks, frontmatter filters
+- ✅ Ask Claude questions; get a feel for what the wiki knows and doesn't
+- ✅ File synthesis pages (`wiki/syntheses/`) — [[what-does-ria-do]], [[getting-started]], [[cc65-vs-llvm-mos]]
+- 👉 Read [[wiki/syntheses/learning-guide]] — structured reading path through the wiki
 
 ### 3c — Share with the community
 
@@ -81,16 +82,30 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 ---
 
+## Phase 4 — Gap filling (from research session 2026-04-18)
+
+- ✅ Update [[release-notes]] for v0.24 (telnet console + Hayes modem overhaul)
+- ✅ Clip cc65 RP6502 platform docs → `raw/web/cc65.github.io/` + [[cc65-rp6502-platform]] source page
+- ✅ New synthesis pages: [[what-does-ria-do]], [[getting-started]], [[cc65-vs-llvm-mos]]
+- ✅ New concept pages: [[monitor-reference]], [[ria-w-networking]], [[via-programming]], [[game-loop-patterns]]
+- ✅ New entity pages: [[rptracker]], [[razemos]]
+- ✅ Collect and ingest: W65C22S datasheet PDF
+- ✅ New topic pages: [[hardware-build-guide]], [[roadmap]]
+- ✅ Add [[wiki/syntheses/trng]] — hardware TRNG, `randomize()`, `lrand()`, entropy sources
+
+---
+
 ## Current wiki size
 
 | Category | Count |
 |---|---|
-| Sources | **48** (includes ehbasic-repo, adventure, community-wiki, etc.) |
-| Entities | **13** |
-| Concepts | **47** |
-| Topics | **7** |
+| Sources | **49** (+ cc65-rp6502-platform) |
+| Entities | **15** (+ rptracker, razemos) |
+| Concepts | **51** (+ monitor-reference, ria-w-networking, via-programming, game-loop-patterns) |
+| Topics | **9** (+ hardware-build-guide, roadmap) |
+| Syntheses | **5** (+ trng) |
 | Inbox | **0** — all ingest plans complete 🎉 |
-| **Total pages** | **~118** |
+| **Total pages** | **~132** |
 
 ---
 
