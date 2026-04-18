@@ -1,8 +1,8 @@
 ---
 type: concept
-tags: [6502, 65c02, assembly, arithmetic, bcd, multiply, divide, multi-precision, bit-manipulation]
-related: [[65c02-instruction-set]], [[6502-application-snippets]], [[6502-data-structures]], [[6502-emulated-instructions]], [[6502-common-errors]], [[6522-via]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
+tags: [6502, 65c02, assembly, arithmetic, bcd, multiply, divide, multi-precision, bit-manipulation, shift, logical, asl, lsr, rol, ror, and, ora, eor, bit]
+related: [[65c02-instruction-set]], [[6502-application-snippets]], [[6502-data-structures]], [[6502-emulated-instructions]], [[6502-common-errors]], [[6522-via]], [[learning-6502-assembly]]
+sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[wagner-assembly-lines]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -362,6 +362,229 @@ A concise list of the most common 6502 surprises for programmers familiar with o
 
 ---
 
+## Shift and rotate operators (Wagner Ch. 12)
+
+Four shift instructions move bits through the Accumulator (or a memory location) one position at a time, feeding in or out through the Carry flag.
+
+| Instruction | Operation | Notes |
+|-------------|-----------|-------|
+| `ASL` | Arithmetic Shift Left: bit 7 → C, 0 → bit 0 | Multiplies by 2 |
+| `LSR` | Logical Shift Right: bit 0 → C, 0 → bit 7 | Divides by 2 (unsigned) |
+| `ROL` | Rotate Left: bit 7 → C, old C → bit 0 | Rotate through carry |
+| `ROR` | Rotate Right: bit 0 → C, old C → bit 7 | Rotate through carry |
+
+Flags affected: N, Z, C (for all four). Each instruction targets A (implied) or a memory location.
+
+### ASL — multiply by powers of 2
+
+```
+$01 (0000 0001) → ASL → $02 (0000 0010), C=0
+$80 (1000 0000) → ASL → $00 (0000 0000), C=1  (overflow)
+$81 (1000 0001) → ASL → $02 (0000 0010), C=1
+```
+
+To multiply by 4: two ASLs. To multiply by 8: three ASLs. ASL is the fastest way to compute `N × 2^k` on the 6502.
+
+```asm
+    ASL  A           ; A *= 2
+    ASL  A           ; A *= 2  (now A *= 4)
+    ASL  A           ; A *= 2  (now A *= 8)
+```
+
+### LSR — test bit 0, halve a value
+
+```
+$01 (0000 0001) → LSR → $00, C=1  (C gets the bit we shifted out)
+$02 (0000 0010) → LSR → $01, C=0
+```
+
+LSR is used to shift out the least-significant bit of an accumulator value for testing — the bit lands in Carry where `BCC`/`BCS` can act on it.
+
+### ROL / ROR — chaining shifts through Carry
+
+ROL/ROR thread the Carry flag through the shift, making them ideal for multi-byte shifts:
+
+```asm
+; Shift a 3-byte number (BASE, BASE+1, BASE+2) one bit left
+    ASL  BASE+2      ; shift LSB: bit 7 → Carry
+    ROL  BASE+1      ; shift middle: old Carry → bit 0, bit 7 → Carry
+    ROL  BASE        ; shift MSB:   old Carry → bit 0, bit 7 → Carry
+```
+
+Note the direction: left-shift starts from the **LSB** (highest index) and works toward the **MSB** (lowest index). See also the multi-precision shift routines in the Leventhal section above.
+
+### Common idiom: testing any bit with shifts
+
+Shift left until the desired bit reaches bit 7, then use `BMI`/`BPL`:
+```asm
+    LDA  VALUE
+    ASL  A           ; bit 6 → bit 7 → N flag
+    BMI  BIT6_SET    ; branch if bit 6 was set
+```
+
+Or shift right until the desired bit falls into Carry:
+```asm
+    LDA  VALUE
+    LSR  A           ; bit 0 → Carry
+    BCS  BIT0_SET
+    LSR  A           ; bit 1 → Carry
+    BCS  BIT1_SET
+```
+
+---
+
+## Logical operators: AND, ORA, EOR, BIT (Wagner Ch. 12)
+
+All four logical operators work bit-by-bit on the Accumulator and an operand (immediate, zero page, absolute, or indexed):
+
+### AND — force bits to 0, test bits
+
+Truth table: `1 AND 1 = 1`; any `0 AND x = 0`.
+
+```asm
+    LDA  VALUE
+    AND  #$0F        ; clear upper nibble (mask = 0000 1111)
+    ; A now holds lower nibble only
+
+    AND  #$C0        ; keep only bits 7 and 6
+    CMP  #$C0
+    BEQ  BOTH_SET    ; both bits 7 and 6 were 1
+```
+
+Primary uses: (1) force specific bits to 0 (masking), (2) isolate a sub-field, (3) test whether all of a set of bits are set (AND then CMP).
+
+### ORA — force bits to 1
+
+Truth table: `0 OR 0 = 0`; `1 OR x = 1`.
+
+```asm
+    LDA  CHAR
+    ORA  #$80        ; set bit 7 (Apple II high-bit convention)
+```
+
+Used to force specific bits on without disturbing others.
+
+### EOR — toggle bits, encode/decode
+
+Truth table: `0 XOR 0 = 0`; `1 XOR 1 = 0`; `0 XOR 1 = 1` (exclusive).
+
+```asm
+    LDA  VALUE
+    EOR  #$03        ; flip bits 0 and 1
+    ; applying EOR again with the same mask restores original value
+```
+
+Key property: applying EOR with the same constant twice returns the original value. This makes it ideal for simple encryption/decryption and for toggling state (e.g., alternate between two display buffers).
+
+```
+Example – toggling bit 0:
+  $80 EOR $03 = $83  (bits 0 and 1 flipped)
+  $83 EOR $03 = $80  (restored)
+```
+
+### BIT — test memory bits without changing Accumulator
+
+`BIT addr` ANDs the Accumulator with the memory byte and sets flags, but does **not** change A:
+- **N flag** = bit 7 of the memory byte (not A AND memory)
+- **V flag** = bit 6 of the memory byte (not A AND memory)
+- **Z flag** = 1 if (A AND memory) = 0
+
+```asm
+; Test bit 7 — keyboard ready on Apple II:
+    BIT  $C000       ; N = bit 7 of $C000 (key pressed if N=1)
+    BPL  NOKEY       ; branch if N=0 (bit 7 clear, no key)
+
+; Test bits 7 and 6 using mask in A:
+    LDA  #$C0        ; mask = 1100 0000
+    BIT  MEM
+    BNE  ATLEAST_ONE ; Z=0 means at least one of bits 7,6 was set in MEM
+```
+
+The BIT instruction is the 6502's only way to test bits 6 and 7 directly in memory without loading the full value into A. It is also commonly used to clear the keyboard strobe: `BIT $C010` toggles the hardware without changing A.
+
+**65C02 additions to BIT**: Three new addressing modes added: Immediate (`BIT #imm`), Absolute Indexed (`BIT addr,X`), Zero Page Indexed (`BIT zp,X`). The immediate mode is useful for quick flag tests; note that BIT immediate does NOT update N and V from the immediate value — only Z is updated.
+
+---
+
+## BCD mode fundamentals (Wagner Ch. 28)
+
+The 6502 has a **Decimal mode** (D flag) that changes how `ADC` and `SBC` work. In decimal mode, each byte is treated as two **BCD** (Binary Coded Decimal) digits: the upper nibble holds the tens digit, the lower nibble holds the units digit.
+
+### Enabling and disabling decimal mode
+
+```asm
+    SED              ; Set Decimal mode
+    ; ... ADC/SBC here produce BCD results ...
+    CLD              ; Clear Decimal mode (ALWAYS do this when done)
+```
+
+**Warning**: The D flag is NOT cleared on hardware reset (NMOS 6502) or power-up in all cases. Every startup routine and every ISR that uses ADC/SBC must execute `CLD` before the arithmetic. The 65C02 clears D on reset. See rule 7 in the quirks table above.
+
+### BCD arithmetic example
+
+```asm
+    SED
+    CLC
+    LDA  #$46        ; $46 = BCD 46 (decimal 46)
+    ADC  #$38        ; $38 = BCD 38 (decimal 38)
+    ; Result: A = $84 (BCD 84 = decimal 84), not $7E (hex 78)
+    CLD
+```
+
+In normal (binary) mode, `$46 + $38 = $7E`. In BCD mode, the 6502 automatically adjusts the result: `46 + 38 = 84` in decimal.
+
+### Multi-byte BCD arithmetic
+
+Multi-byte BCD works identically to multi-byte binary — carry propagates through `ADC`:
+
+```asm
+    SED
+    CLC
+    LDA  BCD1_LO     ; add low BCD byte (two digits)
+    ADC  BCD2_LO
+    STA  RESULT_LO
+    LDA  BCD1_HI     ; add high BCD byte (two more digits)
+    ADC  BCD2_HI     ; carry from low byte carries in
+    STA  RESULT_HI
+    CLD
+```
+
+### Printing BCD values
+
+The major advantage of BCD: each nibble maps directly to a decimal digit. To convert one BCD byte to two ASCII characters:
+
+```asm
+    ; A = BCD byte (two digits)
+    PHA              ; save original
+    LSR  A           ; shift upper nibble down
+    LSR  A
+    LSR  A
+    LSR  A           ; upper digit now in bits 3-0
+    ORA  #$30        ; convert to ASCII digit ('0'–'9' = $30–$39)
+    ; print upper digit
+    PLA              ; restore original
+    AND  #$0F        ; clear upper nibble
+    ORA  #$30        ; convert lower nibble to ASCII
+    ; print lower digit
+```
+
+With BCD, no divide-by-10 loop is needed for decimal display. This is the key advantage over raw binary: BCD storage allows O(1) digit extraction.
+
+### BCD limitations
+
+- Only values `$00`–`$99` per byte are valid BCD. Values `$A0`–`$FF` are undefined in decimal mode.
+- `INC`/`DEC`/`INX`/`DEY` etc. are **always binary** even in decimal mode. Use `ADC #1` / `SBC #1` inside a `SED`…`CLD` block to increment BCD counters.
+- `INC`/`DEC` inside decimal mode have no harmful effect on later `ADC`/`SBC` (the D flag only affects those two instructions), but counting results will be wrong.
+- Never call Monitor, OS, or foreign routines while D=1 unless you know they handle decimal mode safely.
+
+### BCD: 65C02 improvements
+
+On the **W65C02S** (the RP6502 CPU), decimal mode is **fully specified**:
+- N, Z, V flags are **valid** after BCD `ADC`/`SBC` (NMOS 6502: N and V are undefined after BCD operations).
+- This matches the multi-precision BCD note in the Leventhal section above.
+
+---
+
 ## Related pages
 
 - [[6502-application-snippets]] — string and code conversion idioms
@@ -371,3 +594,4 @@ A concise list of the most common 6502 surprises for programmers familiar with o
 - [[65c02-instruction-set]] — `INC A` / `DEC A` (65C02 new ops, save a CLC/ADC #1)
 - [[6502-subroutine-conventions]] — packaging these as callable subroutines
 - [[6522-via]] — VIA timer register idioms
+- [[learning-6502-assembly]] — beginner introduction to loops, branches, Status Register

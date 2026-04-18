@@ -1,8 +1,8 @@
 ---
 type: concept
 tags: [w65c02s, 65c02, instruction-set, opcodes, assembly]
-related: [[w65c02s]], [[65c02-addressing-modes]], [[rp6502-abi]], [[cc65]], [[llvm-mos]], [[6502-subroutine-conventions]], [[6502-data-structures]]
-sources: [[w65c02s-datasheet]], [[leventhal-6502-assembly]]
+related: [[w65c02s]], [[65c02-addressing-modes]], [[rp6502-abi]], [[cc65]], [[llvm-mos]], [[6502-subroutine-conventions]], [[6502-data-structures]], [[6502-relocatable-and-self-modifying]], [[6502-stack-and-subroutines]], [[learning-6502-assembly]]
+sources: [[w65c02s-datasheet]], [[leventhal-6502-assembly]], [[wagner-assembly-lines]]
 created: 2026-04-17
 updated: 2026-04-18
 ---
@@ -304,4 +304,94 @@ On the 65C02, hardware interrupts (IRQ, NMI, BRK, RESET) **automatically clear P
 ### JMP indirect page-boundary bug fixed
 
 On the NMOS 6502, `JMP ($xxFF)` reads the low byte from `$xxFF` and the high byte from `$xx00` (wraps within the same page). The 65C02 fixes this: `JMP ($xxFF)` correctly reads the high byte from `$(xx+1)00`.
+
+---
+
+## Wagner Ch. 33 — beginner perspective on 65C02 enhancements
+
+The following notes come from *Assembly Lines: The Complete Book* (Wagner/Torrence, 2014), Ch. 33. They complement the technical Leventhal notes above with a more approachable framing. Source: [[wagner-assembly-lines]].
+
+### Why the 65C02 has room for new instructions
+
+The 6502 only uses **a subset** of all 256 possible opcode byte values. The "unused" slots were not truly empty on NMOS — they triggered undocumented side-effects (sometimes called "illegal opcodes") that a small amount of software used intentionally as copy-protection tricks. The 65C02 reassigns these unused slots to the new instructions, which is why running code that relies on NMOS undocumented opcodes may fail on a 65C02.
+
+Most production software is unaffected; programs using only documented opcodes run unchanged on the 65C02.
+
+### PHX/PHY/PLX/PLY — practical value
+
+The most immediately useful new instructions for subroutine writing. On NMOS, saving/restoring all registers required routing X and Y through A:
+
+```asm
+; NMOS — 6 instructions to save all three registers:
+    PHA : TXA : PHA : TYA : PHA
+```
+
+On 65C02, just four instructions:
+```asm
+    PHA : PHX : PHY
+```
+
+And the restore is symmetric:
+```asm
+; NMOS restore:
+    PLA : TAY : PLA : TAX : PLA
+; 65C02 restore:
+    PLY : PLX : PLA
+```
+
+This matters most inside interrupt service routines, where all registers must be saved and restored. See [[6502-stack-and-subroutines]] and [[6502-interrupt-patterns]].
+
+### STZ — the missing "clear memory" instruction
+
+On NMOS, clearing a memory location required loading 0 into A first:
+```asm
+; NMOS:
+    LDA  #$00
+    STA  ADDR       ; 5 bytes, clobbers A
+
+; 65C02:
+    STZ  ADDR       ; 3 bytes, A untouched
+```
+
+`STZ` stores zero into memory in all four absolute and zero-page modes. Avoids clobbering A when clearing variables or hardware registers.
+
+### BRA — unconditional relative branch
+
+`BRA offset` always branches. It replaces the `CLV; BVC` forced-branch pattern for relocatable code:
+```asm
+; NMOS forced branch (relocatable jump replacement):
+    CLV              ; 1 byte
+    BVC  TARGET      ; 2 bytes — total 3 bytes, destroys V
+
+; 65C02:
+    BRA  TARGET      ; 2 bytes, no flags changed
+```
+
+See [[6502-relocatable-and-self-modifying]] for full discussion of relocatable patterns.
+
+### TSB / TRB — read-modify-write with test
+
+These fill a common pattern: test specific bits in memory, then atomically set or clear them:
+
+```asm
+; "Is the READY bit set? If not, set it."
+    LDA  #%00000001  ; bit 0 = READY
+    TSB  STATUS      ; set bit 0; Z=1 if it was PREVIOUSLY clear
+    BNE  WAS_ALREADY_SET
+
+; "Clear the busy flag and check if it was set"
+    LDA  #%10000000  ; bit 7 = BUSY
+    TRB  STATUS      ; clear bit 7; Z=1 if it was PREVIOUSLY clear
+    BEQ  WAS_NOT_BUSY
+```
+
+Unlike a separate `LDA / ORA / STA` sequence, TSB and TRB are single instructions — important in time-critical sections.
+
+### 65C02 software compatibility
+
+The 65C02 is **pin-compatible** with NMOS 6502 and handles all documented software identically. Issues only arise with:
+1. Code using undocumented NMOS opcodes (now reassigned on 65C02)
+2. Timing-sensitive code designed around NMOS timing (65C02 is slightly different on some operations)
+
+For RP6502, all toolchain-generated code (cc65, llvm-mos) targets documented 65C02 instructions — no compatibility concerns.
 

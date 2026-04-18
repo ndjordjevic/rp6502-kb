@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, subroutines, abi, calling-convention, stack]
-related: [[rp6502-abi]], [[65c02-instruction-set]], [[65c02-addressing-modes]], [[memory-map]], [[6502-common-errors]]
+related: [[rp6502-abi]], [[65c02-instruction-set]], [[65c02-addressing-modes]], [[memory-map]], [[6502-common-errors]], [[6502-stack-and-subroutines]]
 sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
 created: 2026-04-18
 updated: 2026-04-18
@@ -312,3 +312,4 @@ This design avoids all the 6502 hardware-stack awkwardness for argument passing 
 - [[6502-interrupt-patterns]] — reentrancy requirements for ISR-callable subroutines
 - [[6502-common-errors]] — flag side effects, uninitialised carry, ISR save/restore errors
 - [[memory-map]] — page 1 stack location
+- [[6502-stack-and-subroutines]] — PHA/PLA mechanics, JSR/RTS stack frames, PHX/PHY/PLX/PLY (65C02)

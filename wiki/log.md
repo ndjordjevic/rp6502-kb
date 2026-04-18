@@ -7,6 +7,13 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] lint | wiki | post-wagner-assembly-lines polish
+
+- `wiki/concepts/6502-subroutine-conventions.md`: added `[[6502-stack-and-subroutines]]` to frontmatter and Related pages footer (missing cross-ref to stack mechanics page)
+- `wiki/concepts/6502-interrupt-patterns.md`: added `[[6502-stack-and-subroutines]]` to frontmatter and Related pages footer (ISR entry/exit directly depends on stack mechanics)
+
+---
+
 ## [2026-04-18] lint | wiki | post-leventhal-subroutines polish
 
 - `wiki/index.md`: removed duplicate `[[6502-io-patterns]]` entry (appeared twice in Concepts table); added `[[zaks-programming-6502-ingest-plan]]` and `[[wagner-assembly-lines-ingest-plan]]` to Inbox section (were present as files but missing from index)
@@ -774,3 +781,18 @@ Key facts captured:
 
 ### Deleted
 - `wiki/inbox/youtube-rp6502-ingest-plan.md` — all sessions complete; superseded by source pages and log.md
+
+### [2026-04-18] ingest | Assembly Lines: The Complete Book (Wagner/Torrence 2014) | 3 new concept pages, 2 augmented, 1 new source page; 65c02-instruction-set augmented with Ch.33 Wagner notes
+
+#### New pages
+- `wiki/concepts/learning-6502-assembly.md` — beginner scaffold: registers, Status Register flags, binary numbers, counter/loop patterns (BNE/BEQ), all 8 branch instructions, addressing modes overview, X vs Y non-interchangeability
+- `wiki/concepts/6502-stack-and-subroutines.md` — stack LIFO mechanics ($0100–$01FF), PHA/PLA rules, PHX/PHY/PLX/PLY (65C02), JSR saves PC−1, RTS adds 1, register save/restore idioms, stack depth limits
+- `wiki/concepts/6502-relocatable-and-self-modifying.md` — relocatable vs non-relocatable code, forced branch patterns (CLV+BVC, BRA on 65C02), stepping, JSR simulation, indirect JMP dispatch tables, NMOS page-boundary bug + 65C02 fix, self-modifying code
+
+#### Augmented pages
+- `wiki/concepts/65c02-addressing-modes.md` — added Wagner Ch.7 sidebar: X vs Y non-interchangeability in indirect modes; pre-indexing (zp,X) vs post-indexing (zp),Y with examples
+- `wiki/concepts/6502-programming-idioms.md` — added shift/rotate operators section (ASL/LSR/ROL/ROR), logical operators section (AND/ORA/EOR/BIT with 65C02 extended modes), BCD fundamentals section (SED/CLD, decimal arithmetic, printing, limitations, 65C02 improvements)
+- `wiki/concepts/65c02-instruction-set.md` — added Wagner Ch.33 beginner perspective: PHX/PHY vs NMOS workaround, STZ vs LDA#0/STA, BRA vs CLV+BVC, TSB/TRB practical patterns, compatibility notes
+
+#### Deleted
+- `wiki/inbox/wagner-assembly-lines-ingest-plan.md` — all chapters complete; superseded by source page and log.md

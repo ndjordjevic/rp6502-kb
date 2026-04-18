@@ -24,6 +24,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[w65c02s-datasheet]] | W65C02S datasheet (WDC, Feb 2024, 32 pp.): official CPU reference — 70 instructions, 16 addressing modes, 212 opcodes, pin functions, AC/DC timing, NMOS-vs-CMOS caveats |
 | [[leventhal-6502-assembly]] | *6502 Assembly Language Programming, 2nd Ed.* (Leventhal, 1986): definitive 6502 programmer's reference — 65C02 enhancements (Ch.17), interrupts, subroutines, string/arithmetic/table idioms |
 | [[leventhal-subroutines]] | *6502 Assembly Language Subroutines* (Leventhal & Saville, 1982): emulating missing instructions, common errors, 16-bit arithmetic, 6522 VIA reference, subroutine library (60 routines w/ cycle counts) |
+| [[wagner-assembly-lines]] | *Assembly Lines: The Complete Book* (Wagner/Torrence, 2014): pedagogical 6502 teaching scaffold — loops, branches, addressing modes, stack, arithmetic, shift/logical operators, BCD, relocatable code, 65C02 enhancements |
 | [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
 | [[yt-ep01-8bit-retro-computer]] | Ep1: series intro, breadboard with 12 glue chips, USB/VGA working |
 | [[yt-ep02-pio-and-dma]] | Ep2: dual-Pico pivot; PIO+DMA 6502 read path; 8 MHz achieved |
@@ -97,16 +98,19 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[code-pages]] | Code page 437/850/855: glyph-set swap + FAT short-name encoding; CP850 default; 8.3 fallback with ~1 suffix |
 | [[programmable-sound-generator]] | PSG in RIA firmware: 8 channels, 5 waveforms, variable duty cycle, ADSR envelope, stereo pan, PWM physical layer; first in v0.6 |
 | [[opl2-fm-synth]] | OPL2 FM synthesizer (Yamaha YM3812-compatible) in RIA firmware: same as AdLib/Sound Blaster; firmware-flash only; added v0.16 |
-| [[65c02-instruction-set]] | W65C02S instruction set: 70 mnemonics, 212 opcodes, new CMOS instructions (BBR/BBS, BRA, PHX/PHY/PLX/PLY, RMB/SMB, STP, STZ, TRB/TSB, WAI), reserved-NOP table; Ch.17 Leventhal pedagogical notes |
-| [[65c02-addressing-modes]] | W65C02S 16 addressing modes with cycle/byte counts; new `(zp)` and `(a,x)` modes vs NMOS 6502 |
+| [[65c02-instruction-set]] | W65C02S instruction set: 70 mnemonics, 212 opcodes, new CMOS instructions (BBR/BBS, BRA, PHX/PHY/PLX/PLY, RMB/SMB, STP, STZ, TRB/TSB, WAI), reserved-NOP table; Ch.17 Leventhal pedagogical notes; Ch.33 Wagner beginner perspective |
+| [[65c02-addressing-modes]] | W65C02S 16 addressing modes with cycle/byte counts; new `(zp)` and `(a,x)` modes vs NMOS 6502; X vs Y non-interchangeability in indirect modes (Wagner Ch.7) |
 | [[6502-interrupt-patterns]] | 6502 CPU interrupt system: IRQ/NMI/BRK/RESET vectors, ISR register save/restore, polling dispatch, RTI semantics, ISR design guidelines, 6522 VIA unbuffered interrupt I/O (PINTIO), ring-buffer buffered I/O, real-time clock/calendar (Ch. 11B/11D Leventhal 1982) |
 | [[6502-subroutine-conventions]] | JSR/RTS mechanics, four parameter-passing methods (registers / ZP pseudo-regs / inline / stack), Leventhal 1982 formal 10-field template, reentrancy, relocatability |
 | [[6502-application-snippets]] | Reusable 6502 patterns: string length, blank-skip, hex↔ASCII, BCD↔7-segment, pattern match; Leventhal 1982 Ch.4 code-conversion routines (BN2BCD/BCD2BN/BN2HEX/HEX2BN/BN2DEC/DEC2BN); Ch.8 string manipulation (STRCMP, CONCAT, POS) |
-| [[6502-programming-idioms]] | 6502 arithmetic idioms: multi-precision binary/BCD addition, 8-bit multiply/divide, 16-bit add/sub/mul/div/cmp (Leventhal 1982 Ch. 6), bit set/clear/test/field extraction, multi-precision shifts (Ch. 7), carry-chain rules, 14 6502 quirks quick reference |
+| [[6502-programming-idioms]] | 6502 arithmetic idioms: multi-precision binary/BCD addition, 8-bit multiply/divide, 16-bit add/sub/mul/div/cmp; bit manipulation (set/clear/test/field); shift operators (ASL/LSR/ROL/ROR); logical operators (AND/ORA/EOR/BIT); BCD mode fundamentals; carry-chain rules; 14 6502 quirks quick reference |
 | [[6502-data-structures]] | 6502 data structure patterns: ordered/unordered lists, circular queues, bubble sort, jump tables (pre- and 65C02-style); Leventhal 1982 Ch.5 MFILL/BLKMOV and 1D/2D/N-dim array indexing; Ch.9 ASUM8/ASUM16, BINSCH, BUBSRT, RAMTST |
 | [[6502-io-patterns]] | Terminal line I/O (RDLINE/WRLINE), parity (GEPRTY/CKPRTY), CRC-16 (IBM BSC, X¹⁶+X¹⁵+X²+1), and device-independent I/O handler (IOHDLR with I/O Control Block + device table linked list) — from Leventhal 1982 Ch. 10 |
 | [[6502-emulated-instructions]] | Emulating missing 6502 instructions: 16-bit add/sub, arithmetic shifts, multi-byte shifts, extended branches, indirect addressing, decimal operations |
 | [[6502-common-errors]] | Systematic catalogue of 6502 bugs: carry misuse, flag side effects, addressing confusion, decimal mode hazards, loop errors, ISR pitfalls |
+| [[learning-6502-assembly]] | Beginner 6502 scaffold: registers, Status Register flags, binary numbers, counter/loop patterns (BNE/BEQ), all branch instructions, addressing modes overview; X vs Y non-interchangeability |
+| [[6502-stack-and-subroutines]] | 6502 stack mechanics: LIFO page-1 stack ($0100–$01FF), PHA/PLA rules, PHX/PHY/PLX/PLY (65C02), JSR/RTS operation (PC−1 quirk), register save/restore idioms, stack depth limits |
+| [[6502-relocatable-and-self-modifying]] | Techniques for position-independent 6502 code: forced branch (CLV+BVC, BRA on 65C02), JSR simulation, indirect JMP dispatch tables, JMP page-boundary bug (NMOS) fixed on 65C02, self-modifying code patterns |
 
 ## Inbox
 
@@ -115,7 +119,6 @@ When answering a query, read this file first to find relevant pages, then drill 
 | Page | Description |
 | --- | --- |
 | [[zaks-programming-6502-ingest-plan]] | Ingest plan for Zaks "Programming the 6502" (1983) — chapter list and order |
-| [[wagner-assembly-lines-ingest-plan]] | Ingest plan for Wagner "Assembly Lines Complete" (2014) — chapter list and order |
 
 ## Syntheses
 

@@ -1,10 +1,10 @@
 ---
 type: concept
 tags: [w65c02s, 65c02, addressing-modes, assembly]
-related: [[w65c02s]], [[65c02-instruction-set]], [[memory-map]]
-sources: [[w65c02s-datasheet]]
+related: [[w65c02s]], [[65c02-instruction-set]], [[memory-map]], [[learning-6502-assembly]], [[6502-relocatable-and-self-modifying]]
+sources: [[w65c02s-datasheet]], [[wagner-assembly-lines]]
 created: 2026-04-17
-updated: 2026-04-17
+updated: 2026-04-18
 ---
 
 # 65C02 Addressing Modes
@@ -99,6 +99,49 @@ Only **two** addressing modes are new on W65C02S:
 
 The other 14 are inherited from the NMOS 6502; some are newly available to additional instructions (`BIT #imm`, `BIT zp,x`, `BIT a,x`, `INC A`, `DEC A`, `STA` via `(zp)`, etc.) — see [[65c02-instruction-set]].
 
+---
+
+## When to use X vs Y — pedagogical sidebar (Wagner)
+
+The X and Y registers look symmetric but are **not interchangeable** in the two indirect modes. This is the most common source of confusion for beginners:
+
+### Indexed Indirect `(zp,X)` — pre-indexing, X only
+
+```
+LDA ($80,X)
+```
+1. Add X to the zero-page base address: `$80 + X`
+2. Fetch the 2-byte pointer stored at the resulting zero-page address.
+3. Use that pointer as the effective address.
+
+X selects *which pointer* in a table of zero-page pointers. Y **cannot** be used here. This mode is useful when walking a table of pointers at fixed zero-page offsets (e.g., a dispatch table).
+
+Typical use: `X` is loaded with `0, 2, 4, 6...` (multiples of 2) to select successive pointer pairs on page zero.
+
+### Indirect Indexed `(zp),Y` — post-indexing, Y only
+
+```
+LDA ($80),Y
+```
+1. Fetch the 2-byte base address stored at zero-page addresses `$80` and `$81`.
+2. Add Y to that base address.
+3. Use the result as the effective address.
+
+Y adds an offset to the base pointer. X **cannot** be used here. This is the workhorse mode for any buffer, string, or array access via a pointer — load the pointer into `($80)` once, then Y walks through elements.
+
+### Summary
+
+| Mode | Syntax | Register | When to use |
+|------|--------|----------|-------------|
+| Indexed Indirect | `(zp,X)` | X only | Selecting one of several zero-page pointers |
+| Indirect Indexed | `(zp),Y` | Y only | Walking through a buffer via a single pointer |
+
+For plain indexed addressing (`abs,X` or `abs,Y`), X and Y work similarly — but note `zp,Y` is only available for `LDX`/`STX`, and `abs,Y` is not available for all instructions. Always consult the instruction table in [[65c02-instruction-set]].
+
+---
+
 ## Related pages
 
 - [[65c02-instruction-set]] · [[w65c02s]] · [[w65c02s-datasheet]] · [[memory-map]]
+- [[learning-6502-assembly]] — beginner overview of all modes
+- [[6502-relocatable-and-self-modifying]] — `JMP (abs,X)` for jump tables

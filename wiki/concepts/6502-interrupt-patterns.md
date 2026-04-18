@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, interrupts, irq, nmi, isr, rp6502, via, ring-buffer, real-time-clock]
-related: [[65c02-instruction-set]], [[hardware-irq]], [[rp6502-abi]], [[w65c02s]], [[w65c22s]], [[6522-via]]
+related: [[65c02-instruction-set]], [[hardware-irq]], [[rp6502-abi]], [[w65c02s]], [[w65c22s]], [[6522-via]], [[6502-stack-and-subroutines]]
 sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
 created: 2026-04-18
 updated: 2026-04-18
@@ -447,3 +447,4 @@ CLI
 - [[w65c22s]] — VIA interrupt enable/flag registers (RP6502 specific)
 - [[w65c02s]] — CPU interrupt pins and timing
 - [[6522-via]] — full VIA register reference (IFR, IER, PCR, ACR, timers)
+- [[6502-stack-and-subroutines]] — stack mechanics underlying ISR entry/exit (PHA/PLA, PHX/PHY/PLX/PLY)
