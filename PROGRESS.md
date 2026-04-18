@@ -53,6 +53,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **Zaks Programming the 6502** (raw/pdfs/) — Ch. II/III/V/VI/VIII/IX ingested. 1 new source page ([[zaks-programming-6502]]); 3 concept pages augmented ([[6502-programming-idioms]], [[6502-application-snippets]], [[6502-data-structures]]). Unique contributions: improved 8×8 multiply (10 instr), subroutine parameter passing comparison, 8 Ch.8 utility routines (ZEROM, bracket test, parity, ASCII↔BCD, find-max, 16-bit sum, EOR checksum, zero count), full data-structure library (linked list, circular, queue, tree, doubly-linked, binary search O(log₂N), hashing, merge)
 - ✅ Ingest **Discord export** (raw/discord/) — `#chat` (1,015 msgs) and `#razemos` (32 msgs) fully ingested. 2 new pages ([[rumbledethumps-discord]], [[community-projects]]). Key additions from #chat: HC/AC chip selection, VGA cold-boot fix, TinyUSB silicon latch bug, cc65 Homebrew warning, PIX bus 64 Mbit/s correction, design philosophy quotes, community roster. Key additions from #razemos: razemOS project (v0.01/v0.02), HASS assembler, ALT-F4 exit convention, OS exec vs ria_exec() pattern, ROM self-update pattern.
 - ✅ Ingest **picocomputer/examples** (raw/github/picocomputer/examples/, commit 95965c6) — 9 new pages: [[vga-display-modes]], [[vga-graphics]], [[gamepad-input]], [[rtc]], [[nfc]], [[exec-api]], [[ezpsg]], [[performance]], [[examples]] source; 2 updated: [[programmable-sound-generator]] (ezpsg section), [[fatfs]] (directory API)
+- ✅ Ingest **picocomputer/pico-extras** (raw/github/picocomputer/pico-extras/, commit 7f48b3f) — New: [[pico-extras]] source page; Updated: [[rp6502-vga]] (pico-extras dependency section), [[vga-display-modes]] (mode-switching note). Only 2 rumbledethumps commits: memory leak fix + debug printf fix in `scanvideo_setup_with_timing()`
 - ✅ Ingest **picocomputer/community wiki** (raw/github/picocomputer/community/, commit 348180a) — 2 pages: Home (project directory) + Incompatible USB and BLE Devices. New: [[community-wiki]] source, [[usb-compatibility]] topic; Updated: [[community-projects]] (full wiki project catalogue added), [[gamepad-input]] (USB compat section now links to [[usb-compatibility]])
 - ✅ Ingest **picocomputer/ehbasic** (raw/github/picocomputer/ehbasic/, commit acd5deb) — New: [[ehbasic]] source + entity pages; Updated: [[ria-registers]] (ACIA simulation section). Key finding: no RP6502-specific BASIC extensions; I/O integration entirely in min_mon.s via ACIA registers and open()/close()/read_xstack()/write_xstack()
 
@@ -81,12 +82,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 42 + 1 (ehbasic) = **43** |
-| Entities | 12 + 1 (ehbasic) = **13** |
-| Concepts | **45** (ria-registers updated) |
+| Sources | 43 + 1 (pico-extras) = **44** |
+| Entities | **13** (rp6502-vga updated) |
+| Concepts | **45** (vga-display-modes updated) |
 | Topics | **7** |
-| Inbox | 3 (vscode-cc65, vscode-llvm-mos, pico-extras ingest plans) |
-| **Total pages** | **~108** |
+| Inbox | 2 (vscode-cc65, vscode-llvm-mos ingest plans) |
+| **Total pages** | **~109** |
 
 ---
 

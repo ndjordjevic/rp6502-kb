@@ -7,6 +7,8 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] ingest | picocomputer/pico-extras (git clone, commit 7f48b3f) | New: 1 page (sources/pico-extras); Updated: entities/rp6502-vga (pico-extras dependency section), concepts/vga-display-modes (mode-switching note + [[pico-extras]] link); Key finding: only 2 rumbledethumps commits in fork — memory leak fix + debug printf fix in scanvideo_setup_with_timing(); Ingest plan deleted
+
 ## [2026-04-18] ingest | picocomputer/ehbasic (git clone, commit acd5deb) | New: 2 pages (sources/ehbasic, entities/ehbasic); Updated: concepts/ria-registers (ACIA simulation section + V_INPT/V_OUTP patterns); Key finding: no RP6502-specific BASIC extensions — port is pure OS I/O glue; Ingest plan deleted
 
 ## [2026-04-18] ingest | picocomputer/community wiki (commit 348180a) | New: 3 pages (sources/community-wiki, topics/usb-compatibility, community-projects expanded with wiki Home content); Updated: concepts/gamepad-input (USB compatibility section → [[usb-compatibility]]); Ingest plan deleted

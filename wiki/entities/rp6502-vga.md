@@ -2,7 +2,7 @@
 type: entity
 tags: [rp6502, vga, video, firmware, pico2, hstx, dvi, tmds]
 related: [[rp6502-ria]], [[pix-bus]], [[xreg]], [[xram]], [[sdk-architecture]], [[hstx]]
-sources: [[rp6502-vga-docs]], [[pico-c-sdk]], [[rp2350-datasheet]], [[youtube-playlist]]
+sources: [[rp6502-vga-docs]], [[pico-c-sdk]], [[rp2350-datasheet]], [[youtube-playlist]], [[pico-extras]]
 created: 2026-04-15
 updated: 2026-04-18
 ---
@@ -123,9 +123,21 @@ Console mode (mode 0) was upgraded to **16-bit color** (256-color ANSI palette).
 
 **Mode 5** sprites do **not** support affine transforms. They use a simpler `(x_pos, y_pos, xram_ptr, palette_ptr)` config and support 1/2/4/8-bit palette color. Sizes: 8×8 to 512×512. You can layer all three planes — e.g. plane 0 = mode 4 affine explosions, plane 1 = mode 5 enemy sprites, plane 2 = mode 5 bullets.
 
+## pico-extras dependency
+
+The VGA firmware depends on a **picocomputer fork** of the upstream `raspberrypi/pico-extras` library. See [[pico-extras]] for the full analysis. In summary:
+
+The library's `pico_scanvideo_dpi` component contains `scanvideo_setup_with_timing()`, which is called **every time a display mode changes**. Upstream assumed this is called once; the RP6502 use case calls it repeatedly. Two bugs triggered on each mode change:
+
+1. **Memory leak** — scanline buffers (for all planes) were re-allocated on every call without freeing the previous allocation. Fixed by guarding allocation with `if (!scanline_buffers[i].core.data)`.
+2. **Debug printf flood** — a `printf("Setting up SM %d\n", sm)` inside `setup_sm()` fires on every state-machine re-init during a mode change, flooding the terminal. Fixed by commenting it out.
+
+Both fixes were committed by `rumbledethumps` on 2023-06-23 (commits `eeefb73` and `7f48b3f`). Only `src/rp2_common/pico_scanvideo_dpi/scanvideo.c` was modified. Without this fork, RP6502-VGA programs that switch modes at runtime would slowly exhaust heap and print SM debug lines.
+
 ## Related pages
 
 - [[rp6502-ria]] · [[pix-bus]] · [[xreg]] · [[xram]]
+- [[pico-extras]] — forked dependency: mode-change memory leak fix + debug printf fix
 - [[sdk-architecture]] — CMake INTERFACE model, RP2350 platform, builder pattern used in VGA firmware
 - [[hstx]] — the RP2350 HSTX peripheral used to generate DVI/TMDS video output on Pi Pico 2
 - [[yt-ep08-vga-pix-bus]] · [[yt-ep13-graphics-programming]] · [[yt-ep15-asset-management]]

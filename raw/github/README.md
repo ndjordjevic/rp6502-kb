@@ -18,6 +18,7 @@ Example: `picocomputer/rp6502/`
 | --- | --- | --- | --- | --- |
 | `picocomputer/rp6502/` | [github.com/picocomputer/rp6502](https://github.com/picocomputer/rp6502) | `v0.23` | `368ed8e` | 2026-04-16 |
 | `picocomputer/examples/` | [github.com/picocomputer/examples](https://github.com/picocomputer/examples) | *(no tags)* | `95965c6` | 2026-04-18 |
+| `picocomputer/pico-extras/` | [github.com/picocomputer/pico-extras](https://github.com/picocomputer/pico-extras) | *(no tags)* | `7f48b3f` | 2026-04-18 |
 | `picocomputer/community/` | [github.com/picocomputer/community](https://github.com/picocomputer/community) | *(no tags)* | `348180a` | 2026-04-18 |
 | `picocomputer/ehbasic/` | [github.com/picocomputer/ehbasic](https://github.com/picocomputer/ehbasic) | `v20240114` | `acd5deb` | 2026-04-18 |
 

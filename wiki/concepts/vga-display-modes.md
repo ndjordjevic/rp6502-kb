@@ -2,7 +2,7 @@
 type: concept
 tags: [rp6502, vga, display, modes, xram, xreg, canvas, vsync]
 related: [[rp6502-vga]], [[xram]], [[xreg]], [[pix-bus]], [[vga-graphics]], [[programmable-sound-generator]]
-sources: [[rp6502-vga-docs]], [[examples]]
+sources: [[rp6502-vga-docs]], [[examples]], [[pico-extras]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -176,9 +176,21 @@ Each `xreg_vga_mode()` call adds one render pass per frame. There is no hard lim
 
 ---
 
+## Mode switching and pico-extras dependency
+
+Calling `xreg_vga_mode()` or `xreg_vga_canvas()` to change display modes at runtime triggers a re-initialization of the `pico_scanvideo_dpi` library underneath. The upstream `raspberrypi/pico-extras` library has two bugs that only manifest when this is done repeatedly:
+
+- **Memory leak**: scanline buffers re-allocated on every call without freeing the old ones.
+- **Debug printf**: a `printf("Setting up SM %d\n", sm)` fires on each state-machine re-init.
+
+The VGA firmware uses a **patched fork** (`picocomputer/pico-extras`) that wraps buffer allocation in a `if (!scanline_buffers[i].core.data)` guard and comments out the printf. Without this fork, programs that switch modes at runtime slowly exhaust heap. See [[pico-extras]] for the full diff analysis.
+
+---
+
 ## Related pages
 
-- [[rp6502-vga]] — VGA firmware entity
+- [[rp6502-vga]] — VGA firmware entity (includes pico-extras dependency section)
+- [[pico-extras]] — forked dependency: mode-change memory leak fix
 - [[vga-graphics]] — VGA graphics techniques (sprites, affine transforms, dual-port writes)
 - [[xram]] — where all display config structs and pixel data live
 - [[xreg]] — how `xreg_vga_mode()` and `xreg_vga_canvas()` work
