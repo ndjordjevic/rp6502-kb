@@ -1,8 +1,8 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, interrupts, irq, nmi, isr, rp6502, via, ring-buffer, real-time-clock]
-related: [[65c02-instruction-set]], [[hardware-irq]], [[rp6502-abi]], [[w65c02s]], [[w65c22s]], [[6522-via]], [[6502-stack-and-subroutines]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
+related: [[65c02-instruction-set]], [[hardware-irq]], [[rp6502-abi]], [[w65c02s]], [[w65c22s]], [[6522-via]], [[6502-stack-and-subroutines]], [[6502-overflow-flag]]
+sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[6502org-tutorials]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -439,12 +439,191 @@ CLI
 
 ---
 
+## WAI — ultra-fast interrupt response (65C02 WDC only)
+
+The `WAI` instruction (opcode `$CB`, 3 cycles) halts execution until an interrupt arrives. Combined with the I flag **set** (`SEI`), it enables inline interrupt handling with 1-clock latency — the fastest possible interrupt response.
+
+### Normal IRQ (I=0) — standard latency
+
+When I=0, `WAI` suspends and resumes via the 7-clock interrupt sequence (push PC, push P, fetch vector). Total latency: same as normal interrupt (7–14 clocks).
+
+### Inline IRQ (I=1) — 1-clock latency
+
+When I=1 (interrupts disabled), `WAI` halts until IRQ is asserted, then executes the **next inline instruction** instead of jumping to the ISR vector. No stack push, no vector fetch, no RTI needed:
+
+```assembly
+STA  VIA_IER    ; pre-interrupt setup
+SEI             ; SET interrupt-disable (yes, set it)
+WAI             ; pause until IRQ fires (3 cycles)
+
+; First instruction of "ISR" — no indirection:
+LDA  VIA_T1CL   ; clears timer interrupt early
+INC  COUNT
+BNE  DONE
+INC  COUNT+1
+DONE            ; continues normally — no RTI needed
+```
+
+**Benefits:**
+- 7-clock interrupt sequence eliminated
+- No register save/restore (if ISR doesn't need it)
+- No RTI required at end
+- Total latency: effectively 1 clock
+
+**Constraints:** Only useful when main program can be paused entirely until the next interrupt. Cannot service multiple independent sources this way.
+
+---
+
+## Ghost interrupts
+
+If an interrupt source is disabled while it is simultaneously asserting the IRQ line, the CPU may begin the interrupt sequence before the line is released. By the time the ISR checks the flag register, the condition has already cleared — a "ghost" interrupt.
+
+**Prevention:**
+
+```assembly
+SEI
+JSR  DISABLE_IRQ_SOURCE   ; disable the device
+CLI
+```
+
+Alternatively, if the ISR finds no flag set, simply exit without error. Many real-world systems tolerate an occasional spurious ISR entry.
+
+---
+
+## Open-drain IRQ line timing
+
+Most 65-family peripherals use **open-drain** interrupt outputs with pull-up resistors. The RC time constant (R×C) determines how quickly the IRQ line recovers after being released.
+
+**Critical guideline**: clear the interrupt source **early** in the ISR, before other work. If you defer the clear to the end of the ISR, the RC delay may prevent the line from rising to a valid logic-high before RTI executes, causing immediate re-entry.
+
+> WDC 65C22 uses **active pull-up** (not open-drain). Multiple 65C22s sharing IRQ require AND gates or external logic.
+
+---
+
+## Interrupt performance data
+
+### 6502/65C02 latency components
+
+| Component | Cycles | Notes |
+|-----------|--------|-------|
+| (A) Instruction completion | 0–7 | Current instruction finishes first |
+| (C) Interrupt sequence | 7 | Push PC, push P, fetch vector |
+| (E) RTI | 6 | Restore P, PC |
+| **Total worst case** | **14+6 = 20** | Long instruction + RTI |
+| **WAI with I=1** | **1** | IRQ inline — no sequence, no RTI |
+
+### Comparative latency (clocks at rated speed)
+
+| Processor | Min | Max | @ speed |
+|-----------|-----|-----|---------|
+| 65C02 | 7 | 14 | 20 MHz |
+| 65C02 + WAI | 1 | 1 | 20 MHz |
+| 68HC12 | — | ~21 | 8 MHz |
+| 68HC16 | — | ~36 | 16 MHz |
+| 6800 | 13 | 13 | 2 MHz |
+| 6809 | 19 | 19 | 2 MHz |
+| Z80 | 11 | 19 | 4 MHz |
+| 68000 | 46 | 46 | 16 MHz |
+
+At 20 MHz, the 65C02 min latency is 0.35 µs, max 0.7 µs. RTI takes 0.3 µs. The WAI+I=1 pattern achieves ~0.05 µs (1 clock at 20 MHz).
+
+---
+
+## Pickens RS-232 ring buffer (256-byte variant)
+
+A simpler version of the ring buffer using 8-bit auto-wrap (no explicit modulo):
+
+```assembly
+BUFFER: .DFS $100   ; 256-byte receive buffer
+RD_PTR: .DFS 1      ; read pointer (increments mod 256)
+WR_PTR: .DFS 1      ; write pointer (ISR updates)
+```
+
+**Write (ISR):**
+```assembly
+WR_BUF: LDX  WR_PTR
+        STA  BUFFER,X
+        INC  WR_PTR     ; wraps at 256 automatically (8-bit)
+        RTS
+```
+
+**Read (main):**
+```assembly
+RD_BUF: LDX  RD_PTR
+        LDA  BUFFER,X
+        INC  RD_PTR
+        RTS
+```
+
+**Buffer fill level:**
+```assembly
+BUF_DIF: LDA WR_PTR
+         SEC
+         SBC RD_PTR     ; result = unread byte count (0–255)
+         RTS
+```
+
+**Full**: WR_PTR + 1 = RD_PTR. **Empty**: WR_PTR = RD_PTR.
+
+Advantage over power-of-2 ring buffers: no masking needed — 8-bit overflow handles the wrap automatically. A 256-byte buffer is exactly 1 hardware page.
+
+---
+
+## Waveform generator ISR (VIA T1, configurable rate)
+
+Timer T1 rate formula (for any VIA or equivalent timer):
+
+```
+T1 latch value = f(φ2) / f(IRQ) − 2
+```
+
+Example rates at 5 MHz:
+
+| Target | Actual | T1 latch |
+|--------|--------|----------|
+| 12 kHz | 11.990 kHz | $19F |
+| 20 kHz | Exact | $F8 |
+| 40 kHz | Exact | $7B |
+| 48 kHz | 48.077 kHz | $66 |
+
+ISR skeleton for arbitrary waveform playback:
+
+```assembly
+ARB_SAMPLER:
+        PHA
+        LDA  VIA_IFR        ; is this our timer interrupt?
+        BMI  PLAY
+        PLA
+        JMP  NEXT_SOURCE    ; pass to next handler
+PLAY:   LDA  VIA_T1CL       ; clear T1 interrupt flag
+        LDA  (CUR_ADR)      ; read sample byte
+        STA  VIA_PA         ; output to D/A on Port A
+        INC  CUR_ADR        ; advance pointer
+        BNE  DONE
+        INC  CUR_ADR+1
+DONE:   LDA  CUR_ADR        ; check for end of buffer
+        CMP  END_ADR
+        BNE  EXIT
+        LDA  CUR_ADR+1
+        CMP  END_ADR+1
+        BNE  EXIT
+        LDA  BEG_ADR        ; restart at beginning
+        STA  CUR_ADR
+        LDA  BEG_ADR+1
+        STA  CUR_ADR+1
+EXIT:   PLA
+        RTI
+```
+
+---
+
 ## Related pages
 
-- [[65c02-instruction-set]] — RTI, BRK, CLI/SEI opcodes
+- [[65c02-instruction-set]] — RTI, BRK, CLI/SEI opcodes, WAI instruction
 - [[hardware-irq]] — RP2350 NVIC (RIA firmware side of the same interrupt signals)
 - [[rp6502-abi]] — RIA_SPIN polling model (alternative to true interrupts)
 - [[w65c22s]] — VIA interrupt enable/flag registers (RP6502 specific)
 - [[w65c02s]] — CPU interrupt pins and timing
 - [[6522-via]] — full VIA register reference (IFR, IER, PCR, ACR, timers)
 - [[6502-stack-and-subroutines]] — stack mechanics underlying ISR entry/exit (PHA/PLA, PHX/PHY/PLX/PLY)
+- [[6502-overflow-flag]] — V flag in signed comparisons and BIT instruction

@@ -1,8 +1,8 @@
 ---
 type: concept
 tags: [w65c02s, 65c02, instruction-set, opcodes, assembly]
-related: [[w65c02s]], [[65c02-addressing-modes]], [[rp6502-abi]], [[cc65]], [[llvm-mos]], [[6502-subroutine-conventions]], [[6502-data-structures]], [[6502-relocatable-and-self-modifying]], [[6502-stack-and-subroutines]], [[learning-6502-assembly]]
-sources: [[w65c02s-datasheet]], [[leventhal-6502-assembly]], [[wagner-assembly-lines]]
+related: [[w65c02s]], [[65c02-addressing-modes]], [[rp6502-abi]], [[cc65]], [[llvm-mos]], [[6502-subroutine-conventions]], [[6502-data-structures]], [[6502-relocatable-and-self-modifying]], [[6502-stack-and-subroutines]], [[learning-6502-assembly]], [[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-overflow-flag]], [[6502-interrupt-patterns]]
+sources: [[w65c02s-datasheet]], [[leventhal-6502-assembly]], [[wagner-assembly-lines]], [[6502org-tutorials]]
 created: 2026-04-17
 updated: 2026-04-18
 ---
@@ -394,4 +394,110 @@ The 65C02 is **pin-compatible** with NMOS 6502 and handles all documented softwa
 2. Timing-sensitive code designed around NMOS timing (65C02 is slightly different on some operations)
 
 For RP6502, all toolchain-generated code ([[cc65]], [[llvm-mos]]) targets documented 65C02 instructions — no compatibility concerns.
+
+---
+
+## NMOS 6502 opcode notes
+
+Key NMOS quirks worth knowing for reading older code and understanding 65C02 fixes:
+
+### JMP indirect page-boundary bug (NMOS only)
+
+`JMP ($xxFF)` on the NMOS 6502 reads the low byte from `$xxFF` but the **high byte from `$xx00`** (same page, wrapped) rather than `$(xx+1)00`. Example: `JMP ($30FF)` uses `$30FF` for low byte and `$3000` for high byte.
+
+The 65C02 fixes this and takes 6 cycles (vs. 5 on NMOS).
+
+### Zero-page indexed wrap-around
+
+Zero-page indexed instructions wrap within page 0. `LDA $80,X` with X=`$FF` accesses `$7F` (not `$017F`). If you need the non-wrapped address, use the absolute mode: `LDA $0080,X` (1 extra byte, 1 extra cycle).
+
+```asm
+LDA  $80,X    ; ZeroPage,X → accesses $007F when X=$FF (wraps!)
+LDA  $0080,X  ; Absolute,X → accesses $017F when X=$FF (correct)
+```
+
+### BRK increments PC by 1
+
+BRK is a 1-byte instruction but the PC pushed to the stack points to `BRK + 2` (past the padding byte). RTI returns to the padding byte address (`BRK + 1`). The padding byte can be used as a BRK signature to identify which breakpoint fired.
+
+### BIT as a skip instruction
+
+`BIT $20A2` can skip the next 2 bytes. Example:
+
+```asm
+CLOSE1  LDX #$10
+        .BYTE $2C    ; BIT $20A2 — skips next 2 bytes
+CLOSE2  LDX #$20
+        .BYTE $2C    ; BIT $30A2 — skips next 2 bytes
+CLOSE3  LDX #$30
+CLOSEX  ...
+```
+
+**Caution**: BIT reads the target address, which may cause unwanted I/O side effects. It also modifies N, V, Z flags.
+
+### RTS jump table via push address−1
+
+Since `RTS` pops 2 bytes and adds 1, pushing `(address − 1)` before `RTS` jumps to `address`:
+
+```asm
+; Jump table dispatch via RTS:
+EXEC    LDA  HIBYTE,X
+        PHA
+        LDA  LOBYTE,X
+        PHA
+        RTS              ; jumps to address stored in table
+HIBYTE  .BYTE >ROUTINE0-1, >ROUTINE1-1, ...
+LOBYTE  .BYTE <ROUTINE0-1, <ROUTINE1-1, ...
+```
+
+On 65C02, `JMP (TABLE,X)` is cleaner and doesn't require the `−1` adjustment.
+
+---
+
+## Cycle count corrections (65C02 vs NMOS)
+
+### ASL / LSR / ROL / ROR abs,X
+
+On NMOS 6502: always **7 cycles** for `abs,X` mode regardless of page boundary.  
+On 65C02: **6 cycles** normally; **7 cycles** when indexing crosses a page boundary.
+
+**Note**: DEC abs,X and INC abs,X remain **always 7 cycles** on both processors — documentation sometimes incorrectly claims they benefit from the same optimization.
+
+### ADC / SBC in decimal mode
+
+On 65C02: +1 cycle in decimal mode for all addressing modes.  
+On 65C02 with page-crossing abs,X: +1 (decimal) + +1 (page) = +2 cycles total.
+
+### JMP (abs)
+
+NMOS: 5 cycles.  
+65C02: **6 cycles** (due to the page-boundary bug fix requiring an extra fetch).
+
+### Undocumented NOP timing (1-cycle NOPs)
+
+Opcodes `$x3`, `$xB` (and others) are 1-cycle, 1-byte NOPs on the 65C02. The standard NOP (`$EA`) is 2 cycles. Use 1-cycle NOPs for cycle-precise timing:
+
+```asm
+DB  $03    ; 1 cycle
+NOP        ; 2 cycles
+```
+
+**Caution**: consecutive 1-cycle NOPs can delay interrupt recognition; the processor merges them with the following instruction.
+
+**Conditional skip using 2-byte NOP** (`$42` opcode):
+
+```asm
+DB  $42        ; 2-byte, 2-cycle NOP — skips next byte
+INC  X         ; skipped when $42 is executed
+```
+
+**3-byte skip using `$DC`** (3-byte absolute NOP — preserves all flags):
+
+```asm
+DB  $DC        ; 3-byte NOP — skips next 2 bytes
+LDA  #$FF      ; skipped
+STA  WHEREVER  ; also skipped
+```
+
+---
 

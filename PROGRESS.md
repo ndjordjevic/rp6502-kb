@@ -92,6 +92,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Collect and ingest: W65C22S datasheet PDF
 - ✅ New topic pages: [[hardware-build-guide]], [[roadmap]]
 - ✅ Add [[wiki/syntheses/trng]] — hardware TRNG, `randomize()`, `lrand()`, entropy sources
+- ✅ Ingest **6502.org tutorials** (raw/web/6502.org/, 8 pages) — 4 new concept pages ([[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-overflow-flag]], [[6502org-tutorials]] source); 4 pages updated ([[6502-interrupt-patterns]], [[65c02-instruction-set]], [[6502-stack-and-subroutines]], [[6502-programming-idioms]]). Key additions: N XOR V signed comparison, WAI I=1 inline interrupt, BRK/IRQ B-flag disambiguation (correct stack-read vs wrong PHP), decimal flag validity per CPU, BIT immediate exception, undocumented NOP skip technique, NMOS ZP wrap-around
 
 ---
 
@@ -99,13 +100,13 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | **49** (+ cc65-rp6502-platform) |
-| Entities | **15** (+ rptracker, razemos) |
-| Concepts | **51** (+ monitor-reference, ria-w-networking, via-programming, game-loop-patterns) |
-| Topics | **9** (+ hardware-build-guide, roadmap) |
-| Syntheses | **5** (+ trng) |
+| Sources | **50** (+ 6502org-tutorials) |
+| Entities | **15** |
+| Concepts | **54** (+ 6502-compare-instructions, 6502-decimal-mode, 6502-overflow-flag) |
+| Topics | **9** |
+| Syntheses | **5** |
 | Inbox | **0** — all ingest plans complete 🎉 |
-| **Total pages** | **~132** |
+| **Total pages** | **~136** |
 
 ---
 

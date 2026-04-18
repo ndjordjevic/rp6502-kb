@@ -1001,3 +1001,23 @@ Key facts captured:
 
 ### PROGRESS.md updated
 - Wiki size table corrected: Sources 48, Concepts 47, Topics 7, Total ~118
+
+## [2026-04-18] ingest | 6502.org tutorials (8 pages) | 4 new pages + 4 pages updated
+
+**Source**: `raw/web/6502.org/` — 8 Obsidian Web Clipper exports, primary author Bruce Clark; other authors anonymous/John Pickens.
+
+**New pages created**:
+- `wiki/sources/6502org-tutorials.md` — master source summary for all 8 tutorials
+- `wiki/concepts/6502-compare-instructions.md` — CMP/CPX/CPY, branch selection, multi-byte comparisons, N XOR V signed method
+- `wiki/concepts/6502-decimal-mode.md` — BCD, D flag, flag validity per CPU variant, interrupt D-clear
+- `wiki/concepts/6502-overflow-flag.md` — V flag mechanics, BIT immediate exception, SO pin, signed comparison pattern
+
+**Pages updated**:
+- `wiki/concepts/6502-interrupt-patterns.md` — added WAI I=1 inline interrupt, ghost interrupts, open-drain timing, cross-CPU performance table, Pickens 256-byte ring buffer, waveform generator ISR
+- `wiki/concepts/65c02-instruction-set.md` — added NMOS ZP wrap-around, ASL/LSR/ROL/ROR cycle correction, undocumented NOP skip, BRK PC+2 detail, BIT-as-skip, RTS jump table; updated sources + related
+- `wiki/concepts/6502-stack-and-subroutines.md` — added TSX-based register preservation (no temp storage), BRK/IRQ B-flag disambiguation (correct stack-read vs. wrong PHP); updated sources + related
+- `wiki/concepts/6502-programming-idioms.md` — updated sources frontmatter + related links to new pages
+
+**No conflicts found**: 6502.org facts align with existing content from Leventhal/Wagner/Zaks. BRK/IRQ disambiguation clarification agrees with Leventhal (uses PLA/PHA correctly).
+
+**Index/overview/PROGRESS updated**: 4 new index entries, overview §6502-assembly extended with 3 new concept bullets, PROGRESS wiki size updated (Sources 50, Concepts 54, Total ~136).

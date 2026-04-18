@@ -32,7 +32,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
 | [[rumbledethumps-discord]] | Rumbledethumps Discord server exports: #chat (2022–2026, 1,015 msgs) — hardware tips, firmware internals, USB silicon bug, OPL2, community projects |
 | [[community-wiki]] | Community wiki (2 pages): project directory + USB/BLE device compatibility |
-| [[adventure]] | Colossal Cave Adventure port to RP6502: named ROM assets, DATADIR→"ROM:" pattern, cc65 toolchain |
+| [[6502org-tutorials]] | 8 6502.org tutorials by Bruce Clark et al.: compare instructions, 65C02 opcodes, multi-byte comparisons, decimal mode, overflow flag, interrupts (WAI), register preservation |
 | [[vscode-llvm-mos]] | Official llvm-mos VSCode project template: setup steps, PATH conflict fix, CMake structure |
 | [[vscode-cc65]] | Official cc65 VSCode project template: setup steps (Linux/Windows), CMake macros, hello-world C + ASM |
 | [[pico-extras]] | picocomputer fork of raspberrypi/pico-extras: two mode-change bug fixes (memory leak + debug printf) for RP6502-VGA |
@@ -133,6 +133,9 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[6502-emulated-instructions]] | Emulating missing 6502 instructions: 16-bit add/sub, arithmetic shifts, multi-byte shifts, extended branches, indirect addressing, decimal operations |
 | [[6502-common-errors]] | Systematic catalogue of 6502 bugs: carry misuse, flag side effects, addressing confusion, decimal mode hazards, loop errors, ISR pitfalls |
 | [[learning-6502-assembly]] | Beginner 6502 scaffold: registers, Status Register flags, binary numbers, counter/loop patterns (BNE/BEQ), all branch instructions, addressing modes overview; X vs Y non-interchangeability |
+| [[6502-compare-instructions]] | CMP/CPX/CPY flag mechanics, branch selection table, multi-byte equality/unsigned/signed comparisons, N XOR V signed method |
+| [[6502-decimal-mode]] | BCD D-flag, flag validity by CPU variant (6502 only C; 65C02 adds N/Z; V never valid), cycle costs, interrupt D-clear |
+| [[6502-overflow-flag]] | V flag mechanics, 6 affecting instructions, BIT immediate exception, SO pin, signed comparison after CMP |
 | [[6502-stack-and-subroutines]] | 6502 stack mechanics: LIFO page-1 stack ($0100–$01FF), PHA/PLA rules, PHX/PHY/PLX/PLY (65C02), JSR/RTS operation (PC−1 quirk), register save/restore idioms, stack depth limits |
 | [[6502-relocatable-and-self-modifying]] | Techniques for position-independent 6502 code: forced branch (CLV+BVC, BRA on 65C02), JSR simulation, indirect JMP dispatch tables, JMP page-boundary bug (NMOS) fixed on 65C02, self-modifying code patterns |
 | [[monitor-reference]] | Complete RP6502 monitor command reference: LOAD/INSTALL/LIST/SET/filesystem commands; version history of monitor features |

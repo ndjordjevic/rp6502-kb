@@ -1,8 +1,8 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, stack, subroutines, pha, pla, jsr, rts]
-related: [[learning-6502-assembly]], [[6502-subroutine-conventions]], [[65c02-instruction-set]], [[6502-programming-idioms]]
-sources: [[wagner-assembly-lines]], [[leventhal-subroutines]]
+related: [[learning-6502-assembly]], [[6502-subroutine-conventions]], [[65c02-instruction-set]], [[6502-programming-idioms]], [[6502-interrupt-patterns]]
+sources: [[wagner-assembly-lines]], [[leventhal-subroutines]], [[6502org-tutorials]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -162,10 +162,100 @@ When an **IRQ or NMI** fires, the 6502 automatically pushes 3 bytes: PCH, PCL, P
 
 ---
 
+## Register preservation without temporary storage (TSX technique)
+
+On NMOS 6502, the basic save sequence (`TXA; PHA; TYA; PHA`) destroys A before it can be saved. The workaround using a temporary memory location:
+
+```asm
+STA  TEMP    ; save A to temp first
+PHA          ; then push TEMP
+TXA : PHA
+TYA : PHA
+LDA  TEMP    ; restore A from temp
+```
+
+This requires 4 extra bytes and 6 extra cycles. It also needs `SEI`/`CLI` around it if interrupt handlers might use `TEMP`.
+
+**Stack-based alternative (no temp storage, NMI-safe):**
+
+```asm
+PHA          ; save A first
+TXA
+TSX          ; X now = current SP (points to A's slot on stack)
+PHA          ; push X
+TYA
+PHA          ; push Y
+INX
+LDA  $100,X  ; retrieve original A from stack (SP+1)
+```
+
+This extracts A from the stack via X without needing a temporary memory location. Costs 5 extra bytes and 8 extra cycles vs. the basic method, but is safe even if NMI fires mid-sequence.
+
+### Cost comparison (6502)
+
+| Method | Extra bytes | Extra cycles | Notes |
+|--------|-------------|--------------|-------|
+| Save X,Y only (A clobbered) | 0 | 0 | A unavailable during save |
+| Temp storage | 4 | 6 | Needs SEI if ISRs use temp |
+| TSX + stack read | 5 | 8 | NMI-safe, no shared temp |
+| 65C02 PHX/PHY | 0 | 0 | Cleanest; 3 instructions |
+
+---
+
+## BRK vs. IRQ disambiguation (correct method)
+
+Both BRK and IRQ vector through `$FFFE/$FFFF`. The handler must distinguish them by testing **bit 4 (B flag) of the saved P register on the stack** — NOT by testing the live P register.
+
+**Why the live P is unreliable**: `PHP` always pushes P with B=1 (software push). Testing the current P with `PHP; PLA; AND #$10` always yields B=1, regardless of whether we came from BRK or IRQ.
+
+**Correct 6502 approach** (read from stack via TSX):
+
+```asm
+PHA          ; save A first
+TXA
+TSX          ; X = SP; stack layout: A at $100+SP+1, P at $100+SP+3
+PHA          ; save X
+INX
+INX          ; X now points to saved P on stack
+LDA  $100,X  ; load the saved P
+AND  #$10    ; test B flag
+BNE  BREAK   ; B=1 → BRK
+BEQ  IRQ     ; B=0 → hardware IRQ
+; ... service handler
+EXIT:
+PLA
+TAX          ; restore X
+PLA          ; restore A
+RTI
+```
+
+**Correct 65C02 approach** (1 byte, 2 cycles shorter):
+
+```asm
+PHX          ; save X directly (65C02)
+TSX
+PHA          ; save A
+INX
+INX          ; X points to saved P
+LDA  $100,X
+AND  #$10
+BNE  BREAK
+BEQ  IRQ
+EXIT:
+PLA          ; restore A
+PLX          ; restore X (65C02)
+RTI
+```
+
+> This is a common bug: many code examples mistakenly use `PHP; PLA; AND #$10`. That always sees B=1 and can never distinguish BRK from IRQ. Always read the **stacked** P register.
+
+---
+
 ## Related pages
 
 - [[learning-6502-assembly]] — loop patterns and Status Register basics
 - [[6502-subroutine-conventions]] — parameter passing via stack, Leventhal formal conventions
 - [[65c02-instruction-set]] — full instruction table including PHX/PHY/PLX/PLY (65C02)
-- [[6502-interrupt-patterns]] — interrupt-driven stack usage (ISR entry/exit)
+- [[6502-interrupt-patterns]] — interrupt-driven stack usage (ISR entry/exit), WAI
 - [[6502-programming-idioms]] — arithmetic idioms using the Carry chain
+- [[6502-compare-instructions]] — V flag and signed comparison using the stack
