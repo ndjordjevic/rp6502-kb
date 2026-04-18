@@ -2,7 +2,7 @@
 type: topic
 tags: [rp6502, cc65, llvm-mos, toolchain, vscode, cmake, setup, windows, linux]
 related: [[cc65]], [[llvm-mos]], [[rom-file-format]], [[rp6502-abi]], [[vscode-cc65]]
-sources: [[vscode-cc65]]
+sources: [[vscode-cc65]], [[vscode-llvm-mos]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -216,10 +216,139 @@ Do not disable or override this wrapper — it is intentional.
 
 ---
 
+---
+
+## llvm-mos — Installation
+
+### Linux
+
+1. **VS Code** — download from https://code.visualstudio.com/
+2. **LLVM-MOS SDK** — download from https://llvm-mos.org/wiki/Welcome. See PATH notes below.
+3. System packages:
+   ```bash
+   sudo apt install cmake python3 git build-essential
+   ```
+
+### macOS
+
+- Follow Linux steps; `brew install cmake python3 git` instead of apt.
+
+### Windows
+
+```powershell
+winget install -e --id Microsoft.VisualStudioCode
+winget install -e --id Git.Git
+winget install -e --id Kitware.CMake
+winget install -e --id GnuWin32.Make
+```
+Add `C:\Program Files (x86)\GnuWin32\bin` to your PATH.
+
+- **LLVM-MOS SDK** — download from https://llvm-mos.org/wiki/Welcome. See PATH notes below.
+- **Python 3** — type `python3` in a command prompt; Windows opens the Microsoft Store installer.
+
+### ⚠️ PATH conflict warning
+
+LLVM-MOS must be in PATH, but this **conflicts with any other LLVM installation** (system clang, Homebrew LLVM, etc.). Instead of editing your global PATH, scope it to CMake only by adding `.vscode/settings.json` to your project:
+
+```json
+{
+    "cmake.environment": {
+        "PATH": "~/llvm-mos/bin:${env:PATH}"
+    }
+}
+```
+
+Adjust the path to wherever you installed LLVM-MOS. This file is git-ignored by the template.
+
+---
+
+## llvm-mos — Creating a new project
+
+1. Go to https://github.com/picocomputer/vscode-llvm-mos
+2. Click **"Use this template"** → **"Create a new repository"**
+3. Clone and open:
+   ```bash
+   git clone <your-repo-url>
+   cd <repo-name>
+   code .
+   ```
+4. When VS Code prompts, install the recommended extensions. When asked for a CMake kit, choose **`[Unspecified]`**.
+5. Press **F5** to build, flash, and run. Connect USB to the **RP6502-VGA** port.
+
+---
+
+## llvm-mos — CMake project structure
+
+```cmake
+set(LLVM_MOS_PLATFORM rp6502)
+find_package(llvm-mos-sdk REQUIRED)    # must come before project()
+
+project(MY-RP6502-PROJECT C CXX ASM)  # note: CXX enabled
+
+add_subdirectory(tools)
+
+add_executable(hello)
+rp6502_asset(hello help src/help.txt)
+rp6502_executable(hello DATA file RESET file)   # 'file' = read addresses from linker output
+target_sources(hello PRIVATE src/main.c)
+```
+
+Key differences from cc65:
+- `find_package(llvm-mos-sdk REQUIRED)` must precede `project()`.
+- `DATA file RESET file` — the `file` keyword reads the load and reset addresses from the linker map (no hard-coded addresses needed).
+- `C CXX ASM` — C++ is enabled; you can use `.cpp` sources.
+- No separate toolchain cmake file needed — llvm-mos integrates natively with CMake.
+
+The `rp6502_executable()` and `rp6502_asset()` macros are **identical** to the cc65 template. Ordering rule is the same: `rp6502_asset()` before `rp6502_executable()`.
+
+---
+
+## llvm-mos — Minimal C program
+
+```c
+#include <rp6502.h>
+#include <stdio.h>
+
+int main(void)
+{
+    puts("Hello from LLVM-MOS");
+}
+```
+
+**Differences from cc65**:
+- Entry point is `int main(void)` (standard C), not `void main()`.
+- `float`, `double`, `long long`, and C++ are all available.
+- `int` is still 16 bits on the 6502 target.
+- No C89 variable-declaration restriction.
+
+---
+
+## cc65 vs. llvm-mos — quick comparison
+
+| | cc65 | llvm-mos |
+|---|---|---|
+| Template repo | `picocomputer/vscode-cc65` | `picocomputer/vscode-llvm-mos` |
+| Languages | C + ASM | C, C++, ASM |
+| `int` width | 16 bits | 16 bits |
+| Float / double | ❌ | ✅ |
+| 64-bit int | ❌ | ✅ |
+| C++ | ❌ | ✅ |
+| Standard library | Complete | Sparse (growing) |
+| Entry point | `void main()` | `int main(void)` |
+| Addresses in CMake | Explicit (`0x200`) | From linker (`file`) |
+| IntelliSense shim | Yes (`tools/cc65.cmake`) | No |
+| PATH gotcha | None | Conflicts with system LLVM |
+| Binary size | Smaller | Larger |
+| Performance | Good (tuned code) | Better out-of-the-box |
+| Best for | Most projects, full stdlib | C++, floats, numerics |
+
+---
+
 ## Related pages
 
-- [[cc65]] — cc65 compiler entity: ABI, fork requirement, comparison with llvm-mos
-- [[llvm-mos]] — alternative toolchain (C++, floats)
-- [[rom-file-format]] — `.rp6502` file format produced by `rp6502_executable()`
-- [[rp6502-abi]] — fastcall ABI that cc65 maps to
-- [[vscode-cc65]] — source summary for the template repo
+- [[cc65]] — cc65 compiler entity: ABI, fork requirement
+- [[llvm-mos]] — llvm-mos entity: performance, ABI differences, SDK version lock issue
+- [[rom-file-format]] — `.rp6502` format produced by `rp6502_executable()`
+- [[rp6502-abi]] — ABI conventions (differ between cc65 and llvm-mos)
+- [[vscode-cc65]] — cc65 template source
+- [[vscode-llvm-mos]] — llvm-mos template source

@@ -30,6 +30,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
 | [[rumbledethumps-discord]] | Rumbledethumps Discord server exports: #chat (2022–2026, 1,015 msgs) — hardware tips, firmware internals, USB silicon bug, OPL2, community projects |
 | [[community-wiki]] | Community wiki (2 pages): project directory + USB/BLE device compatibility |
+| [[vscode-llvm-mos]] | Official llvm-mos VSCode project template: setup steps, PATH conflict fix, CMake structure |
 | [[vscode-cc65]] | Official cc65 VSCode project template: setup steps (Linux/Windows), CMake macros, hello-world C + ASM |
 | [[pico-extras]] | picocomputer fork of raspberrypi/pico-extras: two mode-change bug fixes (memory leak + debug printf) for RP6502-VGA |
 | [[ehbasic]] | picocomputer/ehbasic repo: EhBASIC 2.22p5 port — OS glue layer, memory layout, LOAD/SAVE, IRQ pattern |

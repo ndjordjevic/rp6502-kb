@@ -2,7 +2,7 @@
 type: entity
 tags: [rp6502, llvm-mos, toolchain, compiler, 6502, c, cpp]
 related: [[cc65]], [[rp6502-abi]], [[rp6502-os]]
-sources: [[yt-ep18-llvm-mos]], [[rp6502-abi]], [[release-notes]], [[rumbledethumps-discord]]
+sources: [[yt-ep18-llvm-mos]], [[rp6502-abi]], [[release-notes]], [[rumbledethumps-discord]], [[vscode-llvm-mos]]
 created: 2026-04-17
 updated: 2026-04-18
 ---
@@ -66,9 +66,22 @@ The RP6502 provides `lrand()` as its random number function (hardware entropy). 
 
 llvm-mos produces **larger binaries** than cc65 for most programs, and lacks good size optimization passes (expected to improve over time). cc65 is slightly slower in execution but produces smaller output — a meaningful trade-off on a system with 64 KB of RAM. (@rumbledethumps, 2025-12-02)
 
+## VSCode development environment
+
+Template repository: `picocomputer/vscode-llvm-mos`. Workflow is identical to cc65: F5 to build/flash/run, `.rp6502` config file auto-created, USB to RP6502-VGA port.
+
+**Key setup notes** (from [[vscode-llvm-mos]]):
+- When prompted for a CMake kit, choose **`[Unspecified]`**.
+- LLVM-MOS PATH must be prepended via `.vscode/settings.json` → `cmake.environment.PATH` — do not modify your global PATH (conflicts with system LLVM).
+- No IntelliSense shim needed — llvm-mos integrates natively with CMake.
+- Entry point is `int main(void)` (standard C), not `void main()`.
+- CMake uses `DATA file RESET file` (reads addresses from linker output, no hard-coding).
+- See [[toolchain-setup]] for full install steps and side-by-side cc65 comparison.
+
 ## Related pages
 
 - [[cc65]] — the primary toolchain and direct comparison
 - [[rp6502-abi]] — ABI conventions and errno handling differences
+- [[toolchain-setup]] — install steps and comparison table
 - [[yt-ep18-llvm-mos]] — toolchain comparison episode
 - [[known-issues]] — llvm-mos SDK version lock workaround
