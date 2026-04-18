@@ -39,7 +39,8 @@ wiki/inbox/      -- rough notes awaiting organization
   - Every `raw/` subfolder has a `README.md` index. All five must stay in sync with folder contents.
   - When a file is **added**: add a row to the subfolder `README.md` and to the `raw/README.md` "Added sources" table.
   - When a file is **removed**: remove its row from the subfolder `README.md`.
-  - When the **github submodule is bumped**: update the tag, commit, and date in `raw/github/README.md` and add a row to `raw/README.md`.
+  - When a **github repo is added** (plain clone): add a row to `raw/github/README.md` and clone the repo into `raw/github/<org>/<repo>/`.
+  - When the **github repo is updated**: pull latest, update the commit and date in `raw/github/README.md`.
   - When **new YouTube transcripts** are fetched: add rows to `raw/youtube/README.md` and update the coverage line.
   - Subfolder conventions:
 
@@ -49,7 +50,7 @@ wiki/inbox/      -- rough notes awaiting organization
   | `raw/discord/` | `<server>-<channel>-<YYYY-MM-DD>--<YYYY-MM-DD>.txt` | `raw/discord/README.md` — one row per export |
   | `raw/youtube/` | `<video-id>-<sanitized-title>.md` | `raw/youtube/README.md` — one row per video |
   | `raw/web/` | `<Page Title> — <Site Name>.md` (Obsidian Web Clipper) | `raw/web/README.md` — one row per clipped page |
-  | `raw/github/` | Git submodule — `<org>/<repo>/` folder | `raw/github/README.md` — one row per submodule |
+  | `raw/github/` | Plain git clone — `<org>/<repo>/` folder (untracked by parent repo) | `raw/github/README.md` — one row per repo |
 
 ---
 
