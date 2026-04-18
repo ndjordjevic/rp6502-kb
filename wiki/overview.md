@@ -115,9 +115,22 @@ The `picocomputer/examples` repo ([[examples]]) is the authoritative usage refer
 4. **VIA pinout / J1 GPIO header** — not in web docs or repo source; needs the KiCad schematic (`.kicad_sch` not in submodule). J1 is a 2×12 header but VIA PA/PB/CA/CB pin mapping is only in the schematic.
 5. ~~**VGA GPIO full pinout**~~ ✅ Resolved from `scanvideo.c`: R=GPIO 6–10, G=GPIO 12–16, B=GPIO 17–21, HSYNC=GPIO 26, VSYNC=GPIO 27 (RGB555). See [[gpio-pinout]].
 
-## Hub pages
+## Community project ecosystem
 
-- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[w65c02s-datasheet]] · [[leventhal-6502-assembly]] · [[leventhal-subroutines]] · [[wagner-assembly-lines]] · [[zaks-programming-6502]] · [[youtube-playlist]] · [[rumbledethumps-discord]] · [[examples]]
+The `picocomputer/community` wiki ([[community-wiki]]) catalogs a growing ecosystem of community-built software and hardware. As of April 2026:
+
+- **Games**: Star-Swarms (Galaxian), Tetricks (Tetris), Colossal Cave Adventure, Snake, Sliding Block Puzzle, Game of Life, Space Raiders, RP Mega Super Fighter, Mega Chopper
+- **Applications**: ASCII text editor (TE), Home Monitor (RSS via AT commands)
+- **BASIC**: EhBASIC runs the classic BASIC Computer Games book; EhBASIC+ prototype adds graphics
+- **Utilities**: Wozmon, SMON (C64 monitor with single-step debugger), RP6502-Shell, parallax scrolling
+- **Cases**: 3D-printed enclosure
+- **Hardware**: jasonr1100's FPGA OPL2 card, tonyvr0759's 65816 breadboard variant, jjjacer's eInk laptop
+
+USB/BLE compatibility is an important hardware constraint: XInput wired controllers are permanently disabled (TinyUSB quality issue on Pi Pico), Nintendo Switch Pro doesn't work even on Windows, and some USB hubs crash the stack. Recommended: Xbox One/Series via BLE or DS4/DS5 via USB. Full details: [[usb-compatibility]].
+
+
+
+- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[w65c02s-datasheet]] · [[leventhal-6502-assembly]] · [[leventhal-subroutines]] · [[wagner-assembly-lines]] · [[zaks-programming-6502]] · [[youtube-playlist]] · [[rumbledethumps-discord]] · [[examples]] · [[community-wiki]]
 - **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]] · [[6522-via]] · [[rp2350]] · [[cc65]] · [[llvm-mos]] · [[ezpsg]]
 - **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[vga-display-modes]] · [[vga-graphics]] · [[gamepad-input]] · [[rtc]] · [[nfc]] · [[exec-api]] · [[65c02-instruction-set]] · [[65c02-addressing-modes]] · [[6502-interrupt-patterns]] · [[6502-subroutine-conventions]] · [[6502-application-snippets]] · [[6502-programming-idioms]] · [[6502-data-structures]] · [[6502-emulated-instructions]] · [[6502-common-errors]] · [[6502-io-patterns]] · [[learning-6502-assembly]] · [[6502-stack-and-subroutines]] · [[6502-relocatable-and-self-modifying]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]] · [[code-pages]] · [[programmable-sound-generator]] · [[opl2-fm-synth]] · [[fatfs]]
 - **Topics**: [[version-history]] · [[known-issues]] · [[development-history]] · [[community-projects]] · [[performance]]

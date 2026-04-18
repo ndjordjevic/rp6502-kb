@@ -2,7 +2,7 @@
 type: topic
 tags: [rp6502, community, projects, demos, games, tools, tracker, razemos, native-os]
 related: [[rp6502-ria]], [[rp6502-vga]], [[opl2-fm-synth]], [[pix-bus]], [[cc65]], [[llvm-mos]]
-sources: [[rumbledethumps-discord]]
+sources: [[rumbledethumps-discord]], [[community-wiki]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -83,6 +83,58 @@ Repo: `https://github.com/WojciechGw/cc65-rp6502os`
 
 ---
 
+## Community wiki directory
+
+The official [picocomputer/community wiki](https://github.com/picocomputer/community/wiki) maintains a curated project directory by category.
+
+### Games
+
+| Project | Author/Repo | Description |
+|---------|-------------|-------------|
+| **Star-Swarms** | [discussion #66](https://github.com/orgs/picocomputer/discussions/66) | Galaxian clone |
+| **Tetricks** | [discussion #54](https://github.com/orgs/picocomputer/discussions/54) | Tetris clone |
+| **Colossal Cave Adventure** | [picocomputer/adventure](https://github.com/picocomputer/adventure) | Classic text adventure |
+| **Snake** | [netzerohero/snake](https://github.com/netzerohero/snake) | Snake game |
+| **Sliding Block Puzzle** | [discussion #100](https://github.com/orgs/picocomputer/discussions/100) | Sliding block puzzle games |
+| **Game of Life** | [grakoczy](https://github.com/grakoczy/picocomputer-game-of-life) | Conway's Game of Life |
+| **Space Raiders** | [marklinebaugh/RP6502-Space-Raiders](https://github.com/marklinebaugh/RP6502-Space-Raiders) | Space Invaders tribute |
+| **RP Mega Super Fighter** | [discussion #158](https://github.com/orgs/picocomputer/discussions/158) | 2D space shooter (jasonr1100) |
+| **Mega Chopper** | [discussion #160](https://github.com/orgs/picocomputer/discussions/160) | Choplifter variant (jasonr1100) |
+
+### Applications
+
+| Project | Author/Repo | Description |
+|---------|-------------|-------------|
+| **TE — ASCII Text Editor** | [discussion #96](https://github.com/orgs/picocomputer/discussions/96) | ASCII text editor (tonyvr0759) |
+| **Home Monitor** | [discussion #159](https://github.com/orgs/picocomputer/discussions/159) | RSS feed display via AT commands / HTTP |
+
+### BASIC
+
+| Resource | Description |
+|----------|-------------|
+| **EhBASIC** | [picocomputer/ehbasic](https://github.com/picocomputer/ehbasic) — Lee Davison's Enhanced BASIC |
+| **BASIC Computer Games** | Classic games run on EhBASIC; change `RND(1)` → `RND(0)` |
+| **EhBASIC+ Graphics ROM** | [netzerohero/picocomputer-ehbasic](https://github.com/netzerohero/picocomputer-ehbasic) — prototype graphics extension |
+
+### Utilities and Techniques
+
+| Project | Author/Repo | Description |
+|---------|-------------|-------------|
+| **Wozmon** | [discussion #48](https://github.com/orgs/picocomputer/discussions/48) | Apple 1 monitor |
+| **SMON** | [discussion #78](https://github.com/orgs/picocomputer/discussions/78) | Full-featured 6502 monitor with assembler/disassembler/single-step debug (originally for C64, 1984) |
+| **RP6502-Shell** | [discussion #91](https://github.com/orgs/picocomputer/discussions/91) | Basic shell with `func(argc, argv[])` dispatch |
+| **Parallax scrolling** | [netzerohero/paralax](https://github.com/netzerohero/paralax) | Parallax scrolling example |
+| **Game of Life (LLVM-MOS)** | [rumbledethumps/life](https://github.com/rumbledethumps/life) | Game of Life for the experimental llvm-mos compiler |
+| **Game of Life (cc65)** | [netzerohero/life-pico-cc65](https://github.com/netzerohero/life-pico-cc65) | Instrumented cc65 version measuring loop times |
+
+### Cases
+
+| Project | Link | Description |
+|---------|------|-------------|
+| **3D printed case** | [discussion #50](https://github.com/orgs/picocomputer/discussions/50) | 3D-printable enclosure |
+
+---
+
 ## Resources
 
 - Community wiki: https://github.com/picocomputer/community/wiki
@@ -97,3 +149,4 @@ Repo: `https://github.com/WojciechGw/cc65-rp6502os`
 - [[pix-bus]]
 - [[rp6502-vga]]
 - [[rumbledethumps-discord]]
+- [[community-wiki]]

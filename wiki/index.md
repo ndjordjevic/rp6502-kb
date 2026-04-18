@@ -29,6 +29,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[zaks-programming-6502]] | *Programming the 6502* (Zaks, 4th Ed. 1983): systematic 6502 textbook — algorithm design methodology, improved multiply, subroutine parameter passing, data structures (linked list/tree/hash/merge), I/O scheduling (polling vs. interrupts) |
 | [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
 | [[rumbledethumps-discord]] | Rumbledethumps Discord server exports: #chat (2022–2026, 1,015 msgs) — hardware tips, firmware internals, USB silicon bug, OPL2, community projects |
+| [[community-wiki]] | Community wiki (2 pages): project directory + USB/BLE device compatibility |
 | [[examples]] | Official picocomputer/examples repo: ~20 C programs covering VGA modes, audio PSG, gamepad, NFC, FatFS, exec, benchmarking |
 | [[yt-ep01-8bit-retro-computer]] | Ep1: series intro, breadboard with 12 glue chips, USB/VGA working |
 | [[yt-ep02-pio-and-dma]] | Ep2: dual-Pico pivot; PIO+DMA 6502 read path; 8 MHz achieved |
@@ -150,4 +151,5 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[known-issues]] | Bugs, workarounds, and things to watch out for — from release notes + full RP2350 silicon errata (E1–E28) + Discord community reports |
 | [[development-history]] | Chronological narrative of RP6502 design evolution across 5 eras (late 2022–2026) |
 | [[community-projects]] | Notable games, demos, tools, and hardware expansions built by community members |
+| [[usb-compatibility]] | USB and BLE device compatibility: known-incompatible categories + recommended controllers |
 | [[performance]] | Storage and CPU throughput benchmarks: USB MSC read/write speeds, XRAM load rates, PHI2 clock scaling |

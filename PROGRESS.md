@@ -53,6 +53,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **Zaks Programming the 6502** (raw/pdfs/) — Ch. II/III/V/VI/VIII/IX ingested. 1 new source page ([[zaks-programming-6502]]); 3 concept pages augmented ([[6502-programming-idioms]], [[6502-application-snippets]], [[6502-data-structures]]). Unique contributions: improved 8×8 multiply (10 instr), subroutine parameter passing comparison, 8 Ch.8 utility routines (ZEROM, bracket test, parity, ASCII↔BCD, find-max, 16-bit sum, EOR checksum, zero count), full data-structure library (linked list, circular, queue, tree, doubly-linked, binary search O(log₂N), hashing, merge)
 - ✅ Ingest **Discord export** (raw/discord/) — `#chat` (1,015 msgs) and `#razemos` (32 msgs) fully ingested. 2 new pages ([[rumbledethumps-discord]], [[community-projects]]). Key additions from #chat: HC/AC chip selection, VGA cold-boot fix, TinyUSB silicon latch bug, cc65 Homebrew warning, PIX bus 64 Mbit/s correction, design philosophy quotes, community roster. Key additions from #razemos: razemOS project (v0.01/v0.02), HASS assembler, ALT-F4 exit convention, OS exec vs ria_exec() pattern, ROM self-update pattern.
 - ✅ Ingest **picocomputer/examples** (raw/github/picocomputer/examples/, commit 95965c6) — 9 new pages: [[vga-display-modes]], [[vga-graphics]], [[gamepad-input]], [[rtc]], [[nfc]], [[exec-api]], [[ezpsg]], [[performance]], [[examples]] source; 2 updated: [[programmable-sound-generator]] (ezpsg section), [[fatfs]] (directory API)
+- ✅ Ingest **picocomputer/community wiki** (raw/github/picocomputer/community/, commit 348180a) — 2 pages: Home (project directory) + Incompatible USB and BLE Devices. New: [[community-wiki]] source, [[usb-compatibility]] topic; Updated: [[community-projects]] (full wiki project catalogue added), [[gamepad-input]] (USB compat section now links to [[usb-compatibility]])
 
 ## Phase 3 — Learn, share, and apply
 
@@ -79,12 +80,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 40 + 1 (examples) = **41** |
-| Entities | 11 + 1 (ezpsg) = **12** |
-| Concepts | 39 + 6 (vga-display-modes, vga-graphics, gamepad-input, rtc, nfc, exec-api) = **45** |
-| Topics | 5 + 1 (performance) = **6** |
-| Inbox | 5 (community-wiki, vscode-cc65, vscode-llvm-mos, ehbasic, pico-extras ingest plans) |
-| **Total pages** | **~104** |
+| Sources | 41 + 1 (community-wiki) = **42** |
+| Entities | **12** |
+| Concepts | **45** |
+| Topics | 6 + 1 (usb-compatibility) = **7** |
+| Inbox | 4 (vscode-cc65, vscode-llvm-mos, ehbasic, pico-extras ingest plans) |
+| **Total pages** | **~106** |
 
 ---
 

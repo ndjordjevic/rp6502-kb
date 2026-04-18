@@ -128,11 +128,14 @@ if (!(hat & 0x80)) {
 
 ## USB compatibility
 
-Not all USB gamepads work. See [[community-projects]] for known-incompatible device categories:
-- **XInput devices** (Xbox 360 style wired): incompatible — TinyUSB driver disabled
+Not all USB gamepads work. See [[usb-compatibility]] for the full list of known-incompatible and recommended devices.
+
+**Summary**:
+- **XInput devices** (Xbox 360 style wired): incompatible — TinyUSB driver disabled ("TinyUSB is hot garbage on the Pi Pico")
 - **Nintendo Switch Pro Controller**: incompatible (even on Windows)
 - **USB hubs**: some crash the USB stack
-- **Recommended**: Xbox One/Series via BLE, DualShock 4 / DualSense via USB
+- **Non-modern gamepads** (console emulators): strange button mappings; patches to `pad.c` requested
+- **Recommended**: Xbox One/Series via BLE (requires [[rp6502-ria-w]]), DualShock 4 / DualSense via USB
 
 ---
 
@@ -148,3 +151,4 @@ Mouse is handled separately via `xreg_ria_mouse(xaddr)`. The `paint.c` example s
 - [[xram]] — XRAM addressing
 - [[6522-via]] — VIA timer used for mouse IRQ
 - [[vga-graphics]] — mouse + paint demo
+- [[usb-compatibility]] — full USB/BLE device compatibility list
