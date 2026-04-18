@@ -7,6 +7,50 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] lint | wiki | post-leventhal-subroutines polish
+
+- `wiki/index.md`: removed duplicate `[[6502-io-patterns]]` entry (appeared twice in Concepts table); added `[[zaks-programming-6502-ingest-plan]]` and `[[wagner-assembly-lines-ingest-plan]]` to Inbox section (were present as files but missing from index)
+- `wiki/entities/w65c22s.md`: added `[[6522-via]]` to frontmatter `related`, replaced external WDC datasheet URL with `[[6522-via]]` wikilink, added `[[6522-via]]` to Related pages footer
+
+---
+
+## [2026-04-18] ingest | leventhal-subroutines | Leventhal 1982 Pass 3 (Ch. 4, 5, 8, 9, 10)
+
+- `wiki/concepts/6502-application-snippets.md`: AUGMENTED — Ch. 4 code-conversion section (BN2BCD 133 cycles/38 bytes; BCD2BN 38 cycles/24 bytes; BN2HEX ~77 cycles/31 bytes; HEX2BN ~74 cycles/30 bytes; BN2DEC ~7000 cycles/174 bytes for 16-bit signed→ASCII; DEC2BN ~670 cycles/171 bytes for ASCII decimal→16-bit signed); Ch. 8 string manipulation section (STRCMP with Z/C flag protocol; CONCAT with overflow truncation/Carry; POS substring search with 1-based index); updated frontmatter tags + sources + related
+- `wiki/concepts/6502-data-structures.md`: AUGMENTED — Ch. 5 memory operations (MFILL ~11 cycles/byte; BLKMOV with direction-detection for overlapping regions); Ch. 5 multi-dimensional array indexing (D1BYTE 73cy/37B; D1WORD 78cy/39B; D2BYTE ~1500cy/119B; D2WORD; NDIM N-dim Horner evaluation — RP6502 2D framebuffer indexing note included); Ch. 9 array operations (ASUM8 ~16cy/byte + 39 overhead; ASUM16 ~43cy/word + 46 overhead with 24-bit result; BINSCH binary search O(log₂N) iterations; BUBSRT O(N²) stable sort; RAMTST $55/$AA non-destructive RAM test); updated frontmatter tags + sources
+- `wiki/concepts/6502-io-patterns.md`: CREATED — new concept page; RDLINE terminal line editor (138B, Control-H/X editing, bell on overflow, three platform-specific subroutine hooks); WRLINE (37B); GEPRTY even-parity generator (114 cycles/39B); CKPRTY parity checker (111 cycles/25B); CRC-16 three entry points (ICRC16/CRC16/GCRC16, IBM BSC polynomial X¹⁶+X¹⁵+X²+1, 302–454 cycles/byte for CRC16); IOHDLR device-independent I/O handler with I/O Control Block (7 bytes) + device table linked list (17 bytes/entry, operations 0–6), INITIO/ADDDL subroutines, 93 + 59×N cycles
+- `wiki/sources/leventhal-subroutines.md`: Scope table — Ch. 4, 5, 8, 9, 10 all marked [x] ingested
+- `wiki/index.md`: added [[6502-io-patterns]] entry; updated descriptions for 6502-application-snippets and 6502-data-structures
+- `wiki/overview.md`: Leventhal 1982 bullets updated with Pass 3 content; 6502-io-patterns added to concepts hub list
+- `wiki/inbox/leventhal-subroutines-ingest-plan.md`: Pass 3 chapters [x]; plan file deleted (all passes complete)
+- `PROGRESS.md`: Leventhal Subroutines item flipped to ✅; Wagner promoted to 👉; wiki size updated
+
+---
+
+## [2026-04-18] ingest | leventhal-subroutines | Leventhal 1982 Pass 2 (Ch. 6, 7, 11 + App B)
+
+- `wiki/entities/6522-via.md`: CREATED — full 6522 VIA register reference: 16-register table (ORB, ORA, DDRB, DDRA, T1/T2 timers, SR, ACR, PCR, IFR, IER), Port A/B I/O behaviour, T1 continuous/one-shot modes, T2 countdown/pulse-count modes, Shift Register modes (ACR bits 4:2), PCR CA1/CA2/CB1/CB2 control, IFR bit assignments with clear mechanisms, IER enable/disable convention, typical initialisation sequence, Port A vs Port B differences table
+- `wiki/concepts/6502-programming-idioms.md`: AUGMENTED — 16-bit arithmetic section (Ch. 6): ADD16 (80 cycles, CLC/ADC chain), SUB16 (80 cycles, SEC/SBC chain), MUL16 (650–1100 cycles, 238 bytes, 32-bit intermediate product, shift-and-add algorithm), DIV16 with 4 entry points (SDIV16/UDIV16/SREM16/UREM16, ~1000–1160 cycles, 293 bytes, shift-and-subtract), CMP16 (~90 cycles, overflow-corrected flags); Bit manipulation section (Ch. 7): BITSET/BITCLR/BITTST (57/57/50 cycles, 16-bit words, mask table lookup), BFE/BFI (bit field extraction/insertion), multi-precision shifts table (logical left/right, arithmetic right, rotate left/right); updated frontmatter tags + related; added [[6522-via]] to related
+- `wiki/concepts/6502-interrupt-patterns.md`: AUGMENTED — PINTIO pattern (Ch. 11B): complete 6522 VIA interrupt I/O architecture (6 subroutines: INCH/INST/OUTCH/OUTST/INIT/IOSRVC, 194 bytes, 7 bytes data), IOSRVC ISR code showing IFR bit-1/bit-4 polling, input interrupt auto-clear via VIAADR read (pulses CA2 handshake), OIE unserviced-output-interrupt flag design, INIT configuration template; ring-buffer pattern (Ch. 11C): circular receive/transmit buffers with ISR enqueue + main-loop dequeue, 65C02 PHX/PHY optimisation note; real-time clock/calendar (Ch. 11D): CLKINT ISR cascade chain (tick → seconds → minutes → hours → day → month → year), LASTDY table, leap-year test (YEAR AND $03), clock variable layout (18 bytes), tick-rate configuration, atomic read idiom; updated frontmatter tags + related; added [[6522-via]] to related
+- `wiki/sources/leventhal-subroutines.md`: Scope table updated — Ch. 6, 7, 11, App B all marked [x] ingested
+- `wiki/index.md`: updated descriptions for 6502-programming-idioms and 6502-interrupt-patterns; 6522-via entity already present
+- `wiki/overview.md`: 6502-interrupt-patterns bullet updated with Pass 2 content; 6502-programming-idioms bullet updated with 16-bit arithmetic and bit manipulation; [[6522-via]] added to entities hub list
+- `wiki/inbox/leventhal-subroutines-ingest-plan.md`: Pass 2 chapters marked [x]
+- `PROGRESS.md`: wiki size updated; Pass 2 progress noted
+
+---
+
+## [2026-04-18] ingest | leventhal-subroutines | Leventhal 1982 Pass 1 (Ch. 1–3 + Intro to Program Section)
+
+- `wiki/sources/leventhal-subroutines.md`: CREATED — source page with Scope table (Ch. 1–3 + Intro ingested; Ch. 4–11 and App B pending; App A/C skipped), key facts, key takeaways
+- `wiki/concepts/6502-emulated-instructions.md`: CREATED — comprehensive catalogue of 6502 instruction emulations: add/sub without carry, decimal arithmetic, 16-bit add/sub, 16-bit immediate add, negate, reverse subtract, multiply/divide (cross-ref to idioms), arithmetic shift right, 16-bit shifts, rotate, indirect addressing, autoincrement patterns, interrupt flag save/restore, decimal mode flag save/restore; quick reference table of all missing instructions and their emulations; NMOS JMP page-boundary bug conflict note
+- `wiki/concepts/6502-common-errors.md`: CREATED — systematic error guide: Carry misuse (CMP/SBC/ADC conventions, INC/DEC don't affect Carry, 16-bit increment/decrement patterns), flag side effects (STA doesn't set flags, BIT Overflow/Negative side effects, CMP doesn't set Overflow, which instructions affect V/C), addressing confusion (immediate vs. zero-page, indirect alignment, NMOS JMP bug), format errors (hex notation, ASCII↔BCD), array off-by-one, 8-bit index overflow, implicit instruction effects table, initialisation errors (decimal mode, Carry chains, indirect addresses), assembler vs. silent errors, I/O driver errors, ISR errors
+- `wiki/concepts/6502-subroutine-conventions.md`: AUGMENTED — added Leventhal 1982 formal 10-field documentation template (Purpose/Procedure/Registers/Execution time/Program size/Data memory/Special cases/Entry/Exit/Examples); added inline-parameter (Method 4) with complete example; added Leventhal 1982 standardised register conventions (1 × 8-bit in A+Y, 1 × 16-bit in A+Y+X, larger in stack); added error convention (Carry=1 on error); updated related section and frontmatter sources
+- `wiki/concepts/6502-programming-idioms.md`: AUGMENTED — added "14 6502 quirks quick reference" section from Leventhal 1982 Ch. 1; updated related section; updated frontmatter sources
+- `wiki/index.md`: added leventhal-subroutines source entry; added 6502-emulated-instructions and 6502-common-errors concept entries; updated descriptions for 6502-subroutine-conventions and 6502-programming-idioms
+- `wiki/inbox/leventhal-subroutines-ingest-plan.md`: Pass 1 chapters marked `[x]` (plan retained — Passes 2 and 3 pending)
+- `PROGRESS.md`: wiki size updated; Pass 1 progress noted
+
 ## [2026-04-18] ingest | leventhal-6502-assembly | Leventhal 2nd Ed. Ch.6-10, 12, 17
 
 - `wiki/sources/leventhal-6502-assembly.md`: CREATED — source page with full Scope table (Ch.1–17), key facts, key takeaways for all ingested chapters (65C02 enhancements, interrupt system, subroutine conventions, string/arithmetic/table idioms)

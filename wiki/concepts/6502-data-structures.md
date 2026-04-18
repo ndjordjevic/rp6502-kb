@@ -1,8 +1,8 @@
 ---
 type: concept
-tags: [6502, 65c02, assembly, tables, lists, queue, sort, jump-table, data-structures]
+tags: [6502, 65c02, assembly, tables, lists, queue, sort, jump-table, data-structures, array, memory-fill, binary-search]
 related: [[65c02-instruction-set]], [[6502-application-snippets]], [[6502-programming-idioms]], [[6502-subroutine-conventions]]
-sources: [[leventhal-6502-assembly]]
+sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -228,6 +228,181 @@ JMPINST:
 | Sparse lookup | Binary search on a sorted key table; parallel value table |
 
 **Lookup table size**: a 256-entry byte table fits in one page (256 bytes). If the table must not straddle a page boundary, align it on a 256-byte boundary (`.ORG` to a `$xx00` address).
+
+---
+
+## Memory operations (Leventhal 1982, Ch. 5)
+
+### MFILL — Memory fill
+
+Fill an arbitrary area of memory with a constant byte value.
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack: return addr, fill-value byte, area-size (2 bytes), start-address (2 bytes) |
+| Exit | Area `[base .. base+size-1]` written with value |
+| Cycles | ~11 per byte + 93 overhead |
+| Size | 68 bytes + 5 bytes RAM + 2 bytes page-zero pointer |
+
+**Algorithm**: fill complete pages first (using an 8-bit inner loop), then the remaining partial page. Avoids a 16-bit counter in the inner loop for speed. Size = `$0000` causes immediate exit without writing.
+
+**Use case**: screen clear (fill video RAM with space character), zero-initialise a buffer, install NOP sled.
+
+**Caution**: filling any part of page-zero or the stack page (`$0100–$01FF`) causes unpredictable results if this routine itself uses those areas.
+
+### BLKMOV — Block move
+
+Move a block of data from a source area to a destination area. Handles overlapping regions correctly.
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack: return addr, byte-count (2 bytes), source-address (2 bytes), dest-address (2 bytes) |
+| Exit | `byte-count` bytes copied from source to dest |
+| Cycles | 128 overhead + 20 + 4622×(high byte) + 18×(low byte) for left move; higher for overlap/right move |
+| Size | 157 bytes + 2 bytes RAM + 4 bytes page-zero (two pointers) |
+
+**Algorithm**: if dest start falls inside the source range, copy right-to-left (high-address-first, "move right") to avoid overwriting unread source data. Otherwise copy left-to-right (low-address-first). Both paths handle complete pages separately from a partial-page tail.
+
+**Use case**: sprite/tile DMA substitute on 6502 systems; scrolling text buffers by shifting lines up or down.
+
+---
+
+## Multi-dimensional array indexing (Leventhal 1982, Ch. 5)
+
+All routines use stack-based parameter passing. Elements are zero-indexed. Arrays stored in row-major order.
+
+### D1BYTE — 1D byte array element address
+
+```
+address = BASE + SUBSCRIPT
+```
+
+| Cycles | Size |
+|--------|------|
+| 73 | 37 bytes + 4 bytes RAM |
+
+Entry: stack `(return-addr, subscript 2 bytes, base-address 2 bytes)`. Exit: `A`:`Y` = high:low of element address.
+
+### D1WORD — 1D word (16-bit) array element address
+
+```
+address = BASE + SUBSCRIPT × 2
+```
+
+| Cycles | Size |
+|--------|------|
+| 78 | 39 bytes + 4 bytes RAM |
+
+Uses a single left-shift to multiply subscript by 2. Exit: `A`:`Y` = high:low of element address (element occupies address and address+1).
+
+### D2BYTE — 2D byte array element address
+
+```
+address = BASE + ROW_SUBSCRIPT × ROW_SIZE + COL_SUBSCRIPT
+```
+
+| Cycles | ~1500 (dominated by multiply) |
+|--------|------|
+| Size | 119 bytes + 10 bytes RAM |
+
+Parameters: col-subscript (2 bytes), row-size (2 bytes), row-subscript (2 bytes), base-address (2 bytes). Row-size = number of columns. Uses the Ch. 6 16-bit multiplication subroutine MUL16.
+
+### D2WORD — 2D word array element address
+
+```
+address = BASE + (ROW_SUBSCRIPT × ROW_SIZE + COL_SUBSCRIPT) × 2
+```
+
+Extends D2BYTE with an extra left-shift for 2-byte elements.
+
+### NDIM — N-dimensional array element address
+
+For arrays declared with Pascal-like bounds `A: ARRAY[0..K₁, 0..K₂, ..., 0..Kₙ] OF BYTE`:
+
+```
+offset = (((...(S₁ × D₂ + S₂) × D₃ + S₃) × D₄ + S₄) ...) × Dₙ + Sₙ
+```
+
+where `Sᵢ` = subscript i, `Dᵢ` = size of dimension i.
+
+Parameters are pushed as pairs `(subscript_i, dimension_size_i)` for each dimension, then the base address. The routine applies the Horner evaluation loop. Cycle count scales linearly with number of dimensions and quadratically with the magnitude of each dimension size.
+
+**RP6502 relevance**: 2D byte array indexing maps directly to screen-buffer access. A 320×240 framebuffer cell at `(row, col)` = `VRAM_BASE + row × 320 + col` — exactly the D2BYTE formula with `ROW_SIZE = 320`.
+
+---
+
+## Array operations (Leventhal 1982, Ch. 9)
+
+### ASUM8 — 8-bit array summation
+
+Sum an array of up to 255 unsigned bytes; produce a 16-bit result.
+
+| Property | Value |
+|----------|-------|
+| Entry | `A`:`Y` = high:low start address; `X` = array size (bytes) |
+| Exit | `A` = high byte of sum; `Y` = low byte |
+| Cycles | ~16 per byte + 39 overhead |
+| Size | 30 bytes + 2 bytes page-zero pointer |
+
+**Algorithm**: clear 16-bit sum; add each byte to low byte; propagate carry to high byte on each overflow. Processes from highest address downward.
+
+### ASUM16 — 16-bit array summation
+
+Sum an array of up to 255 unsigned 16-bit words; produce a 24-bit result.
+
+| Property | Value |
+|----------|-------|
+| Entry | `A`:`Y` = high:low start address; `X` = array size (words) |
+| Exit | `X`:`A`:`Y` = high/mid/low bytes of 24-bit sum |
+| Cycles | ~43 per word + 46 overhead |
+| Size | 60 bytes + 3 bytes RAM + 2 bytes page-zero pointer |
+
+**Algorithm**: 24-bit memory accumulator; add each 16-bit element; increment MSB on second carry. Elements stored in 6502 little-endian style (LSB first).
+
+### BINSCH — Binary search
+
+Search a sorted array of unsigned bytes for a target value. Returns index or "not found".
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack: return addr, value, array-size, array-address |
+| Exit | `C`=0 found (`A` = 0-based index); `C`=1 not found |
+| Cycles | ~52 per iteration + 80 overhead; iterations ≈ log₂(N) |
+| Size | 89 bytes + 3 bytes RAM + 2 bytes page-zero pointer |
+
+**Algorithm**: maintain lower and upper bound indices; each iteration guesses `(lower + upper) / 2`; compare value with guess element; discard half the remaining array based on ordering; repeat until match or bounds cross.
+
+For N=32: ~5 iterations → ~340 cycles. Compare with linear search at up to 16 cycles × 32 = 512 cycles worst case.
+
+**Requirement**: array must be sorted in ascending order. If sorted descending, reverse the bound-update logic.
+
+### BUBSRT — Bubble sort (ascending)
+
+Sort an array of up to 255 unsigned bytes in ascending order using bubble sort.
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack: return addr, sort-value, array-size, array-address |
+| Cycles | ~34 × N² + 25 × N + 70 (N = array length) |
+| Size | 79 bytes + 2 bytes RAM + 4 bytes page-zero |
+
+**Algorithm**: outer loop iterates until no interchange occurs; inner loop compares adjacent pairs; swaps if out of order; sets an interchange flag. Equal elements are not swapped (stable with respect to equal elements).
+
+For N=32: ~35,686 cycles ≈ 34ms at 1 MHz. Bubble sort is fine for small arrays on 6502; use binary search + insertion for larger data sets.
+
+### RAMTST — RAM test
+
+Non-destructive RAM test verifying that each byte can store both `$55` and `$AA`.
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack: return addr, test-value, area-size, start-address |
+| Exit | `C`=0 RAM good; `C`=1 failure (`A`:`Y` = failing address) |
+| Size | ~110 bytes |
+
+**Algorithm**: for each byte: save original value; write `$55`; read back and compare; write `$AA`; read back and compare; restore original. Failure returns the address of the first bad cell.
+
+**Use case**: power-on self test (POST) for 6502 systems. The RP6502-OS could use this style of test during boot to verify working RAM before running user programs.
 
 ---
 

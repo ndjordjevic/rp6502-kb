@@ -1,8 +1,8 @@
 ---
 type: concept
-tags: [6502, 65c02, assembly, string, ascii, code-conversion, snippets]
-related: [[65c02-instruction-set]], [[65c02-addressing-modes]], [[6502-subroutine-conventions]], [[6502-programming-idioms]]
-sources: [[leventhal-6502-assembly]]
+tags: [6502, 65c02, assembly, string, ascii, code-conversion, snippets, crc, io-patterns]
+related: [[65c02-instruction-set]], [[65c02-addressing-modes]], [[6502-subroutine-conventions]], [[6502-programming-idioms]], [[6502-io-patterns]]
+sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -249,9 +249,135 @@ Convert an 8-bit value (0–255) to three ASCII decimal digits. Strategy: repeat
 
 ---
 
+## Code conversion routines (Leventhal 1982, Ch. 4)
+
+These are the formal subroutines from Leventhal & Saville. Each uses stack-based parameter passing unless otherwise noted (see [[6502-subroutine-conventions]]).
+
+### BN2BCD — Binary byte → two BCD bytes
+
+| Property | Value |
+|----------|-------|
+| Entry | `A` = binary byte |
+| Exit | `A` = hundreds digit, `Y` = packed tens+ones |
+| Cycles | 133 max (depends on number of subtractions) |
+| Size | 38 bytes + 1 byte TEMP in RAM |
+
+**Algorithm**: subtract 100 repeatedly to get hundreds; subtract 10 repeatedly for tens; remainder = ones. Shift tens into high nibble; pack with ones.
+
+Suitable for displaying a 0–99 or 0–255 decimal value.
+
+### BCD2BN — BCD byte → binary byte
+
+| Property | Value |
+|----------|-------|
+| Entry | `A` = packed BCD byte |
+| Exit | `A` = binary |
+| Cycles | 38 |
+| Size | 24 bytes + 1 byte TEMP |
+
+**Algorithm**: `high_nibble × 10 + low_nibble`. Multiply by 10 as `(value × 8) + (value × 2)` using shifts.
+
+### BN2HEX — Binary byte → two ASCII hex characters
+
+| Property | Value |
+|----------|-------|
+| Entry | `A` = binary byte |
+| Exit | `A` = high-nibble ASCII, `Y` = low-nibble ASCII |
+| Cycles | ~77 |
+| Size | 31 bytes |
+
+**Algorithm**: mask each nibble separately; add `$30` if decimal digit; add additional `$07` to bridge the `'9'`→`'A'` gap. (Same approach as the Leventhal 1986 snippet in this page's "Hex nibble → ASCII" section but now applied to a full byte in one call.)
+
+### HEX2BN — Two ASCII hex chars → binary byte
+
+| Property | Value |
+|----------|-------|
+| Entry | `A` = high-nibble ASCII, `Y` = low-nibble ASCII |
+| Exit | `A` = binary byte |
+| Cycles | ~74 + 3 per non-decimal digit |
+| Size | 30 bytes + 1 byte TEMP |
+
+**Algorithm**: reverse of BN2HEX — subtract `$30`; if result ≥ 10 subtract `$07` more. Shift high nibble left 4 and OR with low.
+
+Note: does **not** validate that the characters are legal hex digits.
+
+### BN2DEC — 16-bit signed binary → ASCII decimal string
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack (low-byte-first): return addr, buffer addr, signed 16-bit value |
+| Exit | Buffer: length byte, optional `'-'`, ASCII digits (most-significant first) |
+| Cycles | ~7,000 |
+| Size | 174 bytes + 7 bytes RAM + 2 bytes page-zero buffer pointer |
+
+**Algorithm**: negate if negative (record sign flag); divide by 10 repeatedly (collecting remainders = digits); convert remainders to ASCII with `ADC #'0`; concatenate in reverse; prepend sign if needed. Length byte is stored in buffer position 0.
+
+**Use case**: formatted decimal display on terminal or VGA screen — the only way to show a signed 16-bit value as decimal text.
+
+### DEC2BN — ASCII decimal string → 16-bit signed binary
+
+| Property | Value |
+|----------|-------|
+| Entry | `A`:`Y` = high:low byte of string address |
+| Exit | `A`:`Y` = high:low byte of 16-bit result; `C`=0 valid, `C`=1 invalid |
+| Cycles | ~670 |
+| Size | 171 bytes + 4 bytes RAM + 2 bytes page-zero string pointer |
+
+**Algorithm**: check for leading sign (`+`/`-`); accumulate digits as `ACCUM = ACCUM × 10 + digit` (multiply by 10 as shifts+adds); negate result if minus sign seen. Sets Carry if non-sign/non-digit character is found.
+
+**Use case**: keyboard input parsing — convert typed decimal number to binary for computation.
+
+---
+
+## String manipulation (Leventhal 1982, Ch. 8)
+
+All routines use a **length-prefixed string format**: the first byte of the string is a binary length (0–255), followed by the actual characters. Not null-terminated. Strings live anywhere in RAM; addresses are passed on the stack.
+
+### STRCMP — Compare two strings
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack: return addr, string-2 address, string-1 address |
+| Exit | `Z`=1 identical; `C`=0 string-2 larger; `C`=1 string-1 ≥ string-2 |
+| Cycles | 81 + 19 × chars compared (until first mismatch) or 93 + 19 × shorter length (if equal through shorter) |
+| Size | 52 bytes + 4 bytes page-zero (two string pointers) |
+
+**Algorithm**: determine shorter length; compare byte-by-byte; if any mismatch found compare lengths to set flags; if equal through shorter treat the longer string as larger.
+
+Spaces are treated as ordinary characters — `"SPRING MAID"` < `"SPRINGMAID"` (space = `$20` < `M` = `$4D`).
+
+### CONCAT — Concatenate two strings
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack: return addr, max-length-of-string-1, string-2 addr, string-1 addr |
+| Exit | String-1 extended with string-2 content; `C`=0 if complete, `C`=1 if string-2 was truncated |
+| Cycles | ~40 × chars appended + 164 overhead |
+| Size | 141 bytes + 7 bytes RAM + 4 bytes page-zero |
+
+**Algorithm**: if combined length ≤ max, copy all of string-2 after string-1 and update length byte; else copy only enough characters to reach max and set Carry. String-2 length of zero exits cleanly. If string-1 already exceeds max, exits with Carry set (error).
+
+### POS — Find substring position
+
+| Property | Value |
+|----------|-------|
+| Entry | Stack: return addr, substring address, string address |
+| Exit | `A` = 1-based index of first occurrence; `A`=0 if not found |
+| Cycles | 135 overhead + 47/char match + 50/char mismatch |
+| Size | 124 bytes + 6 bytes RAM + 4 bytes page-zero |
+
+**Algorithm**: scan string for first character of substring; on match compare remaining characters; restart search after mismatch. Returns index of first occurrence only.
+
+**Special cases**: substring length 0 → returns 0; substring longer than string → returns 0; index 1 means substring is a prefix (useful for command abbreviation matching in BASIC interpreters).
+
+**Worst case** (string = `"AAAAAAB"`, substring = `"AAB"`): `(len_str − len_sub + 1) × (47 × (len_sub−1) + 50) + 135` cycles.
+
+---
+
 ## Related pages
 
 - [[6502-subroutine-conventions]] — how to package these as callable subroutines
 - [[6502-programming-idioms]] — arithmetic: multi-precision, multiply, divide
 - [[6502-data-structures]] — tables, lists, jump tables
 - [[65c02-instruction-set]] — new 65C02 ops used here: `(zp)` addressing, `PHX`/`PHY`
+- [[6502-io-patterns]] — terminal I/O, CRC-16, device table handler (Leventhal 1982, Ch. 10)

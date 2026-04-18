@@ -1,8 +1,8 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, subroutines, abi, calling-convention, stack]
-related: [[rp6502-abi]], [[65c02-instruction-set]], [[65c02-addressing-modes]], [[memory-map]]
-sources: [[leventhal-6502-assembly]]
+related: [[rp6502-abi]], [[65c02-instruction-set]], [[65c02-addressing-modes]], [[memory-map]], [[6502-common-errors]]
+sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -53,6 +53,14 @@ JSR  ASDEC     ; convert hex nibble → ASCII
 
 **Limits**: only 3 single-byte slots. Addresses (16-bit) must be split across two registers, which is awkward.
 
+### Leventhal 1982 standardised register conventions
+
+The *6502 Assembly Language Subroutines* library formalises register parameter passing as follows:
+
+1. **A single 8-bit parameter** is passed in the accumulator. A second 8-bit parameter is passed in index register Y.
+2. **A single 16-bit parameter** is passed in A (MSB) and Y (LSB). An accompanying 8-bit parameter is passed in X.
+3. **Larger numbers of parameters** are passed in the stack, either directly (values) or indirectly (pointers). The subroutine assumes it was entered via `JSR`, so the return address is at the top of the stack above the parameters.
+
 ### Method 2: Zero-page pseudo-registers
 
 Reserve zero-page locations (e.g., `$40/$41`) to act as extra 16-bit address registers. Pass a pointer in ZP, then use indexed-indirect `(zp),Y` or indirect `(zp)` (65C02) inside the subroutine.
@@ -82,7 +90,39 @@ CHKCR:
 
 > With **65C02 `(zp)` addressing**: eliminates the need to pre-load Y and the `($40),Y` construct — use `($40)` directly for the base access.
 
-### Method 3: Stack
+### Method 4: Inline (after JSR)
+
+Parameters can be placed immediately after the `JSR` instruction in the instruction stream. The subroutine reads the return address from the stack to find them, then adjusts the return address past them before executing `RTS`.
+
+```asm
+; Caller places 8-bit param inline after JSR:
+    JSR   MYFUNC
+    .BYTE PARAM       ; inline parameter
+    ; execution resumes here after RTS
+
+; Callee:
+MYFUNC:
+    TSX
+    LDA   $0101,X   ; get return address LSB (= addr of .BYTE - 1)
+    STA   RETADR
+    LDA   $0102,X   ; get return address MSB
+    STA   RETADR+1
+    LDY   #1
+    LDA   (RETADR),Y ; read inline param (at return address + 1)
+    ; process param...
+    ; advance return address past the inline param:
+    LDA   RETADR
+    CLC
+    ADC   #1        ; +1 for the one-byte param
+    STA   $0101,X
+    BCC   NORTS
+    INC   $0102,X
+NORTS:
+    RTS             ; now returns past the inline data
+```
+
+**Pros**: self-contained call — no register corruption before call, no separate setup. Used heavily in 6502 ROM routines.  
+**Cons**: complex callee code; non-reentrant unless RETADR is on the stack; harder to debug.
 
 Caller pushes parameters before `JSR`; callee reads them via `TSX` and `$01xx,X` addressing. The return address sits at `$0101,X`/`$0102,X` (after TSX), so parameters pushed before JSR are at `$0103,X` and above.
 
@@ -109,6 +149,8 @@ MYFUNC:
 
 ## Subroutine documentation
 
+### Leventhal 1986 (general form)
+
 Leventhal's required specification for every subroutine:
 
 ```
@@ -124,6 +166,33 @@ Leventhal's required specification for every subroutine:
 ```
 
 If a subroutine changes any flag other than the ones explicitly documented, callers must save flags with `PHP` before the call and restore with `PLP` after.
+
+### Leventhal 1982 formal template (subroutine library standard)
+
+The *6502 Assembly Language Subroutines* library uses a more detailed, 10-field documentation header. Every subroutine in the library is documented with:
+
+```
+1. Purpose       — one-line description of what the routine does
+2. Procedure     — algorithm summary (how it works)
+3. Registers used — A, X, Y, P flags modified
+4. Execution time — clock cycles (typical and worst case)
+5. Program size  — bytes
+6. Data memory required — zero-page and RAM locations used
+7. Special cases — error conditions, trivial inputs, edge cases
+8. Entry conditions — exactly what must be true before calling
+9. Exit conditions — exactly what is true after return
+10. Examples     — at least one concrete call with before/after values
+```
+
+This template is stricter than ad-hoc documentation because it requires the programmer to state **execution time** and **program size** — both critical for real-time and memory-constrained 6502 systems.
+
+### Error indication convention
+
+All subroutines in the 1982 library signal errors via the **Carry flag**:
+- Carry = 0 → success
+- Carry = 1 → error or exceptional condition
+
+Trivial inputs (empty array, zero-length string, out-of-range index) cause immediate exit with minimal side effects.
 
 ---
 
@@ -241,4 +310,5 @@ This design avoids all the 6502 hardware-stack awkwardness for argument passing 
 - [[65c02-instruction-set]] — JSR (`20`), RTS (`60`), RTI (`40`), PHX/PHY/PLX/PLY
 - [[65c02-addressing-modes]] — `(zp)` indirect addressing (65C02 new mode for parameter passing)
 - [[6502-interrupt-patterns]] — reentrancy requirements for ISR-callable subroutines
+- [[6502-common-errors]] — flag side effects, uninitialised carry, ISR save/restore errors
 - [[memory-map]] — page 1 stack location

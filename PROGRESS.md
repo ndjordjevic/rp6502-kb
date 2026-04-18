@@ -48,8 +48,8 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **W65C02S datasheet** — 1 source + 2 new concept pages ([[65c02-instruction-set]], [[65c02-addressing-modes]]); [[w65c02s]] entity greatly expanded with part decode, pin table, vectors, timing, WDC enhancements
 - ✅ Ingest **YouTube playlist** — all 9 sessions complete; 21 source pages + 5 new concept/entity pages (code-pages, programmable-sound-generator, opl2-fm-synth, cc65, llvm-mos); development-history Eras A–E written
 - ✅ Ingest **Leventhal 6502 Assembly Programming 2nd Ed** — 1 source + 6 new concept pages ([[6502-interrupt-patterns]], [[6502-subroutine-conventions]], [[6502-application-snippets]], [[6502-programming-idioms]], [[6502-data-structures]]); [[65c02-instruction-set]] augmented with Ch.17 pedagogical notes
-- 👉 Ingest **Leventhal 6502 Assembly Language Subroutines** (raw/pdfs/)
-- ⬜ Ingest **Wagner Assembly Lines Complete** (raw/pdfs/)
+- ✅ Ingest **Leventhal 6502 Assembly Language Subroutines** (raw/pdfs/) — All 3 passes complete. Pass 1 (Ch. 1–3 + Intro): 2 new concept pages ([[6502-emulated-instructions]], [[6502-common-errors]]), 2 augmented. Pass 2 (Ch. 6, 7, 11 + App B): 1 new entity ([[6522-via]]), 2 augmented ([[6502-programming-idioms]] + [[6502-interrupt-patterns]]). Pass 3 (Ch. 4, 5, 8, 9, 10): 1 new concept page ([[6502-io-patterns]]), 2 augmented ([[6502-application-snippets]] + [[6502-data-structures]])
+- 👉 Ingest **Wagner Assembly Lines Complete** (raw/pdfs/)
 - ⬜ Ingest **Zaks Programming the 6502** (raw/pdfs/)
 - ⬜ Ingest Discord export (if collected)
 
@@ -70,12 +70,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 13 + 22 (youtube-playlist + ep01–ep22 except ep05) + 1 (leventhal-6502-assembly) = **36** |
-| Entities | 8 + 2 (cc65, llvm-mos) = **10** |
-| Concepts | 23 + 3 (code-pages, programmable-sound-generator, opl2-fm-synth) + 2 (65c02-instruction-set, 65c02-addressing-modes) + 5 (6502-interrupt-patterns, 6502-subroutine-conventions, 6502-application-snippets, 6502-programming-idioms, 6502-data-structures) = **33** |
+| Sources | 13 + 22 (youtube-playlist + ep01–ep22 except ep05) + 1 (leventhal-6502-assembly) + 1 (leventhal-subroutines) = **37** |
+| Entities | 8 + 2 (cc65, llvm-mos) + 1 (6522-via) = **11** |
+| Concepts | 23 + 3 (code-pages, programmable-sound-generator, opl2-fm-synth) + 2 (65c02-instruction-set, 65c02-addressing-modes) + 5 (6502-interrupt-patterns, 6502-subroutine-conventions, 6502-application-snippets, 6502-programming-idioms, 6502-data-structures) + 2 (6502-emulated-instructions, 6502-common-errors) + 1 (6502-io-patterns) = **36** |
 | Topics | 4 (overview, version-history, known-issues, development-history) = **4** |
-| Inbox | 0 (leventhal ingest plan deleted) |
-| **Total pages** | **~83** |
+| Inbox | 2 (zaks-programming-6502-ingest-plan, wagner-assembly-lines-ingest-plan) |
+| **Total pages** | **~88** |
 
 ---
 
