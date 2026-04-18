@@ -7,6 +7,8 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] ingest | picocomputer/adventure (git clone, commit 6ac165f) | New: 1 page (sources/adventure); Updated: raw/github/README.md (added adventure row), wiki/index.md, PROGRESS.md; Key facts: named ROM asset pattern (DATADIR "ROM:", 4 advent*.txt files), porting pattern for existing C programs, tools/ is identical to vscode-cc65 template, BIG ROM commit (2026-02-26) converted to v0.18 named-asset format
+
 ## [2026-04-18] ingest | picocomputer/vscode-llvm-mos (git clone, commit 17af418) | New: 1 page (sources/vscode-llvm-mos); Updated: topics/toolchain-setup (llvm-mos section + full cc65 vs llvm-mos comparison table), entities/llvm-mos (VSCode setup section added); Key facts: PATH conflict fix via cmake.environment, CMake kit = [Unspecified], DATA file RESET file addresses; Ingest plan deleted
 
 ## [2026-04-18] ingest | picocomputer/vscode-cc65 (git clone, commit 794a6f2) | New: 2 pages (sources/vscode-cc65, topics/toolchain-setup); Updated: entities/cc65 (VSCode section rewritten with template details, rp6502.py, toolchain cmake); Key facts: no pyserial needed since Jan 2026, rp6502_asset() must precede rp6502_executable(), IntelliSense shim in cc65.cmake; Ingest plan deleted

@@ -1,10 +1,10 @@
 ---
 type: concept
 tags: [rp6502, rom, file-format]
-related: [[rp6502-ria]], [[rp6502-os]], [[xram]]
+related: [[rp6502-ria]], [[rp6502-os]], [[xram]], [[adventure]]
 sources: [[rp6502-ria-docs]], [[release-notes]], [[youtube-playlist]]
 created: 2026-04-15
-updated: 2026-04-16
+updated: 2026-04-18
 ---
 
 # `.rp6502` ROM File Format
@@ -132,7 +132,31 @@ install /game.rp6502   # copy to Pi Pico flash via littlefs
 
 Installed ROMs appear in `HELP` and persist across power cycles with no USB drive required.
 
+## Real-world example: Colossal Cave Adventure ([[adventure]])
+
+The `picocomputer/adventure` repo is the canonical example of named ROM assets in practice:
+
+```cmake
+rp6502_asset(adventure /advent1.txt troglobit/src/advent1.txt)
+rp6502_asset(adventure /advent2.txt troglobit/src/advent2.txt)
+rp6502_asset(adventure /advent3.txt troglobit/src/advent3.txt)
+rp6502_asset(adventure /advent4.txt troglobit/src/advent4.txt)
+rp6502_executable(adventure DATA 0x200 RESET 0x200)
+```
+
+The game code opens these files with:
+```c
+// config.h
+#define DATADIR "ROM:"
+
+// game code (unchanged upstream)
+fd = fopen(DATADIR "advent1.txt", "r");
+```
+
+Changing `DATADIR` to `"ROM:"` is the **entire RP6502 port** for file access — zero changes to upstream game code. The OS resolves `"ROM:advent1.txt"` to the named asset packed in the `.rp6502` file.
+
 ## Related pages
 
 - [[rp6502-ria]] · [[rp6502-os]] · [[xram]] · [[release-notes]]
+- [[adventure]] — canonical named-asset example (Colossal Cave Adventure)
 - [[yt-ep15-asset-management]] — live walkthrough of the CMake workflow

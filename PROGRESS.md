@@ -58,6 +58,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **picocomputer/pico-extras** (raw/github/picocomputer/pico-extras/, commit 7f48b3f) — New: [[pico-extras]] source page; Updated: [[rp6502-vga]] (pico-extras dependency section), [[vga-display-modes]] (mode-switching note). Only 2 rumbledethumps commits: memory leak fix + debug printf fix in `scanvideo_setup_with_timing()`
 - ✅ Ingest **picocomputer/community wiki** (raw/github/picocomputer/community/, commit 348180a) — 2 pages: Home (project directory) + Incompatible USB and BLE Devices. New: [[community-wiki]] source, [[usb-compatibility]] topic; Updated: [[community-projects]] (full wiki project catalogue added), [[gamepad-input]] (USB compat section now links to [[usb-compatibility]])
 - ✅ Ingest **picocomputer/ehbasic** (raw/github/picocomputer/ehbasic/, commit acd5deb) — New: [[ehbasic]] source + entity pages; Updated: [[ria-registers]] (ACIA simulation section). Key finding: no RP6502-specific BASIC extensions; I/O integration entirely in min_mon.s via ACIA registers and open()/close()/read_xstack()/write_xstack()
+- ✅ Ingest **picocomputer/adventure** (raw/github/picocomputer/adventure/, commit 6ac165f) — New: [[adventure]] source page; Updated: [[rom-file-format]] (adventure named-asset example), [[index.md]]. Key finding: canonical named-ROM-asset porting pattern — `DATADIR "ROM:"` in config.h redirects all file I/O to ROM filesystem with zero upstream code changes; `BIG ROM (#1)` commit (2026-02-26) converted project to v0.18 named-asset format
 
 ## Phase 3 — Learn, share, and apply
 
@@ -84,7 +85,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 45 + 1 (vscode-llvm-mos) = **46** |
+| Sources | 46 + 1 (adventure) = **47** |
 | Entities | **13** (llvm-mos updated) |
 | Concepts | **45** |
 | Topics | **8** (toolchain-setup updated) |
