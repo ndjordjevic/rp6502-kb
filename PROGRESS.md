@@ -52,6 +52,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **Wagner Assembly Lines Complete** (raw/pdfs/) — All passes complete. Ch. 1/4/5/7/9/10/12/15/28/33 ingested. 3 new concept pages ([[learning-6502-assembly]], [[6502-stack-and-subroutines]], [[6502-relocatable-and-self-modifying]]); 2 augmented ([[6502-programming-idioms]] + [[65c02-addressing-modes]]); [[65c02-instruction-set]] augmented with Ch.33 Wagner perspective; [[wagner-assembly-lines]] source page
 - ✅ Ingest **Zaks Programming the 6502** (raw/pdfs/) — Ch. II/III/V/VI/VIII/IX ingested. 1 new source page ([[zaks-programming-6502]]); 3 concept pages augmented ([[6502-programming-idioms]], [[6502-application-snippets]], [[6502-data-structures]]). Unique contributions: improved 8×8 multiply (10 instr), subroutine parameter passing comparison, 8 Ch.8 utility routines (ZEROM, bracket test, parity, ASCII↔BCD, find-max, 16-bit sum, EOR checksum, zero count), full data-structure library (linked list, circular, queue, tree, doubly-linked, binary search O(log₂N), hashing, merge)
 - ✅ Ingest **Discord export** (raw/discord/) — `#chat` (1,015 msgs) and `#razemos` (32 msgs) fully ingested. 2 new pages ([[rumbledethumps-discord]], [[community-projects]]). Key additions from #chat: HC/AC chip selection, VGA cold-boot fix, TinyUSB silicon latch bug, cc65 Homebrew warning, PIX bus 64 Mbit/s correction, design philosophy quotes, community roster. Key additions from #razemos: razemOS project (v0.01/v0.02), HASS assembler, ALT-F4 exit convention, OS exec vs ria_exec() pattern, ROM self-update pattern.
+- ✅ Ingest **picocomputer/examples** (raw/github/picocomputer/examples/, commit 95965c6) — 9 new pages: [[vga-display-modes]], [[vga-graphics]], [[gamepad-input]], [[rtc]], [[nfc]], [[exec-api]], [[ezpsg]], [[performance]], [[examples]] source; 2 updated: [[programmable-sound-generator]] (ezpsg section), [[fatfs]] (directory API)
 
 ## Phase 3 — Learn, share, and apply
 
@@ -78,12 +79,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 13 + 22 (youtube-playlist + ep01–ep22 except ep05) + 1 (leventhal-6502-assembly) + 1 (leventhal-subroutines) + 1 (wagner-assembly-lines) + 1 (zaks-programming-6502) + 1 (rumbledethumps-discord) = **40** |
-| Entities | 8 + 2 (cc65, llvm-mos) + 1 (6522-via) = **11** |
-| Concepts | 23 + 3 (code-pages, programmable-sound-generator, opl2-fm-synth) + 2 (65c02-instruction-set, 65c02-addressing-modes) + 5 (6502-interrupt-patterns, 6502-subroutine-conventions, 6502-application-snippets, 6502-programming-idioms, 6502-data-structures) + 2 (6502-emulated-instructions, 6502-common-errors) + 1 (6502-io-patterns) + 3 (learning-6502-assembly, 6502-stack-and-subroutines, 6502-relocatable-and-self-modifying) = **39** |
-| Topics | 4 (overview, version-history, known-issues, development-history) + 1 (community-projects) = **5** |
-| Inbox | 0 |
-| **Total pages** | **~95** |
+| Sources | 40 + 1 (examples) = **41** |
+| Entities | 11 + 1 (ezpsg) = **12** |
+| Concepts | 39 + 6 (vga-display-modes, vga-graphics, gamepad-input, rtc, nfc, exec-api) = **45** |
+| Topics | 5 + 1 (performance) = **6** |
+| Inbox | 5 (community-wiki, vscode-cc65, vscode-llvm-mos, ehbasic, pico-extras ingest plans) |
+| **Total pages** | **~104** |
 
 ---
 

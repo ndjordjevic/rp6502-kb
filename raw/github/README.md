@@ -17,6 +17,7 @@ Example: `picocomputer/rp6502/`
 | Folder | Repo | Current tag | Commit | Pinned |
 | --- | --- | --- | --- | --- |
 | `picocomputer/rp6502/` | [github.com/picocomputer/rp6502](https://github.com/picocomputer/rp6502) | `v0.23` | `368ed8e` | 2026-04-16 |
+| `picocomputer/examples/` | [github.com/picocomputer/examples](https://github.com/picocomputer/examples) | *(no tags)* | `95965c6` | 2026-04-18 |
 
 Nested submodules inside `rp6502`: `src/littlefs`, `src/tinyusb` (per upstream).
 

@@ -29,6 +29,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[zaks-programming-6502]] | *Programming the 6502* (Zaks, 4th Ed. 1983): systematic 6502 textbook — algorithm design methodology, improved multiply, subroutine parameter passing, data structures (linked list/tree/hash/merge), I/O scheduling (polling vs. interrupts) |
 | [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
 | [[rumbledethumps-discord]] | Rumbledethumps Discord server exports: #chat (2022–2026, 1,015 msgs) — hardware tips, firmware internals, USB silicon bug, OPL2, community projects |
+| [[examples]] | Official picocomputer/examples repo: ~20 C programs covering VGA modes, audio PSG, gamepad, NFC, FatFS, exec, benchmarking |
 | [[yt-ep01-8bit-retro-computer]] | Ep1: series intro, breadboard with 12 glue chips, USB/VGA working |
 | [[yt-ep02-pio-and-dma]] | Ep2: dual-Pico pivot; PIO+DMA 6502 read path; 8 MHz achieved |
 | [[yt-ep03-writing-to-pico]] | Ep3: write path; glue logic; AC-chip discovery; RIA name coined |
@@ -68,6 +69,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[rp2350]] | RP2350 microcontroller: dual Cortex-M33 @ 150 MHz, 520 KB SRAM, 3 PIO blocks, TMDS encoder, HSTX; powers Pi Pico 2 |
 | [[cc65]] | cc65 cross-development package: C compiler + assembler + linker for 6502; primary Picocomputer toolchain since Ep9 |
 | [[llvm-mos]] | llvm-mos: LLVM fork for 6502 — C++/floats/64-bit; second supported Picocomputer toolchain; stronger optimization |
+| [[ezpsg]] | ezpsg library: high-level tracker + polyphonic scheduler on top of the 8-channel RIA PSG |
 
 ## Concepts
 
@@ -100,8 +102,14 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[sdk-architecture]] | Pico SDK build model: CMake INTERFACE libraries, library tiers, hardware claiming, builder pattern, RP2040/RP2350 platform split |
 | [[hstx]] | RP2350 HSTX peripheral: DDR serial output up to 300 Mb/s/pin, async FIFO, output shift register, bit crossbar, clock generator, command expander (RAW/TMDS/REPEAT opcodes), PIO-coupled mode, DVI/TMDS example; used by RP6502 VGA firmware |
 | [[code-pages]] | Code page 437/850/855: glyph-set swap + FAT short-name encoding; CP850 default; 8.3 fallback with ~1 suffix |
-| [[fatfs]] | FatFs r0.15+ filesystem driver: FAT32 over USB MSC, ExFAT ready, 8 files+dirs max open; code-page/short-name interaction; littlefs history |
-| [[programmable-sound-generator]] | PSG in RIA firmware: 8 channels, 5 waveforms, variable duty cycle, ADSR envelope, stereo pan, PWM physical layer; first in v0.6 |
+| [[fatfs]] | FatFs r0.15+ filesystem driver: FAT32 over USB MSC, ExFAT ready, 8 files+dirs max open; directory API (f_opendir/f_readdir/f_closedir); code-page/short-name interaction; littlefs history |
+| [[vga-display-modes]] | VGA modes 0–5: canvas selection, config structs, color depths, layer compositing, VSYNC sync pattern |
+| [[vga-graphics]] | VGA graphics techniques: BGAR5515 format, mode-4 sprites, affine transforms, dual-port writes, pixel addressing |
+| [[gamepad-input]] | Gamepad input: `xreg_ria_gamepad()`, 10-byte-per-player data layout, 4 players, analog axes, compatibility notes |
+| [[rtc]] | Real-time clock via standard POSIX time() / gmtime() / localtime(); NTP sync on RIA-W |
+| [[nfc]] | NFC device API: `open("NFC:", …)`, binary command/response protocol, NDEF TLV read/write |
+| [[exec-api]] | Process exec: `ria_execl()`, argc/argv opt-in, device paths (NFC:, TTY:, AT:, ROM:) |
+| [[programmable-sound-generator]] | PSG in RIA firmware: 8 channels, 5 waveforms, variable duty cycle, ADSR envelope, stereo pan, PWM physical layer; ezpsg library; first in v0.6 |
 | [[opl2-fm-synth]] | OPL2 FM synthesizer (Yamaha YM3812-compatible) in RIA firmware: same as AdLib/Sound Blaster; firmware-flash only; added v0.16 |
 | [[65c02-instruction-set]] | W65C02S instruction set: 70 mnemonics, 212 opcodes, new CMOS instructions (BBR/BBS, BRA, PHX/PHY/PLX/PLY, RMB/SMB, STP, STZ, TRB/TSB, WAI), reserved-NOP table; Ch.17 Leventhal pedagogical notes; Ch.33 Wagner beginner perspective |
 | [[65c02-addressing-modes]] | W65C02S 16 addressing modes with cycle/byte counts; new `(zp)` and `(a,x)` modes vs NMOS 6502; X vs Y non-interchangeability in indirect modes (Wagner Ch.7) |
@@ -142,3 +150,4 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[known-issues]] | Bugs, workarounds, and things to watch out for — from release notes + full RP2350 silicon errata (E1–E28) + Discord community reports |
 | [[development-history]] | Chronological narrative of RP6502 design evolution across 5 eras (late 2022–2026) |
 | [[community-projects]] | Notable games, demos, tools, and hardware expansions built by community members |
+| [[performance]] | Storage and CPU throughput benchmarks: USB MSC read/write speeds, XRAM load rates, PHI2 clock scaling |

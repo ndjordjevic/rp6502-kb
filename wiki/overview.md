@@ -94,6 +94,19 @@ The wiki now contains a layer of 6502 **programming knowledge** drawn from four 
 
 These pages answer *how to write 6502 code for RP6502* — patterns that map directly onto the OS ABI and the 65C02 silicon on the board.
 
+## Examples repository — canonical API reference
+
+The `picocomputer/examples` repo ([[examples]]) is the authoritative usage reference for every major RP6502 subsystem API. Key patterns documented:
+
+- **VGA modes** ([[vga-display-modes]]): 6 compositable modes (console, text/tile, tile-bitmap, chunky-bitmap, affine sprites, multi-sprite). Selected via `xreg_vga_canvas()` + `xreg_vga_mode()`. All config structs live in XRAM.
+- **VGA graphics** ([[vga-graphics]]): BGAR5515 pixel format; mode-4 affine transform (Q8 2×3 matrix); dual-port XRAM writes for high-throughput sprite position updates; mode-3 pixel addressing at 1/2/4/8/16 bpp.
+- **Audio** ([[ezpsg]]): the `ezpsg` library wraps the 8-channel PSG into a music tracker with polyphonic note scheduling. `ezpsg_tick(tempo)` drives the engine; `ezpsg_play_note()` allocates channels by duration.
+- **Gamepad** ([[gamepad-input]]): `xreg_ria_gamepad(addr)` exposes 4-player input as a 10-byte-per-player block in XRAM (hat/sticks/buttons/analog axes).
+- **NFC** ([[nfc]]): `open("NFC:", O_RDWR)` returns a binary command/response fd for NDEF card read/write.
+- **exec** ([[exec-api]]): `ria_execl()` replaces the running process; argc/argv requires an opt-in `argv_mem()` function.
+- **FatFS directory API** ([[fatfs]]): `f_opendir`/`f_readdir`/`f_closedir`/`f_getfree`.
+- **Storage benchmark** ([[performance]]): `write_xram`/`read_xram` through FatFS; typical USB drives 1–3 MB/s.
+
 ## Key open questions
 
 1. **W65C02S WAI / STP** — the datasheet ([[w65c02s-datasheet]], Ch. 7) confirms WAI pulls RDY low and releases on any interrupt; the RIA currently busy-polls via a 32-byte `RIA_SPIN` stub. A WAI-based ABI could reduce power but would need an IRQB source on every RIA completion, which RP6502 firmware doesn't currently wire. The `ria_write` PIO generates PHI2 continuously; WAI would stall the 6502 in-place until IRQ fires.
@@ -104,7 +117,7 @@ These pages answer *how to write 6502 code for RP6502* — patterns that map dir
 
 ## Hub pages
 
-- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[w65c02s-datasheet]] · [[leventhal-6502-assembly]] · [[leventhal-subroutines]] · [[wagner-assembly-lines]] · [[zaks-programming-6502]] · [[youtube-playlist]] · [[rumbledethumps-discord]]
-- **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]] · [[6522-via]] · [[rp2350]] · [[cc65]] · [[llvm-mos]]
-- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[65c02-instruction-set]] · [[65c02-addressing-modes]] · [[6502-interrupt-patterns]] · [[6502-subroutine-conventions]] · [[6502-application-snippets]] · [[6502-programming-idioms]] · [[6502-data-structures]] · [[6502-emulated-instructions]] · [[6502-common-errors]] · [[6502-io-patterns]] · [[learning-6502-assembly]] · [[6502-stack-and-subroutines]] · [[6502-relocatable-and-self-modifying]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]] · [[code-pages]] · [[programmable-sound-generator]] · [[opl2-fm-synth]]
-- **Topics**: [[version-history]] · [[known-issues]] · [[development-history]] · [[community-projects]]
+- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[w65c02s-datasheet]] · [[leventhal-6502-assembly]] · [[leventhal-subroutines]] · [[wagner-assembly-lines]] · [[zaks-programming-6502]] · [[youtube-playlist]] · [[rumbledethumps-discord]] · [[examples]]
+- **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]] · [[6522-via]] · [[rp2350]] · [[cc65]] · [[llvm-mos]] · [[ezpsg]]
+- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[vga-display-modes]] · [[vga-graphics]] · [[gamepad-input]] · [[rtc]] · [[nfc]] · [[exec-api]] · [[65c02-instruction-set]] · [[65c02-addressing-modes]] · [[6502-interrupt-patterns]] · [[6502-subroutine-conventions]] · [[6502-application-snippets]] · [[6502-programming-idioms]] · [[6502-data-structures]] · [[6502-emulated-instructions]] · [[6502-common-errors]] · [[6502-io-patterns]] · [[learning-6502-assembly]] · [[6502-stack-and-subroutines]] · [[6502-relocatable-and-self-modifying]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]] · [[code-pages]] · [[programmable-sound-generator]] · [[opl2-fm-synth]] · [[fatfs]]
+- **Topics**: [[version-history]] · [[known-issues]] · [[development-history]] · [[community-projects]] · [[performance]]

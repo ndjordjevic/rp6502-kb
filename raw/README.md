@@ -94,3 +94,4 @@ git commit -m "Bump rp6502 submodule to v0.xx"
 | 2026-04-17 | `discord/rumbledethumps-razemos-2026-03-17--2026-04-13.txt` | DiscordChatExporter export, #razemos channel, Rumbledethumps server |
 | 2026-04-17 | `pdfs/` | Various 6502 / RP2040 / RP2350 reference books and datasheets; see `pdfs/README.md` |
 | 2026-04-18 | `pdfs/2023-06-07-rp6502.pdf` | RP6502 schematic Rev A, fetched from [picocomputer/picocomputer.github.io `_static/`](https://github.com/picocomputer/picocomputer.github.io/tree/main/docs/source/_static) |
+| 2026-04-18 | `github/picocomputer/examples/` | Git submodule [github.com/picocomputer/examples](https://github.com/picocomputer/examples) at latest commit `95965c6` (no release tags) |

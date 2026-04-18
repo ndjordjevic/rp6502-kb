@@ -74,9 +74,20 @@ The PSG and [[opl2-fm-synth]] are both available simultaneously in the RIA firmw
 
 A community member wrote a full music tracker for the Picocomputer that uses both the PSG and OPL2. The tracker supports arpeggio, portamento, vibrato, echo, tremolo, and microtonal folds. See [[yt-ep22-graphics-sound-demos]].
 
+## ezpsg — high-level library
+
+The [[ezpsg]] entity page documents `ezpsg.h`/`ezpsg.c` from `picocomputer/examples` — a self-contained tracker and polyphonic scheduler on top of the PSG hardware:
+
+- `ezpsg_init(xaddr)` — clears XRAM block and calls `xreg(0, 1, 0x00, xaddr)` to start the PSG
+- `ezpsg_tick(tempo)` — call 60 Hz per frame; advances song, handles note durations/releases
+- `ezpsg_play_note(note, duration, release, duty, vol_attack, vol_decay, wave_release, pan)` — allocates a free channel
+- `ezpsg_play_song(song*)` — starts a byte-stream song; `ezpsg_instruments()` callback defines instruments
+- Note range: `a0` (83 Hz) to `c8` (~12558 Hz) — full piano range (88 notes)
+
 ## Related pages
 
 - [[rp6502-ria]] — firmware that contains the PSG
 - [[opl2-fm-synth]] — the FM synthesizer that coexists with the PSG
 - [[xreg]] — how to set the PSG register block address
 - [[xram]] — where the 64-byte PSG config block lives
+- [[ezpsg]] — the ezpsg high-level library

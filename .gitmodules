@@ -1,3 +1,6 @@
 [submodule "raw/github/picocomputer/rp6502"]
 	path = raw/github/picocomputer/rp6502
 	url = https://github.com/picocomputer/rp6502.git
+[submodule "raw/github/picocomputer/examples"]
+	path = raw/github/picocomputer/examples
+	url = https://github.com/picocomputer/examples

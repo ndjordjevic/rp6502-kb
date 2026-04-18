@@ -7,6 +7,8 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] ingest | picocomputer/examples (git submodule, commit 95965c6) | New: 9 pages (sources/examples, concepts/vga-display-modes, concepts/vga-graphics, concepts/gamepad-input, concepts/rtc, concepts/nfc, concepts/exec-api, entities/ezpsg, topics/performance); Updated: concepts/programmable-sound-generator (ezpsg section), concepts/fatfs (directory API); All 8 ingest plan groups complete; plan file deleted
+
 ## [2026-04-18] ingest | raw/pdfs/2023-06-07-rp6502.pdf | New: schematic-2023 source page + board-circuits concept (glue logic, VGA DAC, audio filter, IRQ merge, IORQ decode, dual power rail, connector pinouts)
 
 ## [2026-04-18] update | picocomputer.github.io _static/ | Mouser BOM, schematic PDFs, headerless Pico build variant added to rp6502-board + hardware source

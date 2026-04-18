@@ -52,6 +52,43 @@ Default code page: **CP850** (Latin-1).
 
 **littlefs** was an early candidate for internal flash storage (designed by Arm for bare flash devices, with wear leveling at the library level). It appeared in early RP6502 discussions (Ep6) but was ultimately not included in the final OS design — the RP6502-OS stores everything on removable USB media only.
 
+## Directory listing API
+
+From `dir.c` in `picocomputer/examples`:
+
+```c
+int dirdes = f_opendir(path);         // returns descriptor; < 0 on error
+f_stat_t *fi = malloc(sizeof(f_stat_t));
+while (1) {
+    f_readdir(fi, dirdes);
+    if (!fi->fname[0]) break;         // empty fname = end of directory
+    // fi->fsize, fi->fattrib, fi->fdate, fi->ftime, fi->fname
+}
+f_closedir(dirdes);
+```
+
+`f_stat_t` field summary:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `fsize` | long | File size in bytes |
+| `fdate` | uint16 | FAT date: bits [15:9]=year-1980, [8:5]=month, [4:0]=day |
+| `ftime` | uint16 | FAT time: bits [15:11]=hours, [10:5]=minutes, [4:0]=seconds/2 |
+| `fattrib` | uint8 | Attribute flags (see below) |
+| `fname` | char[] | Filename (null-terminated) |
+
+Attribute flags: `AM_RDO`=0x01 (read-only), `AM_HID`=0x02 (hidden), `AM_SYS`=0x04 (system), `AM_DIR`=0x10 (directory), `AM_ARC`=0x20 (archive).
+
+Additional FatFS calls from `dir.c`:
+
+```c
+f_getlabel("", label_buf);                          // volume label
+f_getcwd(path_buf, sizeof(path_buf));               // current directory
+f_getfree("", &free_blocks, &total_blocks);         // 512-byte blocks
+```
+
+Errors use standard `errno`; check `errno` after any `< 0` return.
+
 ---
 
 ## Related pages
