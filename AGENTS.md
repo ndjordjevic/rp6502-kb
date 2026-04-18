@@ -7,6 +7,12 @@ The AI agent maintains the wiki. The human curates sources, asks questions, and 
 
 ---
 
+## Git policy
+
+**Never commit automatically.** Do not run `git add`, `git commit`, or `git push` unless the human explicitly asks. Make all file edits, then stop and let the human review and commit.
+
+---
+
 ## Folder structure
 
 ```
