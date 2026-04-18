@@ -27,6 +27,10 @@ Human-driven. Claude does not write to `raw/`.
 - ✅ **RP2350 datasheet** PDF → `raw/pdfs/RP-008373-DS-2-rp2350-datasheet.pdf`
 - ✅ **Raspberry Pi Pico C SDK reference** PDF → `raw/pdfs/RP-009085-KB-1-raspberry-pi-pico-c-sdk (1).pdf`
 - ✅ **W65C02S datasheet** PDF → `raw/pdfs/w65c02s.pdf` (WDC official, Feb 2024, 32 pp.)
+- ✅ **6502 Assembly Language Programming (2nd Ed)** — Leventhal 1986 → `raw/pdfs/`
+- ✅ **Assembly Lines Complete** — Roger Wagner 2014 → `raw/pdfs/`
+- ✅ **Programming the 6502** — Rodnay Zaks 1983 → `raw/pdfs/`
+- ✅ **6502 Assembly Language Subroutines** — Leventhal 1982 → `raw/pdfs/`
 - ✅ Populate `raw/youtube/VIDEO_INDEX.md` with RP6502 videos and fetch captions via `yt-dlp` (21/22 transcripts; Ep5 has no captions)
 - ⬜ *(Optional)* Export Discord RP6502 channels via DiscordChatExporter → `raw/discord/`
 
@@ -43,6 +47,10 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **RP2350 datasheet** — all 14 sessions complete: SIO/TMDS, PIO, GPIO, clocks, DMA, USB, SPI, UART, HSTX, errata (E1–E28); 1 new concept page ([[hstx]]), 9 concept pages updated with RP2350 differences, full errata table in [[known-issues]]; ingest plan deleted
 - ✅ Ingest **W65C02S datasheet** — 1 source + 2 new concept pages ([[65c02-instruction-set]], [[65c02-addressing-modes]]); [[w65c02s]] entity greatly expanded with part decode, pin table, vectors, timing, WDC enhancements
 - ✅ Ingest **YouTube playlist** — all 9 sessions complete; 21 source pages + 5 new concept/entity pages (code-pages, programmable-sound-generator, opl2-fm-synth, cc65, llvm-mos); development-history Eras A–E written
+- ✅ Ingest **Leventhal 6502 Assembly Programming 2nd Ed** — 1 source + 6 new concept pages ([[6502-interrupt-patterns]], [[6502-subroutine-conventions]], [[6502-application-snippets]], [[6502-programming-idioms]], [[6502-data-structures]]); [[65c02-instruction-set]] augmented with Ch.17 pedagogical notes
+- 👉 Ingest **Leventhal 6502 Assembly Language Subroutines** (raw/pdfs/)
+- ⬜ Ingest **Wagner Assembly Lines Complete** (raw/pdfs/)
+- ⬜ Ingest **Zaks Programming the 6502** (raw/pdfs/)
 - ⬜ Ingest Discord export (if collected)
 
 ## Phase 3 — Maintain & synthesize
@@ -62,12 +70,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 13 + 22 (youtube-playlist + ep01–ep22 except ep05) = **35** |
+| Sources | 13 + 22 (youtube-playlist + ep01–ep22 except ep05) + 1 (leventhal-6502-assembly) = **36** |
 | Entities | 8 + 2 (cc65, llvm-mos) = **10** |
-| Concepts | 23 + 3 (code-pages, programmable-sound-generator, opl2-fm-synth) + 2 (65c02-instruction-set, 65c02-addressing-modes) = **28** |
+| Concepts | 23 + 3 (code-pages, programmable-sound-generator, opl2-fm-synth) + 2 (65c02-instruction-set, 65c02-addressing-modes) + 5 (6502-interrupt-patterns, 6502-subroutine-conventions, 6502-application-snippets, 6502-programming-idioms, 6502-data-structures) = **33** |
 | Topics | 4 (overview, version-history, known-issues, development-history) = **4** |
-| Inbox | 0 (youtube ingest plan deleted) |
-| **Total pages** | **~77** |
+| Inbox | 0 (leventhal ingest plan deleted) |
+| **Total pages** | **~83** |
 
 ---
 

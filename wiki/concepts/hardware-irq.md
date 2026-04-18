@@ -183,3 +183,4 @@ user_irq_unclaim(irq_num);
 - [[gpio-pinout]] — GPIO IRQ callbacks (`gpio_set_irq_enabled_with_callback`) install to `IO_IRQ_BANK0`
 - [[dma-controller]] — DMA channel interrupts (`DMA_IRQ_0`, `DMA_IRQ_1`)
 - [[dual-core-sio]] — `SIO_IRQ_PROC0/1` (RP2040) / `SIO_IRQ_FIFO` (RP2350) for inter-core FIFO interrupts
+- [[6502-interrupt-patterns]] — **6502 CPU side**: IRQ/NMI vectors, ISR register save/restore, polling vs. vectored dispatch

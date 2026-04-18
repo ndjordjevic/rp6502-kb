@@ -1,7 +1,7 @@
 ---
 type: topic
 tags: [rp6502, overview]
-updated: 2026-04-17
+updated: 2026-04-18
 ---
 
 # RP6502 Wiki — Overview
@@ -74,6 +74,19 @@ The RP6502 VGA module uses the Pi Pico 2 (RP2350), and the RIA-W uses the Pi Pic
 - **USB PHY_ISO**: `MAIN_CTRL.PHY_ISO` resets to 1 on RP2350 — must clear before any USB use. RP2040 code that immediately enables the USB controller will hang. `clk_sys` must be **> 48 MHz** (not equal) when USB is active (RP2350-E12). See [[usb-controller]].
 - **Silicon errata**: 28 documented errata (E1–E28). Most critical: E12 (USB), E5/E8 (DMA CHAIN_TO/ABORT), E2 (SIO spinlock), E1 (interpolator OVERF). Full list with workarounds: [[known-issues]] § RP2350 silicon errata.
 
+## 6502 Programmer's library
+
+The wiki now contains a layer of 6502 **programming knowledge** drawn from Leventhal's *6502 Assembly Language Programming, 2nd Ed.* (1986), the definitive reference for practical 65C02 coding.
+
+- **Instruction set enhancements** ([[65c02-instruction-set]]): all 65C02 additions over NMOS 6502 — `(zp)` indirect, `JMP (a,x)`, BRA, PHX/PHY/PLX/PLY, STZ, INC A/DEC A, TRB/TSB, SMB/RMB/BBR/BBS; decimal-flag-cleared-on-interrupt fix; JMP indirect page-boundary fix.
+- **Interrupt system** ([[6502-interrupt-patterns]]): IRQ/NMI/BRK/RESET vectors, canonical 5-instruction register save/restore sequence, IRQ-vs-BRK distinguish via stack B-bit, polling dispatch, RTI semantics, ISR design rules.
+- **Subroutine conventions** ([[6502-subroutine-conventions]]): JSR/RTS off-by-one mechanics, three parameter-passing methods (registers / ZP pseudo-registers / stack), reentrancy, relocatability. Related to the XSTACK ABI ([[rp6502-abi]]).
+- **Application snippets** ([[6502-application-snippets]]): string length, blank-skip, parity, hex↔ASCII, BCD-to-7-segment, pattern match.
+- **Arithmetic idioms** ([[6502-programming-idioms]]): multi-precision binary/BCD addition, 8-bit multiply (shift-and-add), 8-bit divide (shift-and-subtract), carry-chain rules.
+- **Data structures** ([[6502-data-structures]]): unordered/ordered list operations, circular queue, bubble sort, jump tables (pre- and 65C02-style).
+
+These pages answer *how to write 6502 code for RP6502* — patterns that map directly onto the OS ABI and the 65C02 silicon on the board.
+
 ## Key open questions
 
 1. **W65C02S WAI / STP** — the datasheet ([[w65c02s-datasheet]], Ch. 7) confirms WAI pulls RDY low and releases on any interrupt; the RIA currently busy-polls via a 32-byte `RIA_SPIN` stub. A WAI-based ABI could reduce power but would need an IRQB source on every RIA completion, which RP6502 firmware doesn't currently wire. The `ria_write` PIO generates PHI2 continuously; WAI would stall the 6502 in-place until IRQ fires.
@@ -84,7 +97,7 @@ The RP6502 VGA module uses the Pi Pico 2 (RP2350), and the RIA-W uses the Pi Pic
 
 ## Hub pages
 
-- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[w65c02s-datasheet]] · [[youtube-playlist]]
+- **Sources**: [[picocomputer-intro]] · [[hardware]] · [[rp6502-ria-docs]] · [[rp6502-ria-w-docs]] · [[rp6502-vga-docs]] · [[rp6502-os-docs]] · [[rp6502-github-repo]] · [[release-notes]] · [[quadros-rp2040]] · [[fairhead-pico-c]] · [[pico-c-sdk]] · [[rp2350-datasheet]] · [[w65c02s-datasheet]] · [[leventhal-6502-assembly]] · [[youtube-playlist]]
 - **Entities**: [[rp6502-board]] · [[rp6502-ria]] · [[rp6502-ria-w]] · [[rp6502-vga]] · [[rp6502-os]] · [[w65c02s]] · [[w65c22s]] · [[rp2350]] · [[cc65]] · [[llvm-mos]]
-- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[65c02-instruction-set]] · [[65c02-addressing-modes]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]] · [[code-pages]] · [[programmable-sound-generator]] · [[opl2-fm-synth]]
+- **Concepts**: [[memory-map]] · [[pix-bus]] · [[xram]] · [[xreg]] · [[rom-file-format]] · [[rp6502-abi]] · [[reset-model]] · [[launcher]] · [[ria-registers]] · [[api-opcodes]] · [[65c02-instruction-set]] · [[65c02-addressing-modes]] · [[6502-interrupt-patterns]] · [[6502-subroutine-conventions]] · [[6502-application-snippets]] · [[6502-programming-idioms]] · [[6502-data-structures]] · [[pio-architecture]] · [[pioasm]] · [[gpio-pinout]] · [[hardware-irq]] · [[dual-core-sio]] · [[rp2040-memory]] · [[dma-controller]] · [[usb-controller]] · [[rp2040-clocks]] · [[rp2040-uart]] · [[rp2040-spi]] · [[sdk-architecture]] · [[hstx]] · [[code-pages]] · [[programmable-sound-generator]] · [[opl2-fm-synth]]
 - **Topics**: [[version-history]] · [[known-issues]] · [[development-history]]

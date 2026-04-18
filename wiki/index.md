@@ -22,6 +22,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[pico-c-sdk]] | Raspberry Pi Pico-series C/C++ SDK (RP-009085-KB-1, 2025): official API reference — function signatures, PIOASM encoding, RP2040/RP2350 compat table; all 14 sessions ingested ✅ |
 | [[rp2350-datasheet]] | RP2350 datasheet (RP-008373-DS-2, 2025-07-29): authoritative RP2350 hardware reference — SIO/TMDS, clocks/LPOSC, GPIO F0–F11, PIO v1, DMA (16-ch), USB, UART, SPI, HSTX, errata E1–E28; all 14 sessions ingested ✅ |
 | [[w65c02s-datasheet]] | W65C02S datasheet (WDC, Feb 2024, 32 pp.): official CPU reference — 70 instructions, 16 addressing modes, 212 opcodes, pin functions, AC/DC timing, NMOS-vs-CMOS caveats |
+| [[leventhal-6502-assembly]] | *6502 Assembly Language Programming, 2nd Ed.* (Leventhal, 1986): definitive 6502 programmer's reference — 65C02 enhancements (Ch.17), interrupts, subroutines, string/arithmetic/table idioms |
 | [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
 | [[yt-ep01-8bit-retro-computer]] | Ep1: series intro, breadboard with 12 glue chips, USB/VGA working |
 | [[yt-ep02-pio-and-dma]] | Ep2: dual-Pico pivot; PIO+DMA 6502 read path; 8 MHz achieved |
@@ -94,8 +95,13 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[code-pages]] | Code page 437/850/855: glyph-set swap + FAT short-name encoding; CP850 default; 8.3 fallback with ~1 suffix |
 | [[programmable-sound-generator]] | PSG in RIA firmware: 8 channels, 5 waveforms, variable duty cycle, ADSR envelope, stereo pan, PWM physical layer; first in v0.6 |
 | [[opl2-fm-synth]] | OPL2 FM synthesizer (Yamaha YM3812-compatible) in RIA firmware: same as AdLib/Sound Blaster; firmware-flash only; added v0.16 |
-| [[65c02-instruction-set]] | W65C02S instruction set: 70 mnemonics, 212 opcodes, new CMOS instructions (BBR/BBS, BRA, PHX/PHY/PLX/PLY, RMB/SMB, STP, STZ, TRB/TSB, WAI), reserved-NOP table |
+| [[65c02-instruction-set]] | W65C02S instruction set: 70 mnemonics, 212 opcodes, new CMOS instructions (BBR/BBS, BRA, PHX/PHY/PLX/PLY, RMB/SMB, STP, STZ, TRB/TSB, WAI), reserved-NOP table; Ch.17 Leventhal pedagogical notes |
 | [[65c02-addressing-modes]] | W65C02S 16 addressing modes with cycle/byte counts; new `(zp)` and `(a,x)` modes vs NMOS 6502 |
+| [[6502-interrupt-patterns]] | 6502 CPU interrupt system: IRQ/NMI/BRK/RESET vectors, ISR register save/restore, polling dispatch, RTI semantics, ISR design guidelines |
+| [[6502-subroutine-conventions]] | JSR/RTS mechanics, three parameter-passing methods (registers / ZP pseudo-regs / stack), reentrancy, relocatability, subroutine documentation |
+| [[6502-application-snippets]] | Reusable 6502 patterns: string length, blank-skip, hex↔ASCII, BCD↔7-segment, pattern match |
+| [[6502-programming-idioms]] | 6502 arithmetic idioms: multi-precision binary/BCD addition, 8-bit multiply, 8-bit divide, carry-chain rules |
+| [[6502-data-structures]] | 6502 data structure patterns: ordered/unordered lists, circular queues, bubble sort, jump tables (pre- and 65C02-style) |
 
 ## Inbox
 

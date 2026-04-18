@@ -1,10 +1,10 @@
 ---
 type: concept
 tags: [w65c02s, 65c02, instruction-set, opcodes, assembly]
-related: [[w65c02s]], [[65c02-addressing-modes]], [[rp6502-abi]], [[cc65]], [[llvm-mos]]
-sources: [[w65c02s-datasheet]]
+related: [[w65c02s]], [[65c02-addressing-modes]], [[rp6502-abi]], [[cc65]], [[llvm-mos]], [[6502-subroutine-conventions]], [[6502-data-structures]]
+sources: [[w65c02s-datasheet]], [[leventhal-6502-assembly]]
 created: 2026-04-17
-updated: 2026-04-17
+updated: 2026-04-18
 ---
 
 # 65C02 Instruction Set
@@ -165,3 +165,143 @@ The RP6502's [[rp6502-abi]] leverages WDC enhancements:
 ## Related pages
 
 - [[w65c02s]] · [[65c02-addressing-modes]] · [[w65c02s-datasheet]] · [[rp6502-abi]] · [[cc65]] · [[llvm-mos]]
+
+---
+
+## Leventhal Ch. 17 — pedagogical notes on new instructions
+
+The following notes come from *6502 Assembly Language Programming, 2nd Ed.* (Leventhal, 1986), Ch. 17, which frames the 65C02 enhancements from a programmer's perspective. Source: [[leventhal-6502-assembly]].
+
+### Indirect addressing for arithmetic/logic — the key improvement
+
+The NMOS 6502 only supports indirect addressing for `JMP` and for the two pre/post-indexed indirect modes `(zp,X)` / `(zp),Y`. The 65C02 adds **true `(zp)` indirect** to all arithmetic, logical, and transfer instructions (ADC, AND, CMP, EOR, LDA, ORA, SBC, STA). This is the most practically significant 65C02 enhancement:
+
+```asm
+; Load from address stored in zero-page pair $40/$41:
+LDA  ($40)        ; effective address = word at ($40), ($41)
+
+; Compare with indirect data:
+CMP  ($42)        ; compares A with byte pointed to by ($42)/$43
+
+; Without this mode (NMOS): must set Y=0 and use (zp),Y
+LDY  #0
+LDA  ($40),Y      ; NMOS equivalent — wastes a register
+```
+
+Any zero-page address pair can now serve as a full 16-bit address register. This is Leventhal's primary motivation for recommending the 65C02 over the NMOS 6502 for new designs.
+
+### `JMP (a,x)` — clean jump tables
+
+```asm
+; Jump to table entry indexed by Accumulator:
+ASL  A            ; × 2 (each entry is 2 bytes)
+TAX
+JMP  (JTBL,X)     ; opcode $7C — load PC from JTBL+X
+```
+
+This replaces a 7-instruction pre-65C02 sequence (ASL / TAX / LDA JTBL,X / STA $40 / LDA JTBL+1,X / STA $41 / JMP ($40)). See [[6502-data-structures]] for full comparison.
+
+### Bit-manipulation instructions — `SMB` / `RMB` / `BBS` / `BBR`
+
+These four instruction families operate on **single bits of zero-page bytes**:
+
+| Mnemonic | Opcode range | Operation |
+|----------|-------------|-----------|
+| `RMB0`–`RMB7` | `$07,$17,...,$77` | Reset (clear) bit N of zero-page byte |
+| `SMB0`–`SMB7` | `$87,$97,...,$F7` | Set bit N of zero-page byte |
+| `BBR0`–`BBR7` | `$0F,$1F,...,$7F` | Branch if bit N of ZP byte is 0 |
+| `BBS0`–`BBS7` | `$8F,$9F,...,$FF` | Branch if bit N of ZP byte is 1 |
+
+All are 3-byte instructions. Example pattern for a status-flag byte in zero page:
+
+```asm
+; Set flag 3 in ZP location FLAGS ($42):
+SMB3  $42         ; bit 3 of ($42) ← 1
+
+; Clear flag 0:
+RMB0  $42         ; bit 0 of ($42) ← 0
+
+; Branch if flag 5 is set:
+BBS5  $42, TARGET ; branch to TARGET if bit 5 of ($42) = 1
+```
+
+These are particularly useful for port-pin control and software flags without needing ORA/AND masks.
+
+### `BRA` — unconditional relative branch
+
+Opcode `$80`. Eliminates the common NMOS workaround of using `BNE *+0` (exploit a known flag) or a 3-byte `JMP` for short branches:
+
+```asm
+; NMOS: need a trick or 3-byte JMP for short backward branch
+LOOP:   INX
+        BNE  LOOP    ; only works if you want to branch when Z=0
+
+; 65C02: always branch with BRA
+LOOP:   INX
+        BRA  LOOP    ; unconditional, 2-byte, ±127 bytes range
+```
+
+### `PHX` / `PHY` / `PLX` / `PLY` — save/restore index registers without trashing A
+
+```asm
+; Preserve X and Y across a subroutine call:
+PHX               ; push X ($DA — 3 cycles)
+PHY               ; push Y ($5A — 3 cycles)
+JSR  MYFUNC
+PLY               ; pop Y ($7A — 4 cycles)
+PLX               ; pop X ($FA — 4 cycles)
+; A is not touched
+```
+
+Total: 4 instructions (14 cycles) instead of 6 instructions (20+ cycles) via TXA/PHA/TYA/PHA/PLA/TAY/PLA/TAX. See [[6502-subroutine-conventions]].
+
+### `STZ` — store zero without loading the accumulator
+
+```asm
+; NMOS: LDA #0 / STA addr (3 bytes, 5 cycles)
+LDA  #0
+STA  $40
+
+; 65C02: STZ addr (2 bytes, 3 cycles for ZP)
+STZ  $40          ; opcode $64 (ZP), $74 (ZP,X), $9C (abs), $9E (abs,X)
+```
+
+Initialization loops that clear arrays become significantly shorter.
+
+### `INC A` / `DEC A` — accumulator increment/decrement
+
+```asm
+; NMOS: CLC / ADC #1 (2 instructions, 4 cycles)
+CLC
+ADC  #1
+
+; 65C02: INC A (1 instruction, 2 cycles, opcode $1A)
+INC  A            ; or just: INC (bare accumulator mode)
+DEC  A            ; opcode $3A
+```
+
+### `TRB` / `TSB` — test and modify bits
+
+`TSB` (Test and Set Bits, opcodes `$04` ZP / `$0C` abs): Z = (A AND M) == 0; M ← M OR A.  
+`TRB` (Test and Reset Bits, opcodes `$14` ZP / `$1C` abs): Z = (A AND M) == 0; M ← M AND NOT(A).
+
+Pattern: use accumulator as a **mask**, test bits, and set or clear them — all in one instruction:
+
+```asm
+; Turn on bits 3 and 5 of PORT, test if they were previously clear:
+LDA  #%00101000   ; mask for bits 3 and 5
+TSB  PORT         ; PORT ← PORT | mask; Z = 1 if both were 0 before
+
+; Clear bits 3 and 5, test if they were set:
+LDA  #%00101000
+TRB  PORT         ; PORT ← PORT & ~mask; Z = 1 if both were 0
+```
+
+### Decimal mode flag cleared on interrupt (65C02 fix)
+
+On the 65C02, hardware interrupts (IRQ, NMI, BRK, RESET) **automatically clear P.D** before loading the vector. This means the ISR body starts in binary mode regardless of what the interrupted code was doing. On the NMOS 6502, the ISR had to explicitly `CLD` at entry to be safe. This is a silent but important correctness fix.
+
+### JMP indirect page-boundary bug fixed
+
+On the NMOS 6502, `JMP ($xxFF)` reads the low byte from `$xxFF` and the high byte from `$xx00` (wraps within the same page). The 65C02 fixes this: `JMP ($xxFF)` correctly reads the high byte from `$(xx+1)00`.
+

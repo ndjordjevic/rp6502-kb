@@ -7,6 +7,22 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] ingest | leventhal-6502-assembly | Leventhal 2nd Ed. Ch.6-10, 12, 17
+
+- `wiki/sources/leventhal-6502-assembly.md`: CREATED — source page with full Scope table (Ch.1–17), key facts, key takeaways for all ingested chapters (65C02 enhancements, interrupt system, subroutine conventions, string/arithmetic/table idioms)
+- `wiki/concepts/6502-interrupt-patterns.md`: CREATED — IRQ/NMI/BRK/RESET vectors, interrupt response sequence, IRQ vs BRK distinguish, register save/restore (PHA/TXA/PHA/TYA/PHA → PLA/TAY/PLA/TAX/PLA), RTI semantics, polling dispatch with 6522 VIA IFR, ISR design guidelines, 65C02 decimal-flag-cleared-on-interrupt improvement, RP6502 context
+- `wiki/concepts/6502-subroutine-conventions.md`: CREATED — JSR/RTS off-by-one mechanics, three parameter-passing methods (registers / ZP pseudo-registers / stack), reentrancy requirements, relocatability, subroutine documentation format, 65C02 PHX/PHY improvements, RP6502 XSTACK relationship
+- `wiki/concepts/6502-application-snippets.md`: CREATED — ASCII structure, string length, leading-blank skip, leading-zero replace, parity, pattern match; hex↔ASCII conversion (with gap offset explained), BCD-to-7-segment table lookup, BCD unpacking (Ch.6–7)
+- `wiki/concepts/6502-programming-idioms.md`: CREATED — multi-precision binary addition (MSB-first, CLC once + loop ADC), multi-precision BCD addition (SED/CLD wrap), 8-bit multiply (shift-and-add, ~250 cycles), 8-bit divide (shift-and-subtract), carry-chain instruction table (Ch.8)
+- `wiki/concepts/6502-data-structures.md`: CREATED — add-to-list (with duplicate check), check-ordered-list (backward scan, early exit), circular queue (enqueue/dequeue with wrap), bubble sort (PHA/PLA swap, equal-element safety), jump table pre-65C02 (7 instructions) vs 65C02 `JMP (JTBL,X)` (3 instructions), table lookup patterns (Ch.9)
+- `wiki/concepts/65c02-instruction-set.md`: AUGMENTED — added Leventhal Ch.17 section: indirect addressing for arithmetic/logic, `JMP (a,x)` jump tables, bit-manipulation (SMB/RMB/BBS/BBR) examples, BRA, PHX/PHY/PLX/PLY cycle counts, STZ vs LDA#0/STA, INC A/DEC A, TRB/TSB masking patterns, decimal-flag-cleared-on-interrupt fix, JMP indirect page-boundary fix
+- `wiki/concepts/hardware-irq.md`: cross-link added → `[[6502-interrupt-patterns]]`
+- `wiki/concepts/rp6502-abi.md`: cross-link added → `[[6502-subroutine-conventions]]`
+- `wiki/index.md`: added 1 source entry + 7 concept entries (6 new, 1 updated description)
+- `wiki/overview.md`: updated — 65C02 programming section expanded; new 6502 programmer's library section
+- `wiki/inbox/leventhal-6502-assembly-ingest-plan.md`: DELETED (all planned chapters ingested)
+- `PROGRESS.md`: Leventhal ingest flipped 👉 → ✅; wiki size updated
+
 ## [2026-04-17] ingest | w65c02s-datasheet | full PDF (32 pp., WDC Feb 2024)
 
 - `wiki/sources/w65c02s-datasheet.md`: CREATED — source page with Scope table (Ch.1–7, 10 ingested; Ch.8/9 hard-core/RTL skipped), key facts, NMOS-vs-CMOS caveats summary, pin-function highlights, packages

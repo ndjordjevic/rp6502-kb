@@ -137,6 +137,7 @@ All source files must be listed in `add_executable()`. No other CMake knowledge 
 ## Related pages
 
 - [[ria-registers]] · [[api-opcodes]] · [[rp6502-os]] · [[rp6502-ria]] · [[xram]] · [[memory-map]]
+- [[6502-subroutine-conventions]] — native 6502 parameter passing (registers, ZP, stack) that the XSTACK model improves upon
 
 ---
 
