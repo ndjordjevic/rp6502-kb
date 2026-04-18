@@ -1,0 +1,183 @@
+==============================================================
+Guild: Rumbledethumps
+Channel: Text Channels / razemos
+Topic: Come together and build a native OS for the RP6502.
+==============================================================
+
+[3/17/2026 5:57 AM] rumbledethumps
+Many of you have expressed interest in a fully on-device experience for the RP6502. I propose that we collaborate on the project here.
+
+@WojciechGw has already established a strong starting point, which you can find here: https://github.com/WojciechGw/cc65-rp6502os. Projects like GeckOS and LUnix also offer excellent ideas that map well to the RP6502 architecture.
+
+I plan to stay on the sidelines to provide coaching and ensure the platform remains supportable. To avoid future confusion with the existing RP6502-OS name, part of the RP6502-RIA, RP6502-RIA-W, RP6502-VGA family, I suggest we begin by choosing a unique name for this project.
+
+So let's get things started with bikeshedding the name.
+
+
+[3/17/2026 7:44 AM] voidas_pl
+right name for this channel 🙂
+In Polish, it literally means "togetherOS"
+
+
+[3/17/2026 7:55 AM] rumbledethumps
+I thought you might like that. It even has MOS in it.
+
+
+[3/17/2026 8:01 AM] voidas_pl
+I like it indeed 🙂
+
+
+[3/17/2026 1:51 PM] lupin3rd
+Add another vote for razemos!
+
+
+[3/17/2026 6:38 PM] ericwstark
+It's all the Raze!  😉
+
+
+[3/18/2026 9:39 AM] voidas_pl
+https://github.com/WojciechGw/cc65-rp6502os/releases/tag/0.01-pre
+
+{Embed}
+https://github.com/WojciechGw/cc65-rp6502os/releases/tag/0.01-pre
+Release Version 0.01 (pre-release) · WojciechGw/cc65-rp6502os
+This is a working but pre-release version.
+Take a look at release/latest catalog for extra files.
+Have fun !
+https://images-ext-1.discordapp.net/external/BWWzYmXyiFSqTtcIlpNoyjydrCCHiSM3uozoV_LNwZo/https/opengraph.githubassets.com/186198da2a9f68703f3060a2f625e53de6cad302e94ea0c4feaa24d9d5ede833/WojciechGw/cc65-rp6502os/releases/tag/0.01-pre
+
+
+[3/18/2026 9:42 AM] voidas_pl
+The most changes in HASS
+
+
+[3/29/2026 6:18 PM] tonyvr0759
+Thanks for setting up this channel.  I think that is a greeat idea, and hope to contribute to the effort.
+
+
+[3/29/2026 9:51 PM] rumbledethumps
+The new non-blocking CON: and TTY: in v0.21 (released today) will be useful when multitasking is added.
+
+{Reactions}
+👍 💪
+
+[3/30/2026 9:41 PM] rumbledethumps
+https://picocomputer.github.io/os.html#launcher
+I explain how the launcher can be used for a native OS.
+
+{Reactions}
+👍
+
+[4/10/2026 12:37 AM] voidas_pl
+https://github.com/WojciechGw/cc65-rp6502os/releases/tag/0.01
+
+{Embed}
+https://github.com/WojciechGw/cc65-rp6502os/releases/tag/0.01
+Release Version 0.01 · WojciechGw/cc65-rp6502os
+razemOS (native 65C02 OS) + HASS (Handy ASSembler for 65C02)
+as a separate .rp6502
+.zip includes also ctx.py and crx.py
+scripts for PC side transfer files from/to Picocomputer 6502
+https://images-ext-1.discordapp.net/external/JZR6Rkrk5LuarF25gAUnogA8_EmA_aJRrYErFNrhTo8/https/opengraph.githubassets.com/fe2ca4c15095e11d6a9a891a6fee91f28a0c5a16dc68de9ae65704ec11094128/WojciechGw/cc65-rp6502os/releases/tag/0.01
+
+{Reactions}
+🤘
+
+[4/10/2026 3:14 AM] jasonr1100
+this is very sleek.  and very well done!
+
+
+[4/10/2026 9:17 AM] voidas_pl
+thank you very much 🙂 I’d like to reach your level of elegance ...
+
+
+[4/10/2026 9:37 AM] voidas_pl
+If you can spare some time to test it and share your feedback, I’d be grateful.
+
+
+[4/10/2026 9:48 AM] voidas_pl
+I’m still working on the text editor, but right now I’m more focused on the memory footprint of razemOS. So far, I’ve managed to get it below the magic 0x8000. Thats why HASS became a standalone .rp6502, in its current state, it needs memory space starting at 0x7B00 in order to run as a .com program.
+
+
+[4/10/2026 9:52 AM] voidas_pl
+And of course, moving toward multitasking...
+
+
+[4/10/2026 11:49 AM] voidas_pl
+@JasonR I have a small request: would you add an ESC exit option to all your past and future ROMs?
+
+
+[4/10/2026 1:39 PM] jasonr1100
+Yes!  I was thinking of that when playing with razemOS. I'll add that to all my existing roms.
+
+
+[4/10/2026 4:58 PM] rumbledethumps
+Pleased don't. Everyone presses ESC for a menu because that's what what modern games do. I have special builds of games that disable this so I don't have to explain why a single keypresses crashes the CPU and restart the game for them.
+
+
+[4/10/2026 5:05 PM] voidas_pl
+So maybe, instead of using Esc, add an EXIT option to the main game/app menu?
+
+
+[4/10/2026 5:08 PM] rumbledethumps
+at least a confirmation. even adventure has a confirmation before exiting. if you really want a KILL IT DED NOW button, I suggest ALT-F4.
+
+
+[4/10/2026 5:10 PM] voidas_pl
+BOSS KEY 😉
+
+
+[4/10/2026 5:11 PM] rumbledethumps
+hrm, maybe ALT-F4 could be universal like CTRL ALT DEL. ALT-F4 always exits and returns to the launcher where CTRL ALT DEL always exits to monitor.
+
+{Reactions}
+👍
+
+[4/10/2026 5:14 PM] jasonr1100
+I'm on board with ALT-F4.
+
+
+[4/10/2026 5:16 PM] voidas_pl
+@Rumbledethumps BTW I can’t quite understand “Native OS Boot Sequence” — could you explain it in more detail?
+
+
+[4/10/2026 5:18 PM] rumbledethumps
+What part don't you understand? It's a pretty large topic to just start over and redocument.
+
+
+[4/10/2026 5:19 PM] voidas_pl
+"self update" part
+
+
+[4/10/2026 5:21 PM] rumbledethumps
+You can't update a ROM that's running. If you're booting your OS as a ROM that's how you can self-update.
+
+
+[4/10/2026 5:23 PM] rumbledethumps
+ideally, you should be loading OS apps with the OS exec, not ria_exec(). this leaves the launcher system free to supervise OS restarts.
+
+
+[4/12/2026 4:11 PM] voidas_pl
+https://github.com/WojciechGw/cc65-rp6502os/releases/tag/0.02
+
+{Embed}
+https://github.com/WojciechGw/cc65-rp6502os/releases/tag/0.02
+Release Version 0.02 · WojciechGw/cc65-rp6502os
+razemOS
+
+bug fixes
+added the pack command for packing and unpacking .zip files (STORE and DEFLATE modes)
+added the roms command — a .rp6502 launchpad (lists .rp6502 files in the current directory)
+...
+https://images-ext-1.discordapp.net/external/F_ARLK_5RJSETrmm3pRXZWsaxmXUpCoH9OhP6fWSuzo/https/opengraph.githubassets.com/a0cc49e0f075592dd47bd2a5f23b6927b77a2dca31b54411e085f4faa32e02fa/WojciechGw/cc65-rp6502os/releases/tag/0.02
+
+{Reactions}
+👍 ❤️
+
+[4/13/2026 5:57 PM] rumbledethumps
+There's so much stuff I haven't look at but I'm glad the filesystem API is getting some testing.
+
+
+==============================================================
+Exported 32 message(s)
+==============================================================

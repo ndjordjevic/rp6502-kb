@@ -68,7 +68,7 @@ Notable bring-up quirk: the **first 7 clock cycles after RESB**, the 6502 drives
 
 [[yt-ep06-roms-filesystem]] ([Ep6](https://www.youtube.com/watch?v=9u82Uy_458E)) documented the reasoning behind using two file systems simultaneously — a decision that has remained unchanged to the present day:
 
-- **FatFs** for removable USB media (drives and SD cards via USB adapter). USB drives and SD cards have built-in wear-leveling controllers, so any filesystem works. FAT is the right choice for maximum compatibility.
+- **[[fatfs|FatFs]]** for removable USB media (drives and SD cards via USB adapter). USB drives and SD cards have built-in wear-leveling controllers, so any filesystem works. FAT is the right choice for maximum compatibility.
 - **littlefs** for the Pi Pico's internal flash chip. A "naked" flash chip has no wear-leveling controller; FAT's block allocation would wear it out unevenly over time. littlefs was designed by Arm specifically for bare flash memory.
 
 The divide is physical: if a media controller manages the wear leveling for you, use FAT; if the flash chip is directly exposed, use littlefs. This logic remains load-bearing in the current firmware.

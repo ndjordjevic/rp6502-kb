@@ -2,9 +2,9 @@
 type: concept
 tags: [rp6502, ria, registers, abi, hardware]
 related: [[rp6502-ria]], [[rp6502-abi]], [[api-opcodes]], [[memory-map]], [[xram]], [[cc65]], [[llvm-mos]]
-sources: [[rp6502-ria-docs]], [[rp6502-github-repo]]
+sources: [[rp6502-ria-docs]], [[rp6502-github-repo]], [[rumbledethumps-discord]]
 created: 2026-04-16
-updated: 2026-04-16 (audit: filled register map $FFE0–$FFEB from source, fixed XSTACK register name)
+updated: 2026-04-18
 ---
 
 # RIA Registers
@@ -113,6 +113,23 @@ The internal `api_errno` enum (from `src/ria/api/api.h`) has 19 entries. They ar
 
 ---
 
+## Special device paths (from Discord / v0.18+)
+
+The OS `open()` call accepts pseudo-device paths beyond filesystem filenames:
+
+| Path syntax | Description |
+|---|---|
+| `open("ROM:filename", O_RDONLY)` | Open a named asset embedded inside the running ROM. Assets added to ROM with `rp6502_asset()` CMake macro. Debug builds can use real filesystem paths. |
+| `open("VCP3:9600,7E2", 0)` | Open USB virtual COM port #3 at 9600 baud, 7 data bits, even parity, 2 stop bits. Up to 8 VCP devices (VCP0–VCP7). |
+| `open("CON:", ...)` | Console device (stdin/stdout) |
+| `open("TTY:", ...)` | TTY device |
+
+**NFC device API**: NFC reader support added v0.21. `SET NFC 0/1/2` enables reader scanning. NDEF TEXT records containing filenames/commands auto-launch on tap. Low-level NFC API documented at `https://picocomputer.github.io/ria.html#nfc-device-api`. (@rumbledethumps, 2026-03-19)
+
+---
+
 ## Related pages
 
 - [[rp6502-abi]] · [[api-opcodes]] · [[memory-map]] · [[rp6502-ria]]
+- [[rom-file-format]] — ROM asset embedding
+- [[rumbledethumps-discord]] — VCP and ROM asset open() examples

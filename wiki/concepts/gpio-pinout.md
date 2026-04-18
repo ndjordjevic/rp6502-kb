@@ -9,7 +9,7 @@ updated: 2026-04-17
 
 # GPIO Pinout
 
-**Summary**: GPIO pin assignments for both the RIA Pico and VGA Pico as defined in the firmware source. Not in the web docs — sourced from `src/ria/sys/ria.h`, `cpu.h`, `pix.h`, `com.h`, and `src/vga/sys/pix.h`.
+**Summary**: GPIO pin assignments for both the RIA Pico and VGA Pico as defined in the firmware source. Not in the web docs — sourced from `src/ria/sys/ria.h`, `cpu.h`, `pix.h`, `com.h`, `src/vga/sys/pix.h`, and `src/vga/scanvideo/scanvideo.c`.
 
 ---
 
@@ -36,10 +36,15 @@ updated: 2026-04-17
 
 | GPIO | Signal | Source constant | Notes |
 | --- | --- | --- | --- |
+| 0–3 | PIX0–PIX3 (input) | `PIX_PIN_BASE=0` | PIX bus data received from RIA Pico |
+| 6–10 | Red DAC R0–R4 | `COLOR_PIN_BASE=6`, `RSHIFT=0`, `RCOUNT=5` | 5-bit red channel to resistor-ladder DAC |
 | 11 | PHI2 (input) | `PIX_PHI2_PIN=11` | PIX bus clock received from RIA Pico |
-| 0–3 (inferred) | PIX0–PIX3 (input) | — | PIX bus data received from RIA Pico |
+| 12–16 | Green DAC G0–G4 | `COLOR_PIN_BASE=6`, `GSHIFT=6`, `GCOUNT=5` | 5-bit green channel to resistor-ladder DAC |
+| 17–21 | Blue DAC B0–B4 | `COLOR_PIN_BASE=6`, `BSHIFT=11`, `BCOUNT=5` | 5-bit blue channel to resistor-ladder DAC |
+| 26 | HSYNC (output) | `SYNC_PIN_BASE=26` | Horizontal sync signal |
+| 27 | VSYNC (output) | `SYNC_PIN_BASE+1=27` | Vertical sync signal |
 
-> The VGA Pico's full GPIO map (VGA DAC outputs, sync signals) is in `src/vga/sys/vga.h` and `scanvideo/scanvideo.pio` — not yet read in detail. The above are confirmed from `src/vga/sys/pix.h`.
+Pixel format is RGB555 (5 bits each). Source: `src/vga/scanvideo/scanvideo.h` + `scanvideo.c`.
 
 ---
 

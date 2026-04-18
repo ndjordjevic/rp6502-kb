@@ -73,6 +73,33 @@ Link to related pages using [[wikilinks]] throughout.
 
 ---
 
+## Discord ingest workflow
+
+Discord exports live in `raw/discord/` as plain-text files exported by DiscordChatExporter.
+Each file covers one channel over a date range; see `raw/discord/README.md` for the file list.
+
+**File naming convention:** `server-<channel-name>-<YYYY-MM-DD>--<YYYY-MM-DD>.txt`
+- `server` = Discord server name (e.g. `rumbledethumps`)
+- `channel-name` = channel name without the `#` (e.g. `chat`)
+- First date = earliest message, second date = last message.
+- Subsequent exports start from the day after the previous file's last date (incremental).
+
+**When ingesting a Discord export:**
+
+1. Skim the full file for recurring topics, named contributors, and technical threads.
+2. Ignore off-topic chat, greetings, image-only posts, and link-dump messages with no discussion.
+3. Focus on: bug reports, workarounds, hardware tips, firmware quirks, roadmap hints, and anything `rumbledethumps` (the author) says about design decisions.
+4. Create or update `wiki/sources/<server-name>-discord.md` (e.g. `rumbledethumps-discord.md`). One source page per Discord server — covers all channels from that server.
+5. Extract actionable facts → update relevant `wiki/entities/` and `wiki/concepts/` pages.
+6. Flag anything that contradicts official docs with a `> **Conflict:**` block.
+7. Cite individual messages as: `(@username, YYYY-MM-DD, #channel-name)`.
+8. Follow standard housekeeping: update `wiki/index.md`, `wiki/overview.md`, `wiki/log.md`, and `PROGRESS.md`.
+9. Update `raw/discord/README.md` if a new file was added (add a row to the file table).
+
+**Incremental exports:** When the user adds a follow-up export (same channel, later dates), ingest only the new messages and update existing source/entity/concept pages in place. Do not duplicate content.
+
+---
+
 ## Ingest workflow
 
 When the user adds a source to `raw/` and asks you to ingest it:

@@ -2,9 +2,9 @@
 type: concept
 tags: [rp6502, audio, opl2, fm, synthesis, ym3812]
 related: [[rp6502-ria]], [[programmable-sound-generator]], [[xreg]], [[xram]], [[pix-bus]]
-sources: [[yt-ep22-graphics-sound-demos]], [[release-notes]]
+sources: [[yt-ep22-graphics-sound-demos]], [[release-notes]], [[rumbledethumps-discord]]
 created: 2026-04-17
-updated: 2026-04-17
+updated: 2026-04-18
 ---
 
 # OPL2 FM Synthesizer
@@ -49,11 +49,31 @@ The YM3812 register set is well-documented and compatible with the AdLib standar
 
 ## Music tracker
 
-A community-written music tracker supports both the PSG and OPL2. Effects include arpeggio, portamento, vibrato, echo, tremolo, and microtonal folds. Documentation is 20 pages long.
+**RPTracker** (jasonr1100) is a native OPL2 music tracker for the RP6502:
+- 9 channels, 256 patches (0–127 Sierra/AdLib GM, 128–255 drums/noise)
+- Effects: arpeggio, portamento, vibrato, volume slides, tremolo, delay
+- CP437 character display; save/load song files
+- v0.1 released 2025-12-31 (@jasonr1100)
+
+---
+
+## PSG and OPL2 mutual exclusion
+
+PSG is **disabled** when native OPL2 is active — only one sound card at a time. (@rumbledethumps, 2026-01-10)
+
+---
+
+## FPGA OPL2 extension (community hardware)
+
+jasonr1100 built an FPGA OPL2 expansion card connecting to the [[pix-bus]] at addresses `$1FF00–$1FF01` for register writes, using a 6522 VIA IRQ for timing. This experiment directly inspired the native OPL2 firmware implementation.
+
+---
 
 ## Related pages
 
 - [[rp6502-ria]] — the firmware that contains the OPL2 emulation
 - [[programmable-sound-generator]] — the PSG that coexists with OPL2
 - [[xreg]] — how to point the OPL2 at its 256-byte register image
+- [[pix-bus]] — bus used by community FPGA OPL2 card
+- [[community-projects]] — RPTracker and FPGA OPL2 project details
 - [[yt-ep22-graphics-sound-demos]] — origin story and first demo

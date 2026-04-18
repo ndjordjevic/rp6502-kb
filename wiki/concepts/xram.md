@@ -52,6 +52,18 @@ If you put more than one [[rp6502-vga]] on the same PIX bus, they all see the sa
 
 XRAM lives in one of the RP2040's six SRAM banks. The RIA firmware uses [[dma-controller]] channels paced by PIO DREQ signals (`DREQ_PIOx_RX`, `DREQ_PIOx_TX`) to move data between the 65C02 bus capture FIFOs and XRAM. This is what gives XRAM its ~512 KB/s bandwidth without tying up either CPU core.
 
+### Throughput vs. X16 (from Discord, 2026-04-12)
+
+Comparison reported by @rumbledethumps vs. Commander X16:
+
+| Metric | X16 | RP6502 |
+|--------|-----|--------|
+| System RAM load speed | ~140 KB/s (via KERNAL LOAD) | ~170 KB/s (via `load()` under llvm-mos) |
+| Video RAM load speed | ~100–120 KB/s (VERA overhead) | — |
+| XRAM load speed | — | **~800 KB/s** via `load_xram()` — **uses NO 6502 CPU** |
+
+The RP6502 XRAM load is fully DMA-driven: the 6502 is free to do other work while the transfer runs.
+
 ## Related pages
 
 - [[memory-map]] · [[pix-bus]] · [[xreg]] · [[rp6502-ria]] · [[rp6502-vga]] · [[dma-controller]]

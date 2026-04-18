@@ -2,9 +2,9 @@
 type: concept
 tags: [rp6502, pix, bus, protocol]
 related: [[rp6502-ria]], [[rp6502-vga]], [[xram]], [[xreg]], [[pio-architecture]]
-sources: [[rp6502-ria-docs]], [[rp6502-vga-docs]], [[rp6502-github-repo]], [[youtube-playlist]]
+sources: [[rp6502-ria-docs]], [[rp6502-vga-docs]], [[rp6502-github-repo]], [[youtube-playlist]], [[rumbledethumps-discord]]
 created: 2026-04-15
-updated: 2026-04-16
+updated: 2026-04-18
 ---
 
 # PIX Bus
@@ -95,6 +95,8 @@ Six parallel wires × 4 cycles = 24 bits — almost enough. But framing and mult
 
 With **DDR (Double Data Rate)** — shifting on both rising and falling PHI2 edges — 4 wires carry 8 bits per cycle → 32 bits in 4 cycles. The same electrical speed, twice the bandwidth. This is the PIX bus.
 
+At 8 MHz PHI2: **4 bits × 2 edges × 8 MHz = 64 Mbit/s** raw throughput. (@rumbledethumps confirmed 64 Mbit/s in Discord, 2026-04-17)
+
 ### PIO resource cost
 
 | Component | PIO cost |
@@ -125,7 +127,16 @@ PIX is one-directional (RIA→devices), but the VGA Pico needs a path back for V
 
 **Complexity hidden from users**: the pin-reversal requires flushing all hardware FIFOs (different depths for UART vs. CDC), handling re-sync when either device reboots independently, and using a "phantom UART" (not connected to any physical GPIO pin) as a flow-control barrier for the PIX bus side. From the 6502 programmer's perspective: just read the `vsync` register.
 
+## Community PIX devices
+
+The PIX bus is open for expansion. Community members have connected second PIX devices:
+
+- **FPGA OPL2 sound card** (jasonr1100): FPGA board attached to PIX bus; OPL2 registers written at `$1FF00–$1FF01`. Used a 6522 VIA IRQ for timing. Predated native OPL2 support and inspired its addition.
+- **eInk display** (jjjacer): rumbledethumps described how a Pi Pico (not ESP32) could act as a second PIX device, receive console output + XRAM data, and drive an eInk panel with custom video modes. "You'll have access to XRAM so pretty much anything you can imagine is possible."
+- PIX also handles `SET VGA` (canvas/mode) commands over its device control channel, which any attached device can listen on.
+
 ## Related pages
 
 - [[rp6502-ria]] · [[rp6502-vga]] · [[xram]] · [[xreg]]
 - [[yt-ep08-vga-pix-bus]] · [[yt-ep12-fonts-vsync]] · [[development-history]]
+- [[community-projects]] · [[rumbledethumps-discord]]

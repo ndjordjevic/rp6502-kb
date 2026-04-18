@@ -2,9 +2,9 @@
 type: topic
 tags: [rp6502, bugs, workarounds, known-issues, rp2350, errata, hardware]
 related: [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[release-notes]], [[dma-controller]], [[usb-controller]], [[rp6502-board]]
-sources: [[release-notes]], [[rp2350-datasheet]], [[youtube-playlist]]
+sources: [[release-notes]], [[rp2350-datasheet]], [[youtube-playlist]], [[rumbledethumps-discord]]
 created: 2026-04-16
-updated: 2026-04-17
+updated: 2026-04-18
 ---
 
 # Known Issues
@@ -214,6 +214,68 @@ If a program unexpectedly stops (e.g., user pressed Enter on an `INPUT` prompt w
 
 ---
 
+## Community-reported issues (from Discord)
+
+### VGA Not Found on cold boot — v0.16/v0.17 (fixed v0.18)
+
+**Symptom**: `VGA Not Found` appears on first power-up; system works fine after any subsequent reboot.
+
+**Cause**: Cold-boot UART noise from RP2350 A2-stepping hardware corrupts the RIA→VGA backchannel before the VGA firmware is ready. The `VGA_BACKCHANNEL_ACK_MS` timeout of 1 ms was insufficient on real hardware (vs. emulated/hot-reload).
+
+**Fix** (merged v0.18 — `vga_connect()` in `ria/sys/vga.c`):
+```c
+busy_wait_ms(5);
+while (stdio_getchar_timeout_us(0) != PICO_ERROR_TIMEOUT)
+    tight_loop_contents();
+```
+Minimum reliable value is **5 ms** on RP2350 A2 boards. (@ndjordjevic5067 + @rumbledethumps, 2026-02-26)
+
+### PHI2 reset to 100 kHz after config file truncation — v0.16 (fixed v0.17)
+
+**Symptom**: System becomes extremely slow after a v0.16 flash; `STATUS` reports PHI2 at 100 kHz.
+
+**Cause**: Config file containing `SET PHI2 8000` was zeroed out during firmware upgrade, reverting clock to default 100 kHz.
+
+**Fix**: Enter `SET PHI2 8000` in the monitor manually, then `SAVE`. (@rumbledethumps, 2026-01-02)
+
+### Raspberry Pi keyboard — num lock breaks right-side keys (fixed v0.18)
+
+**Symptom**: On the Raspberry Pi official keyboard (no numpad, VID `04d9` PID `0006`), keys on the right side of the keyboard misbehave after the system forces num lock ON — the RP6502 firmware was enabling num lock globally, causing the RPi keyboard to enter a numpad emulation mode.
+
+**Fix** (PR #118): Added a PID/VID exception in the HID driver so the RPi keyboard is not sent a num lock enable command. (@ndjordjevic5067, 2026-02-28; merged v0.18)
+
+### USB freezes on device plug-in — v0.1–v0.18 (fixed v0.19)
+
+**Symptom**: System hangs or behaves erratically when a USB device is plugged in, especially after a USB mass storage device triggers a mount event.
+
+**Cause**: Silicon bug in the RP2040/RP2350 USB SIE: the SIE shares a single set of handshake latches across EPX and interrupt endpoint transactions. An interrupt poll occurring immediately after an EPX transfer overwrites the EPX handshake before the IRQ handler reads it.
+
+**Fix** (v0.19): Required full rewrites of the HCD, MSC Transport, and SCSI layers (~200 engineering hours). Upstream TinyUSB PR submitted at `hathach/tinyusb#3582`. (@rumbledethumps, 2026-03-05)
+
+### llvm-mos SDK version lock (fixed in llvm-mos-sdk commit 6d99981)
+
+**Symptom**: `cmake` fails with error about mismatched clang version when using llvm-mos-sdk v22.
+
+**Cause**: llvm-mos-sdk v22 hardcoded a specific clang version in its cmake files.
+
+**Fix**: Update llvm-mos-sdk to a commit after `6d99981`. (@tonyvr0759, 2026-02-24)
+
+### cc65 from package managers (Homebrew, apt, etc.) will not work
+
+Package manager versions of cc65 (including v2.18 from Homebrew on macOS) are years out of date and lack RP6502 platform support. You **must** build cc65 from the picocomputer fork source or use a picocomputer-provided snapshot. (@rumbledethumps, 2026-04-17)
+
+### Affine sprite line glitch on RP2350 — fixed in v0.16
+
+**Cause**: RP2350 broke the hardware interpolator behaviour relied upon by the VGA affine sprite rotation ASM code.
+
+**Fix**: Affine sprite rendering line replaced with equivalent C code (commit `2277d06`). (@rumbledethumps, 2025-12-04)
+
+### Build folder cmake regression in vscode
+
+Occasionally after a vscode extension update, cmake loses its configuration or intellisense breaks. **Fix**: Delete the `build/` folder and reconfigure. (@rumbledethumps, 2025-12-04)
+
+---
+
 ## Related pages
 
 - [[release-notes]] · [[rp6502-ria-w]] · [[rp6502-ria]] · [[rp6502-vga]]
@@ -221,4 +283,5 @@ If a program unexpectedly stops (e.g., user pressed Enter on an `INPUT` prompt w
 - [[usb-controller]] — RP2350 USB errata E12
 - [[code-pages]] — full code page documentation
 - [[yt-ep12-fonts-vsync]] · [[yt-ep17-basics-of-basic]]
+- [[rumbledethumps-discord]] — Discord community bug reports and workarounds
 

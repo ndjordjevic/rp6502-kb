@@ -32,7 +32,7 @@ Human-driven. Claude does not write to `raw/`.
 - ✅ **Programming the 6502** — Rodnay Zaks 1983 → `raw/pdfs/`
 - ✅ **6502 Assembly Language Subroutines** — Leventhal 1982 → `raw/pdfs/`
 - ✅ Populate `raw/youtube/VIDEO_INDEX.md` with RP6502 videos and fetch captions via `yt-dlp` (21/22 transcripts; Ep5 has no captions)
-- ⬜ *(Optional)* Export Discord RP6502 channels via DiscordChatExporter → `raw/discord/`
+- ✅ Export Discord RP6502 channels via DiscordChatExporter → `raw/discord/` (`#chat` 1,015 msgs + `#razemos` 32 msgs)
 
 ## Phase 2 — Ingest sessions
 
@@ -51,18 +51,26 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **Leventhal 6502 Assembly Language Subroutines** (raw/pdfs/) — All 3 passes complete. Pass 1 (Ch. 1–3 + Intro): 2 new concept pages ([[6502-emulated-instructions]], [[6502-common-errors]]), 2 augmented. Pass 2 (Ch. 6, 7, 11 + App B): 1 new entity ([[6522-via]]), 2 augmented ([[6502-programming-idioms]] + [[6502-interrupt-patterns]]). Pass 3 (Ch. 4, 5, 8, 9, 10): 1 new concept page ([[6502-io-patterns]]), 2 augmented ([[6502-application-snippets]] + [[6502-data-structures]])
 - ✅ Ingest **Wagner Assembly Lines Complete** (raw/pdfs/) — All passes complete. Ch. 1/4/5/7/9/10/12/15/28/33 ingested. 3 new concept pages ([[learning-6502-assembly]], [[6502-stack-and-subroutines]], [[6502-relocatable-and-self-modifying]]); 2 augmented ([[6502-programming-idioms]] + [[65c02-addressing-modes]]); [[65c02-instruction-set]] augmented with Ch.33 Wagner perspective; [[wagner-assembly-lines]] source page
 - ✅ Ingest **Zaks Programming the 6502** (raw/pdfs/) — Ch. II/III/V/VI/VIII/IX ingested. 1 new source page ([[zaks-programming-6502]]); 3 concept pages augmented ([[6502-programming-idioms]], [[6502-application-snippets]], [[6502-data-structures]]). Unique contributions: improved 8×8 multiply (10 instr), subroutine parameter passing comparison, 8 Ch.8 utility routines (ZEROM, bracket test, parity, ASCII↔BCD, find-max, 16-bit sum, EOR checksum, zero count), full data-structure library (linked list, circular, queue, tree, doubly-linked, binary search O(log₂N), hashing, merge)
-- 👉 Ingest Discord export (if collected)
+- ✅ Ingest **Discord export** (raw/discord/) — `#chat` (1,015 msgs) and `#razemos` (32 msgs) fully ingested. 2 new pages ([[rumbledethumps-discord]], [[community-projects]]). Key additions from #chat: HC/AC chip selection, VGA cold-boot fix, TinyUSB silicon latch bug, cc65 Homebrew warning, PIX bus 64 Mbit/s correction, design philosophy quotes, community roster. Key additions from #razemos: razemOS project (v0.01/v0.02), HASS assembler, ALT-F4 exit convention, OS exec vs ria_exec() pattern, ROM self-update pattern.
 
-## Phase 3 — Maintain & synthesize
+## Phase 3 — Learn, share, and apply
 
-- ✅ First lint pass (contradictions, orphans, gaps, missing cross-refs)
-- ✅ Second lint pass (stale open questions pruned, hub lists updated)
-- ✅ Full source audit — all raw sources cross-checked against wiki; 4 fixes applied (ria-registers register map, XSTACK register name, RIA_SPIN stub size, DREQ_PWM_WRAP7 book typo)
-- ✅ `wiki/overview.md` kept current (revised after every ingest session)
-- ⬜ File first query answer to `wiki/syntheses/` (suggested: "What does the RIA actually do?")
-- ⬜ Backfill missing entity pages: ~~[[cc65]], [[llvm-mos]]~~ ✅ done (Sessions 3–9)
-- ⬜ VIA pinout / J1 GPIO header (requires schematic PDF — not yet in `raw/`)
-- ⬜ VGA GPIO full pinout — DAC output and sync pins not yet confirmed
+### 3b — Learn the wiki
+
+- 👉 Open in Obsidian; explore graph view, backlinks, frontmatter filters
+- ⬜ Ask Claude questions; get a feel for what the wiki knows and doesn't
+- ⬜ File first synthesis page (`wiki/syntheses/`) — suggested: "What does the RIA actually do?"
+
+### 3c — Share with the community
+
+- ⬜ Polish `README.md` for public audience
+- ⬜ Push to public GitHub and post link in RP6502 Discord
+
+### 3d — RP6502 emulator project
+
+- ⬜ New emulator repo; wire wiki in via multi-root workspace or `.context/` symlink
+- ⬜ Add session-start hook to inject `overview.md` + `index.md` automatically
+- ⬜ Vibe code with Claude citing wiki; feed new findings back into `wiki/`
 
 ---
 
@@ -70,12 +78,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 13 + 22 (youtube-playlist + ep01–ep22 except ep05) + 1 (leventhal-6502-assembly) + 1 (leventhal-subroutines) + 1 (wagner-assembly-lines) + 1 (zaks-programming-6502) = **39** |
+| Sources | 13 + 22 (youtube-playlist + ep01–ep22 except ep05) + 1 (leventhal-6502-assembly) + 1 (leventhal-subroutines) + 1 (wagner-assembly-lines) + 1 (zaks-programming-6502) + 1 (rumbledethumps-discord) = **40** |
 | Entities | 8 + 2 (cc65, llvm-mos) + 1 (6522-via) = **11** |
 | Concepts | 23 + 3 (code-pages, programmable-sound-generator, opl2-fm-synth) + 2 (65c02-instruction-set, 65c02-addressing-modes) + 5 (6502-interrupt-patterns, 6502-subroutine-conventions, 6502-application-snippets, 6502-programming-idioms, 6502-data-structures) + 2 (6502-emulated-instructions, 6502-common-errors) + 1 (6502-io-patterns) + 3 (learning-6502-assembly, 6502-stack-and-subroutines, 6502-relocatable-and-self-modifying) = **39** |
-| Topics | 4 (overview, version-history, known-issues, development-history) = **4** |
+| Topics | 4 (overview, version-history, known-issues, development-history) + 1 (community-projects) = **5** |
 | Inbox | 0 |
-| **Total pages** | **~93** |
+| **Total pages** | **~95** |
 
 ---
 

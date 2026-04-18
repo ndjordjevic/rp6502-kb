@@ -2,9 +2,9 @@
 type: entity
 tags: [rp6502, llvm-mos, toolchain, compiler, 6502, c, cpp]
 related: [[cc65]], [[rp6502-abi]], [[rp6502-os]]
-sources: [[yt-ep18-llvm-mos]], [[rp6502-abi]], [[release-notes]]
+sources: [[yt-ep18-llvm-mos]], [[rp6502-abi]], [[release-notes]], [[rumbledethumps-discord]]
 created: 2026-04-17
-updated: 2026-04-17
+updated: 2026-04-18
 ---
 
 # llvm-mos
@@ -54,8 +54,21 @@ From [[yt-ep18-llvm-mos]] Mandelbrot benchmark:
 | Performance | Good with tuned code | Better optimization by default |
 | Best for | Most projects needing stdlib | C++, floats, or 64-bit math |
 
+## SDK version lock issue (fixed in 6d99981)
+
+llvm-mos-sdk v22 hardcoded a specific clang version in its cmake files, causing configure-time failures with a "mismatched clang version" error. Fixed in llvm-mos-sdk commit `6d99981`. If you hit this, update the SDK. (@tonyvr0759, 2026-02-24)
+
+## `lrand()` random number
+
+The RP6502 provides `lrand()` as its random number function (hardware entropy). Available in recent llvm-mos-sdk versions. Do not use `rand()` if true randomness is needed. (@rumbledethumps, 2026-04-02)
+
+## Binary size vs. cc65
+
+llvm-mos produces **larger binaries** than cc65 for most programs, and lacks good size optimization passes (expected to improve over time). cc65 is slightly slower in execution but produces smaller output — a meaningful trade-off on a system with 64 KB of RAM. (@rumbledethumps, 2025-12-02)
+
 ## Related pages
 
 - [[cc65]] — the primary toolchain and direct comparison
 - [[rp6502-abi]] — ABI conventions and errno handling differences
 - [[yt-ep18-llvm-mos]] — toolchain comparison episode
+- [[known-issues]] — llvm-mos SDK version lock workaround

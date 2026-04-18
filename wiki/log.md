@@ -7,6 +7,44 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] lint | wiki | post-razemos polish
+
+**Re-check**: razemos ingest verified clean — all dates, version numbers, attributions correct.
+
+**Contradictions fixed (2)**:
+- `concepts/memory-map.md:63`: "12-channel DMA controller" → "16-channel DMA controller (RP2350; RP2040 had 12)"
+- `entities/rp2350.md:63,129`: two occurrences of "12 channels / 12-channel DMA" → "16 channels / 16-channel DMA"
+
+**Data gap filled (1)**:
+- Created `wiki/concepts/fatfs.md` — FatFs r0.15+ filesystem driver: FAT32 over USB MSC, ExFAT readiness, open file limits, code-page/short-name interaction, littlefs history
+- Linked from `rp6502-os.md`, `development-history.md`, `index.md`
+
+**Cross-refs already present**: `pio-architecture.md` already links `[[hardware-irq]]`; `gpio-pinout.md` already links `[[pio-architecture]]` in footer — no action needed.
+
+---
+
+## [2026-04-18] ingest | rumbledethumps #razemos Discord export | 32 messages, 2026-03-17–2026-04-13
+
+- `wiki/sources/rumbledethumps-discord.md`: Marked #razemos `[x] ingested`; updated summary; added `## #razemos channel` section with razemOS project, release history, architecture notes, OS exec pattern, ROM self-update pattern, keyboard exit convention (ALT-F4/CTRL-ALT-DEL)
+- `wiki/topics/community-projects.md`: Expanded voidas_pl section — renamed cc65-rp6502os → razemOS with v0.01/v0.02 release details; added HASS and ctx.py/crx.py entries
+
+---
+
+## [2026-04-18] lint | gpio-pinout | VGA Pico full GPIO map resolved from scanvideo.c
+
+- `wiki/concepts/gpio-pinout.md`: Filled in VGA Pico DAC and sync pins from `src/vga/scanvideo/scanvideo.c` + `scanvideo.h`: R=GPIO 6–10, G=GPIO 12–16, B=GPIO 17–21 (RGB555, `COLOR_PIN_BASE=6`), HSYNC=GPIO 26, VSYNC=GPIO 27 (`SYNC_PIN_BASE=26`); removed "not yet read" note
+- `wiki/overview.md`: Open question #5 marked resolved with pin summary
+- `PROGRESS.md`: VGA item flipped to ✅; VIA/J1 item updated to note KiCad schematic specifically required
+
+---
+
+## [2026-04-18] lint | wiki | post-discord-chat polish
+
+- `wiki/sources/rumbledethumps-discord.md`: Expanded Scope section from a single bullet into a proper channel table — `#razemos` (32 messages, 2026-03-17–2026-04-13) was in `raw/discord/` but not acknowledged as pending ingestion
+- `PROGRESS.md`: Updated `⬜ *(Optional)* Export additional Discord channels` → `👉 Ingest #razemos channel export` with file path and message count (channel is already collected)
+
+---
+
 ## [2026-04-18] lint | wiki | post-zaks polish
 
 - `wiki/concepts/6502-programming-idioms.md`: Added missing `## Multi-precision binary addition (Leventhal 1982, Ch. 6)` heading — section was floating after a `---` divider with no heading
@@ -828,3 +866,18 @@ Key facts captured:
 
 #### Deleted
 - `wiki/inbox/wagner-assembly-lines-ingest-plan.md` — all chapters complete; superseded by source page and log.md
+
+### [2026-04-18] ingest | Discord #chat export (2022-11-03–2026-04-18) | 2 new pages, 3 augmented pages, major known-issues expansion
+
+#### New pages
+- `wiki/sources/rumbledethumps-discord.md` — source summary: hardware tips (HC vs AC logic, PHI2 sampling, PIX bus 64Mbit/s, GPIO voltages, Rev B board), firmware internals (NOP alignment, regs[] scratch_x, AUD_PWM_IRQ_PIN), USB silicon bug (TinyUSB EPX/interrupt latch race), TinyUSB PR #3582, OPL2 native details, telnet+Hayes modem (v0.24), cc65 toolchain tips (homebrew warning, binary size comparison), community design philosophy quotes, ROM asset format, NFC reader support
+- `wiki/topics/community-projects.md` — jasonr1100 (RPTracker, RPMegaFighter, RPMegaChopper, RPMegaRacer, RPGalaxy, RP6502_OPL2 FPGA card, MovieTime6502), voidas_pl (cc65-rp6502os, PicoMatrix), tonyvr0759 (RP6502-TextEditor, 65816 adaptation), jjjacer (eInk laptop), markrvm (RP6809), ndjordjevic5067 (VGA cold-boot fix, RPi keyboard PR)
+
+#### Augmented pages
+- `wiki/topics/known-issues.md` — added Community-reported issues section: VGA cold-boot (busy_wait_ms 5ms), PHI2 100kHz after config truncation, RPi keyboard num-lock bug, TinyUSB silicon bug (EPX/interrupt latch), llvm-mos SDK version lock, cc65 package manager warning, affine sprite RP2350 glitch, build folder cmake regression
+- `wiki/topics/version-history.md` — added Era 9 (v0.24): Telnet console, Hayes modem, telnet upload 56KB/s, multi-user BBS; updated v0.23 summary; added community context links
+- `wiki/concepts/opl2-fm-synth.md` — replaced generic tracker entry with RPTracker full details (9ch, 256 patches, effects list); added PSG/OPL2 mutual exclusion note; added FPGA OPL2 extension (jasonr1100 PIX bus hardware)
+
+#### Housekeeping
+- `wiki/index.md` — added rumbledethumps-discord source row; updated known-issues and version-history descriptions; added community-projects topic row
+- `PROGRESS.md` — Discord ingest flipped 👉 → ✅; next item promoted; wiki size table updated

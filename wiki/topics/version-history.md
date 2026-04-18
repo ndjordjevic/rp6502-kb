@@ -2,9 +2,9 @@
 type: topic
 tags: [rp6502, history, versions, changelog]
 related: [[release-notes]], [[known-issues]], [[rp6502-ria]], [[rp6502-vga]], [[rp6502-os]]
-sources: [[release-notes]]
+sources: [[release-notes]], [[rumbledethumps-discord]]
 created: 2026-04-16
-updated: 2026-04-16
+updated: 2026-04-18
 ---
 
 # Version History
@@ -89,8 +89,22 @@ The first versioned release established a working 65C02 + RIA firmware on Pi Pic
 
 ---
 
+## Era 9 — Networking (v0.24, Apr 2026)
+
+**v0.24** introduced Telnet console and Hayes modem support, completing the first phase of native WiFi networking:
+
+- **Telnet console**: reach the monitor and running 6502 from any remote telnet client. `SET PORT`, `SET KEY` commands.
+- **Hayes modem**: dial out and accept incoming calls over raw TCP or telnet. 10 persistent modem configs.
+- **Telnet upload speed**: ~56 KB/s — not throttled by UART (vs. serial ~11 KB/s).
+- **BBS potential**: Up to 4 modems simultaneously; headless operation (USB drive + power only). Multi-user BBS or door game server possible.
+
+This release topped 30,000 lines of code unique to the project (not counting FatFs, TinyUSB, etc.).
+
+---
+
 ## Related pages
 
 - [[release-notes]] — raw chronological table
 - [[known-issues]] — bugs and workarounds
 - [[rp6502-os]] · [[launcher]] · [[rom-file-format]] · [[rp6502-abi]]
+- [[rumbledethumps-discord]] — community context for version milestones
