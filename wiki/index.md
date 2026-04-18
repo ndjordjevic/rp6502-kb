@@ -30,6 +30,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
 | [[rumbledethumps-discord]] | Rumbledethumps Discord server exports: #chat (2022–2026, 1,015 msgs) — hardware tips, firmware internals, USB silicon bug, OPL2, community projects |
 | [[community-wiki]] | Community wiki (2 pages): project directory + USB/BLE device compatibility |
+| [[ehbasic]] | picocomputer/ehbasic repo: EhBASIC 2.22p5 port — OS glue layer, memory layout, LOAD/SAVE, IRQ pattern |
 | [[examples]] | Official picocomputer/examples repo: ~20 C programs covering VGA modes, audio PSG, gamepad, NFC, FatFS, exec, benchmarking |
 | [[yt-ep01-8bit-retro-computer]] | Ep1: series intro, breadboard with 12 glue chips, USB/VGA working |
 | [[yt-ep02-pio-and-dma]] | Ep2: dual-Pico pivot; PIO+DMA 6502 read path; 8 MHz achieved |
@@ -71,6 +72,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[cc65]] | cc65 cross-development package: C compiler + assembler + linker for 6502; primary Picocomputer toolchain since Ep9 |
 | [[llvm-mos]] | llvm-mos: LLVM fork for 6502 — C++/floats/64-bit; second supported Picocomputer toolchain; stronger optimization |
 | [[ezpsg]] | ezpsg library: high-level tracker + polyphonic scheduler on top of the 8-channel RIA PSG |
+| [[ehbasic]] | EhBASIC 2.22p5: BASIC interpreter for RP6502 — LOAD/SAVE via OS, ACIA simulation I/O, SET BOOT |
 
 ## Concepts
 

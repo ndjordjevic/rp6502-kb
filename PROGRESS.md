@@ -54,6 +54,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ Ingest **Discord export** (raw/discord/) — `#chat` (1,015 msgs) and `#razemos` (32 msgs) fully ingested. 2 new pages ([[rumbledethumps-discord]], [[community-projects]]). Key additions from #chat: HC/AC chip selection, VGA cold-boot fix, TinyUSB silicon latch bug, cc65 Homebrew warning, PIX bus 64 Mbit/s correction, design philosophy quotes, community roster. Key additions from #razemos: razemOS project (v0.01/v0.02), HASS assembler, ALT-F4 exit convention, OS exec vs ria_exec() pattern, ROM self-update pattern.
 - ✅ Ingest **picocomputer/examples** (raw/github/picocomputer/examples/, commit 95965c6) — 9 new pages: [[vga-display-modes]], [[vga-graphics]], [[gamepad-input]], [[rtc]], [[nfc]], [[exec-api]], [[ezpsg]], [[performance]], [[examples]] source; 2 updated: [[programmable-sound-generator]] (ezpsg section), [[fatfs]] (directory API)
 - ✅ Ingest **picocomputer/community wiki** (raw/github/picocomputer/community/, commit 348180a) — 2 pages: Home (project directory) + Incompatible USB and BLE Devices. New: [[community-wiki]] source, [[usb-compatibility]] topic; Updated: [[community-projects]] (full wiki project catalogue added), [[gamepad-input]] (USB compat section now links to [[usb-compatibility]])
+- ✅ Ingest **picocomputer/ehbasic** (raw/github/picocomputer/ehbasic/, commit acd5deb) — New: [[ehbasic]] source + entity pages; Updated: [[ria-registers]] (ACIA simulation section). Key finding: no RP6502-specific BASIC extensions; I/O integration entirely in min_mon.s via ACIA registers and open()/close()/read_xstack()/write_xstack()
 
 ## Phase 3 — Learn, share, and apply
 
@@ -80,12 +81,12 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | 41 + 1 (community-wiki) = **42** |
-| Entities | **12** |
-| Concepts | **45** |
-| Topics | 6 + 1 (usb-compatibility) = **7** |
-| Inbox | 4 (vscode-cc65, vscode-llvm-mos, ehbasic, pico-extras ingest plans) |
-| **Total pages** | **~106** |
+| Sources | 42 + 1 (ehbasic) = **43** |
+| Entities | 12 + 1 (ehbasic) = **13** |
+| Concepts | **45** (ria-registers updated) |
+| Topics | **7** |
+| Inbox | 3 (vscode-cc65, vscode-llvm-mos, pico-extras ingest plans) |
+| **Total pages** | **~108** |
 
 ---
 

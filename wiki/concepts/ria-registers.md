@@ -21,6 +21,36 @@ Internally, any register address is accessed as `REGS(addr)` = `regs[(addr) & 0x
 
 ---
 
+## ACIA simulation — character I/O
+
+The first three registers (`$FFE0–$FFE2`) implement a **simulated ACIA** (Asynchronous Communications Interface Adapter) for console character I/O. This is the lowest-level interface for terminal input/output and is used by EhBASIC's `V_INPT`/`V_OUTP` vectors.
+
+| Register | Alias | Address | Description |
+|----------|-------|---------|-------------|
+| UART status | `RIA_READY` | `$FFE0` | Bit 7 = TX FIFO ready (safe to write); Bit 6 = RX byte available (safe to read) |
+| UART TX | `RIA_TX` | `$FFE1` | Write a byte here to send to the console |
+| UART RX | `RIA_RX` | `$FFE2` | Read a byte here from the console |
+
+**Typical output pattern** (poll then write):
+```asm
+poll_tx:
+    BIT   RIA_READY       ; test bit 7 (TX ready)
+    BPL   poll_tx         ; branch if bit 7 clear (not ready)
+    STA   RIA_TX          ; send character
+```
+
+**Typical input pattern** (poll then read):
+```asm
+poll_rx:
+    BIT   RIA_READY       ; test bit 6 (RX available) — BIT sets V from bit 6
+    BVC   poll_rx         ; branch if bit 6 clear (no byte waiting)
+    LDA   RIA_RX          ; read character; SEC to indicate byte received
+```
+
+EhBASIC's `V_INPT` and `V_OUTP` use this ACIA simulation for all console I/O. When `LOAD`/`SAVE` redirects to a file, the character I/O is switched to `read_xstack`/`write_xstack` OS calls instead — see [[ehbasic]] for details.
+
+---
+
 ## Register map
 
 | Address | Name | Direction | Description |
@@ -132,4 +162,5 @@ The OS `open()` call accepts pseudo-device paths beyond filesystem filenames:
 
 - [[rp6502-abi]] · [[api-opcodes]] · [[memory-map]] · [[rp6502-ria]]
 - [[rom-file-format]] — ROM asset embedding
+- [[ehbasic]] — ACIA simulation usage (V_INPT/V_OUTP console I/O)
 - [[rumbledethumps-discord]] — VCP and ROM asset open() examples

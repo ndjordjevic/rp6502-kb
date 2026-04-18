@@ -7,6 +7,8 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] ingest | picocomputer/ehbasic (git clone, commit acd5deb) | New: 2 pages (sources/ehbasic, entities/ehbasic); Updated: concepts/ria-registers (ACIA simulation section + V_INPT/V_OUTP patterns); Key finding: no RP6502-specific BASIC extensions — port is pure OS I/O glue; Ingest plan deleted
+
 ## [2026-04-18] ingest | picocomputer/community wiki (commit 348180a) | New: 3 pages (sources/community-wiki, topics/usb-compatibility, community-projects expanded with wiki Home content); Updated: concepts/gamepad-input (USB compatibility section → [[usb-compatibility]]); Ingest plan deleted
 
 ## [2026-04-18] ingest | picocomputer/examples (git submodule, commit 95965c6) | New: 9 pages (sources/examples, concepts/vga-display-modes, concepts/vga-graphics, concepts/gamepad-input, concepts/rtc, concepts/nfc, concepts/exec-api, entities/ezpsg, topics/performance); Updated: concepts/programmable-sound-generator (ezpsg section), concepts/fatfs (directory API); All 8 ingest plan groups complete; plan file deleted
