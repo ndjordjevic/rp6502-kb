@@ -2,3 +2,7 @@
 .claude/settings.local.json
 .claude/.openrouter-settings.json
 .obsidian/workspace.json
+
+# Generated analysis artifacts (not source-controlled)
+all_pages.txt
+linked_pages.txt
