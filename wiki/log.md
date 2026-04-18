@@ -1021,3 +1021,29 @@ Key facts captured:
 **No conflicts found**: 6502.org facts align with existing content from Leventhal/Wagner/Zaks. BRK/IRQ disambiguation clarification agrees with Leventhal (uses PLA/PHA correctly).
 
 **Index/overview/PROGRESS updated**: 4 new index entries, overview §6502-assembly extended with 3 new concept bullets, PROGRESS wiki size updated (Sources 50, Concepts 54, Total ~136).
+
+## [2026-04-18] lint | deep wiki health check (post-6502.org ingest) | 12 fixes applied
+
+### Contradictions
+None found. All 6 checked pairs consistent. ✅
+
+### Broken links fixed (B1–B2)
+- `wiki/concepts/memory-map.md` lines 65, 68 — backslash escapes in `[[pio-architecture\|PIO]]` and `[[hstx\|High-speed transmit]]` replaced with correct pipe syntax
+
+### Orphans resolved (O1–O2)
+- `wiki/syntheses/learning-guide.md` — added inbound link from `learning-6502-assembly.md` Related pages
+- `wiki/syntheses/trng.md` — added inbound link from `rp2350.md` Related pages; updated trng.md frontmatter with broader related set
+
+### Missing cross-refs fixed (MR1–MR6)
+- `6502-compare-instructions.md` — added `[[6502-decimal-mode]]` to Related pages
+- `6502-emulated-instructions.md` — added `[[6502-compare-instructions]]` + `[[6502-overflow-flag]]` to Related pages and frontmatter
+- `65c02-instruction-set.md` — added `[[6502-decimal-mode]]` + `[[6502-interrupt-patterns]]` to Related pages
+- `6502-common-errors.md` — added `[[6502-decimal-mode]]`, `[[6502-compare-instructions]]`, `[[6502-overflow-flag]]` to Related pages and frontmatter
+- `learning-guide.md` — inserted A3b/A7b/A7c rows for new concept pages; updated frontmatter related
+
+### Data gaps fixed (DG1–DG2)
+- `w65c02s.md` — added `[[6502-compare-instructions]]`, `[[6502-decimal-mode]]`, `[[6502-overflow-flag]]`, `[[6502-interrupt-patterns]]` to Related pages and frontmatter
+- `6502-common-errors.md` — inline links and Related pages updated (same edit as MR above)
+
+### Incomplete ingestion
+None found — all 8 checked source Scope sections fully covered. ✅

@@ -276,6 +276,7 @@ LOOP LDA  $20,X
 
 - [[65c02-instruction-set]]
 - [[6502-overflow-flag]]
+- [[6502-decimal-mode]]
 - [[6502-programming-idioms]]
 - [[6502-common-errors]]
 - [[learning-6502-assembly]]

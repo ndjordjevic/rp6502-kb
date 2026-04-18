@@ -62,10 +62,10 @@ The RP2350 (the MCU running the RIA and VGA firmware) has a separate 32-bit addr
 |---|---|---|
 | DMA | `0x50000000` | 16-channel DMA controller (RP2350; RP2040 had 12) |
 | USB | `0x50100000` | USB 1.1 DPRAM + registers |
-| PIO0 | `0x50200000` | [[pio-architecture\|PIO]] block 0 (4 SMs) |
+| PIO0 | `0x50200000` | [[pio-architecture|PIO]] block 0 (4 SMs) |
 | PIO1 | `0x50300000` | PIO block 1 (4 SMs) |
 | PIO2 | `0x50400000` | PIO block 2 (4 SMs) — RP2350 only |
-| HSTX FIFO | `0x50600000` | [[hstx\|High-speed transmit]] data FIFO |
+| HSTX FIFO | `0x50600000` | [[hstx|High-speed transmit]] data FIFO |
 
 ### APB peripherals (min 3 cycles read, 4 write)
 

@@ -188,3 +188,4 @@ See [[65c02-addressing-modes]] for the full cycle/byte count table and all 16 mo
 - [[6502-programming-idioms]]
 - [[6502-subroutine-conventions]]
 - [[6502-common-errors]]
+- [[learning-guide]] — structured reading path through all 6502 and RP6502 wiki pages

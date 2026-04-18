@@ -1,7 +1,7 @@
 ---
 type: synthesis
 tags: [rp6502, 6502, learning, guide]
-related: [[overview]], [[learning-6502-assembly]], [[toolchain-setup]], [[rp6502-os]]
+related: [[overview]], [[learning-6502-assembly]], [[toolchain-setup]], [[rp6502-os]], [[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-overflow-flag]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -42,10 +42,13 @@ Each item is a wiki page. Read it, follow the wikilinks it contains, then come b
 | A1 | [[learning-6502-assembly]] | Registers, Status Register flags, binary arithmetic, counter/loop patterns, all 8 branch instructions |
 | A2 | [[65c02-addressing-modes]] | All 16 addressing modes with cycle and byte counts; new `(zp)` and `(a,x)` modes; X-vs-Y asymmetry |
 | A3 | [[65c02-instruction-set]] | Every 65C02 mnemonic; CMOS additions over NMOS; how to read the opcode table |
+| A3b | [[6502-compare-instructions]] | CMP/CPX/CPY flag mechanics, branch-after-compare table, multi-byte signed/unsigned comparisons, N XOR V method |
 | A4 | [[6502-stack-and-subroutines]] | Stack layout ($0100–$01FF), PHA/PLA mechanics, JSR saves PC−1, RTS adds 1; register save/restore idioms |
 | A5 | [[6502-subroutine-conventions]] | Parameter-passing (registers / ZP / inline / stack), Leventhal's 10-field template, reentrancy |
 | A6 | [[6502-interrupt-patterns]] | IRQ/NMI/BRK/RESET vectors, ISR register save/restore, polling dispatch, RTI; VIA interrupt pattern |
 | A7 | [[6502-programming-idioms]] | Multi-precision arithmetic, 8-bit multiply/divide, BCD mode, carry-chain rules, 14 quirks quick reference |
+| A7b | [[6502-decimal-mode]] | BCD D-flag, flag validity by CPU variant (6502 only C; 65C02 adds N/Z; V never valid), cycle costs |
+| A7c | [[6502-overflow-flag]] | V flag mechanics, which instructions affect it, BIT immediate exception, SO pin, signed comparison pattern |
 | A8 | [[6502-data-structures]] | Lists, queues, sort, jump tables, linked lists, trees, binary search, hashing (Zaks Ch.9) |
 | A9 | [[6502-application-snippets]] | Reusable patterns: string ops, hex↔ASCII, BCD, parity, checksum; Zaks memory-clear and range-test |
 | A10 | [[6502-common-errors]] | Bug catalogue: carry misuse, flag side effects, decimal-mode hazards, ISR pitfalls |

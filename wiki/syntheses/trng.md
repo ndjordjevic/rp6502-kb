@@ -1,7 +1,7 @@
 ---
 type: synthesis
 tags: [rp6502, trng, random, ria, rp2350, cc65, llvm-mos, api]
-related: [[rp6502-os]], [[ria-registers]], [[cc65]], [[llvm-mos]], [[cc65-vs-llvm-mos]], [[api-opcodes]]
+related: [[rp6502-board]], [[w65c02s]], [[rp6502-ria]], [[rp2350]], [[dual-core-sio]], [[rp6502-os]], [[ria-registers]], [[cc65]], [[llvm-mos]], [[cc65-vs-llvm-mos]], [[api-opcodes]]
 sources: [[rp6502-os-docs]], [[rp6502-github-repo]], [[cc65-rp6502-platform]], [[rumbledethumps-discord]]
 created: 2026-04-18
 updated: 2026-04-18

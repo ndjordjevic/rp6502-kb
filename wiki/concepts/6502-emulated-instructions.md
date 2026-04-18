@@ -1,7 +1,7 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, emulation, instructions, addressing-modes, 16-bit, shifts, branches]
-related: [[65c02-instruction-set]], [[6502-programming-idioms]], [[6502-common-errors]], [[6502-subroutine-conventions]]
+related: [[65c02-instruction-set]], [[6502-programming-idioms]], [[6502-common-errors]], [[6502-subroutine-conventions]], [[6502-compare-instructions]], [[6502-overflow-flag]]
 sources: [[leventhal-subroutines]]
 created: 2026-04-18
 updated: 2026-04-18
@@ -432,5 +432,7 @@ Interrupt service routines **must** do this if they execute `ADC` or `SBC`, beca
 - [[6502-common-errors]] — misuse of these idioms is a primary source of bugs
 - [[6502-programming-idioms]] — 8-bit and 16-bit arithmetic, BCD patterns
 - [[65c02-instruction-set]] — 65C02 new instructions that replace some emulations (`INC A`, `DEC A`, `PHX`, `PHY`, `BRA`, `(zp)` addressing)
+- [[6502-compare-instructions]] — correct multi-byte and signed comparison patterns
+- [[6502-overflow-flag]] — V flag mechanics underlying the signed comparison emulations
 - [[6502-subroutine-conventions]] — parameter passing, reentrancy
 - [[6502-data-structures]] — 16-bit block move, N-dimensional array indexing

@@ -165,6 +165,8 @@ The RP6502's [[rp6502-abi]] leverages WDC enhancements:
 ## Related pages
 
 - [[w65c02s]] · [[65c02-addressing-modes]] · [[w65c02s-datasheet]] · [[rp6502-abi]] · [[cc65]] · [[llvm-mos]]
+- [[6502-decimal-mode]] — D flag cleared on interrupt; BCD flag validity per CPU variant
+- [[6502-interrupt-patterns]] — interrupt entry/exit; WAI usage; IRQ/NMI/BRK vectors
 
 ---
 
