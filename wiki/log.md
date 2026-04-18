@@ -7,6 +7,8 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] ingest | picocomputer/vscode-cc65 (git clone, commit 794a6f2) | New: 2 pages (sources/vscode-cc65, topics/toolchain-setup); Updated: entities/cc65 (VSCode section rewritten with template details, rp6502.py, toolchain cmake); Key facts: no pyserial needed since Jan 2026, rp6502_asset() must precede rp6502_executable(), IntelliSense shim in cc65.cmake; Ingest plan deleted
+
 ## [2026-04-18] ingest | picocomputer/pico-extras (git clone, commit 7f48b3f) | New: 1 page (sources/pico-extras); Updated: entities/rp6502-vga (pico-extras dependency section), concepts/vga-display-modes (mode-switching note + [[pico-extras]] link); Key finding: only 2 rumbledethumps commits in fork — memory leak fix + debug printf fix in scanvideo_setup_with_timing(); Ingest plan deleted
 
 ## [2026-04-18] ingest | picocomputer/ehbasic (git clone, commit acd5deb) | New: 2 pages (sources/ehbasic, entities/ehbasic); Updated: concepts/ria-registers (ACIA simulation section + V_INPT/V_OUTP patterns); Key finding: no RP6502-specific BASIC extensions — port is pure OS I/O glue; Ingest plan deleted
