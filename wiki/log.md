@@ -867,6 +867,15 @@ Key facts captured:
 #### Deleted
 - `wiki/inbox/wagner-assembly-lines-ingest-plan.md` — all chapters complete; superseded by source page and log.md
 
+### [2026-04-18] update | picocomputer.github.io "networking" commit | RIA-W telnet console + full modem telnet
+
+#### Changed pages
+- `wiki/entities/rp6502-ria-w.md` — added Telnet Console section (`SET PORT`/`SET KEY`); updated modem section: full telnet now live (`AT\N0`/`AT\N1`), added `AT\L`, `AT\T`, `ATA`, `ATDS`, 10-profile device names, 4-slot phonebook, 4 simultaneous connections; removed "raw TCP only" limitation
+- `wiki/sources/rp6502-ria-w-docs.md` — updated summary and key facts; noted raw file is pre-April-18; removed stale "no telnet" claims
+- `wiki/topics/known-issues.md` — moved "Telnet not yet implemented" to resolved; removed from active issues
+
+---
+
 ### [2026-04-18] ingest | Discord #chat export (2022-11-03–2026-04-18) | 2 new pages, 3 augmented pages, major known-issues expansion
 
 #### New pages

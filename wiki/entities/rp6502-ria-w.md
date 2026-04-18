@@ -4,7 +4,7 @@ tags: [rp6502, ria, wireless, wifi, bluetooth, pico2w]
 related: [[rp6502-ria]], [[rp6502-board]], [[dual-core-sio]]
 sources: [[rp6502-ria-w-docs]], [[release-notes]], [[fairhead-pico-c]], [[youtube-playlist]]
 created: 2026-04-15
-updated: 2026-04-16
+updated: 2026-04-18
 ---
 
 # RP6502-RIA-W
@@ -32,23 +32,42 @@ Configured from the monitor:
 
 Once associated, NTP runs automatically. Set time zone with `SET TZ`; DST handled automatically. See [[rp6502-os]] for the programmatic clock API.
 
+## Telnet Console
+
+Remote network access to the RP6502 monitor (or running 6502 app stdio) over TCP.
+
+| Command | Effect |
+| --- | --- |
+| `SET PORT <port>` or `0` | TCP listening port (`0` disables; standard telnet = 23) |
+| `SET KEY <key>` or `-` | Passkey required to connect; `-` clears |
+
+Both PORT and KEY must be configured to enable the telnet console. Connections are **unencrypted** in transit.
+
 ## Hayes modem emulation
 
-Lets 6502 apps dial into BBSs over raw TCP.
+Lets 6502 apps dial into BBSs over raw TCP or telnet. Supports up to **four simultaneous modem devices**.
+
+**Device names:** `AT:` (transient, factory defaults, no storage) or `AT0:`–`AT9:` (10 persistent profiles with flash-backed settings and 4-slot phonebook).
 
 | AT command | Effect |
 | --- | --- |
-| `ATDexample.com:23` | "Dial" a host:port |
+| `ATA` | Answer incoming call |
+| `ATD<host>:<port>` | Dial host:port |
+| `ATDS=<0-3>` | Dial saved phonebook entry |
 | `+++` | Escape to command mode |
 | `ATH` | Hang up |
-| `ATE1`, `ATV1`, `ATX0` | Echo / verbosity / progress messaging |
+| `ATO` | Return to active call |
+| `ATE1`, `ATQ0`, `ATV1`, `ATX0` | Echo / quiet / verbosity / progress messaging |
 | `ATSxxx?` / `ATSxxx=yyy` | Register query / set |
-| `AT&F` / `ATZ` / `AT&W` | Factory / NVRAM load / NVRAM save |
-| `AT&V` | View profile |
-| `AT&Z0=host:port` | Save "telephone number" to NVRAM (immediate, not per-profile) |
+| `AT&F` / `ATZ` / `AT&W` | Factory / reload / save profile |
+| `AT&V` | View profile, phonebook, and network settings |
+| `AT&Z<0-3>=<host>:<port>` | Save phonebook entry |
+| `AT\L=<port>` / `AT\L?` | Modem listen port for incoming calls |
+| `AT\N0`/`AT\N1` / `AT\N?` | Network mode: 0 = raw TCP, 1 = telnet |
+| `AT\T=<type>` / `AT\T?` | Telnet terminal type advertisement |
 | `AT+RF=`, `AT+RFCC=`, `AT+SSID=`, `AT+PASS=` | Expose same-named RIA settings via AT |
 
-> **Gotcha:** no telnet stack yet — all connections are **raw TCP**. Unencrypted in transit. The v0.12 release notes confirm: "modem supports raw TCP only — full Telnet layer is still in the works." `src/ria/net/tel.c` is the WIP implementation.
+Connections are **unencrypted** in transit.
 
 ## Bluetooth
 
@@ -205,7 +224,7 @@ The Pico 2 W's WiFi radio enables the 6502 to reach the internet. The first show
 
 **Hardware upgrade path** from this episode: swap Pi Pico 1 for Pi Pico 2 (plain Pico 2 for VGA, Pico 2 W for RIA). This is the migration that corresponds to v0.10 in [[version-history]].
 
-**Current limitation**: raw TCP only; Telnet protocol (RFC 854 negotiation) is not yet implemented. See [[known-issues]].
+As of v0.24, full telnet support is implemented (`AT\N1`) alongside raw TCP (`AT\N0`).
 
 ## Related pages
 
@@ -213,5 +232,5 @@ The Pico 2 W's WiFi radio enables the 6502 to reach the internet. The first show
 - [[rp6502-board]]
 - [[dual-core-sio]] — multicore context and FreeRTOS+WiFi integration
 - [[fairhead-pico-c]] — SDK patterns for cyw43 and LwIP
-- [[known-issues]] — telnet WIP, BLE-only limitations, TinyUSB history
+- [[known-issues]] — BLE-only limitations, TinyUSB history
 - [[yt-ep20-bbs]] — BBS demo episode

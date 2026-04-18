@@ -42,9 +42,6 @@ See also: [[development-history]] Era A; [[rp6502-board]] BOM notes.
 
 ## Active known issues (as of v0.23)
 
-### Telnet not yet implemented
-The Hayes modem (RIA-W) supports **raw TCP connections only**. A full Telnet protocol layer is planned but not yet complete (first noted in v0.12 release notes). The `tel.c` source file is the WIP implementation. For BBS access, raw TCP works with most modern BBS software.
-
 ### cc65 requires a fork
 v0.14 overhauled the errno system. The upstream `cc65` compiler does not yet include the matching changes — a [PR is pending](https://github.com/cc65/cc65/pull/2844). Until it merges, use the official fork at `github.com/picocomputer/cc65`.
 
@@ -161,6 +158,7 @@ The following errata are present in A2 silicon but are **fixed or mitigated by t
 | v0.5 | Mode 2 rendering glitch | Fixed in v0.5 |
 | v0.15 | Affine sprites show garbage line | Fixed in v0.15 |
 | v0.5 | Hub support spotty | Fixed in v0.11 (hub-in-hub, 16 devices) |
+| v0.12–v0.23 | Modem supports raw TCP only; telnet WIP (`tel.c`) | Fixed April 18 2026 (networking commit): full telnet via `AT\N1`, listen via `AT\L` |
 
 ---
 
