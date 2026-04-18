@@ -7,6 +7,38 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] lint | wiki | post-zaks polish
+
+- `wiki/concepts/6502-programming-idioms.md`: Added missing `## Multi-precision binary addition (Leventhal 1982, Ch. 6)` heading — section was floating after a `---` divider with no heading
+- `wiki/concepts/6502-application-snippets.md`: Fixed self-referential link `[[6502-application-snippets]]` → `[[6502-io-patterns]]` in EOR checksum section (CRC-16 lives in io-patterns, not in this page)
+- `wiki/overview.md`: Removed duplicate "Interrupt system" bullet — appeared twice (plain and augmented); merged into single consolidated entry
+- `wiki/index.md`: Removed dead Inbox entry for deleted Zaks ingest plan (file no longer exists)
+- `wiki/concepts/6502-subroutine-conventions.md`: Added missing `### Method 3: Stack (push before JSR)` heading — Method 3 content was present but unlabelled, appearing under Method 4's heading
+
+---
+
+## [2026-04-18] ingest | Zaks — Programming the 6502 (1983) | full ingest complete
+
+**Source**: `raw/pdfs/Programming the 6502 Rodnay Zaks 1983.pdf` (70.6 MB, ~420 pp.)
+**Chapters ingested**: II (Hardware/stack/paging), III (Arithmetic/BCD/multiply/divide/subroutines), V (Addressing modes taxonomy), VI (I/O scheduling, polling vs. interrupts), VIII (Application examples), IX (Data structures — Parts I and II)
+**Chapters skipped**: I (binary/hex background), IV (instruction set — covered by W65C02S datasheet), VII (6520/6522/6530 I/O devices — not used in RP6502), X (assembler/macro), XI (conclusion), Appendix (exercise answers)
+
+**New pages created:**
+- `wiki/sources/zaks-programming-6502.md` — source summary, 15+ unique contributions table, full chapter scope section
+
+**Pages augmented:**
+- `wiki/concepts/6502-programming-idioms.md` — Zaks improved 8×8 multiply (10 instr, accumulator = partial product high); subroutine parameter passing 3-method comparison + pointer hybrid guideline
+- `wiki/concepts/6502-application-snippets.md` — Zaks Ch.8: memory clear (ZEROM), bracket test (range test via V+C), parity generation (ROL-based), ASCII↔BCD (AND #$0F + BCD-to-binary ×10 hint), find-max, 16-bit sum, EOR checksum, count zeroes
+- `wiki/concepts/6502-data-structures.md` — Zaks Ch.9: pointers/directories, linked lists (O(1) insert/delete), circular list (round-robin), queue (FIFO), trees, doubly-linked lists, binary search (O(log₂N)), hashing (XOR+rotate hash, 80% fullness rule), merge algorithm
+
+**Supporting file changes:**
+- `wiki/index.md` — zaks-programming-6502 source row added; 3 concept page descriptions updated; inbox entry for Zaks plan marked completed
+- `wiki/overview.md` — "6502 programmer's library" intro updated for 4 books; 3 concept bullets revised with Zaks content; hub sources list updated
+- `wiki/inbox/zaks-programming-6502-ingest-plan.md` — **deleted** (superseded by source page and this log entry)
+- `PROGRESS.md` — Zaks `👉` → `✅`; Discord export promoted to `👉`; wiki size updated to ~95 pages
+
+---
+
 ## [2026-04-18] lint | wiki | post-wagner-assembly-lines polish
 
 - `wiki/concepts/6502-subroutine-conventions.md`: added `[[6502-stack-and-subroutines]]` to frontmatter and Related pages footer (missing cross-ref to stack mechanics page)

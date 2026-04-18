@@ -1,8 +1,8 @@
 ---
 type: concept
-tags: [6502, 65c02, assembly, arithmetic, bcd, multiply, divide, multi-precision, bit-manipulation, shift, logical, asl, lsr, rol, ror, and, ora, eor, bit]
-related: [[65c02-instruction-set]], [[6502-application-snippets]], [[6502-data-structures]], [[6502-emulated-instructions]], [[6502-common-errors]], [[6522-via]], [[learning-6502-assembly]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[wagner-assembly-lines]]
+tags: [6502, 65c02, assembly, arithmetic, bcd, multiply, divide, multi-precision, bit-manipulation, shift, logical, asl, lsr, rol, ror, and, ora, eor, bit, subroutine-parameters]
+related: [[65c02-instruction-set]], [[6502-application-snippets]], [[6502-data-structures]], [[6502-emulated-instructions]], [[6502-common-errors]], [[6522-via]], [[learning-6502-assembly]], [[6502-subroutine-conventions]]
+sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[wagner-assembly-lines]], [[zaks-programming-6502]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -190,6 +190,8 @@ Arithmetic right shift requires copying the sign bit back into the MSB after the
 ```
 
 ---
+
+## Multi-precision binary addition (Leventhal 1982, Ch. 6)
 
 Add two N-byte unsigned integers stored MSB-first. The carry propagates from LSB to MSB via the `ADC` instruction.
 
@@ -582,6 +584,55 @@ With BCD, no divide-by-10 loop is needed for decimal display. This is the key ad
 On the **W65C02S** (the RP6502 CPU), decimal mode is **fully specified**:
 - N, Z, V flags are **valid** after BCD `ADC`/`SBC` (NMOS 6502: N and V are undefined after BCD operations).
 - This matches the multi-precision BCD note in the Leventhal section above.
+
+---
+
+## Improved 8×8 multiply (Zaks Ch. 3)
+
+Zaks presents an optimized multiply that halves the instruction count by placing the partial product in the accumulator, freeing register TMP. The accumulator is right-shifted via `ROR` to accept bits freed by the multiplier as it is shifted right.
+
+```asm
+; Inputs:  C = multiplier (memory byte), D = multiplicand (memory byte)
+; Outputs: A = high byte of result, B = low byte (page 0 location)
+; Uses: A (partial product high), B (partial product low), X (counter)
+
+MULT    LDA  #0        ; initialize partial product high byte
+        STA  B         ; initialize low byte
+        LDX  #8        ; 8-bit shift counter
+LOOP    LSR  C         ; shift multiplier right; bit falls into carry
+        BCC  NOADD     ; if carry=0, no addition this pass
+        CLC            ; carry was 1 — clear it before ADC
+        ADC  D         ; A = A + multiplicand
+NOADD   ROR  A         ; shift partial product high byte right (carry→bit7)
+        ROR  B         ; shift partial product low byte, catching bit from A
+        DEX
+        BNE  LOOP      ; repeat for all 8 bits
+```
+
+**Key insight**: combining the multiplier's right-shift with the result's right-shift shares a single register chain. Each `ROR A` / `ROR B` pair shifts the 16-bit partial product right by one, reusing the bits that the multiplier frees from its left side. This is roughly half the code of the naive approach.
+
+**Trade-off**: result ends up right-shifted (low byte in B, high byte accumulates in A). The result is the correct 16-bit product after all 8 iterations.
+
+---
+
+## Subroutine parameter passing (Zaks Ch. 3)
+
+Three mechanisms for passing data between caller and subroutine:
+
+| Method | Pros | Cons |
+|--------|------|------|
+| **Registers** (A, X, Y) | Fast; no fixed memory needed; subroutine is relocatable | Only 3×8-bit values |
+| **Fixed memory locations** | Handles large data blocks | Ties the subroutine to specific addresses; unsafe for recursion |
+| **Stack** | Relocatable; safe for recursion; natural for nested calls | Reduces available stack depth |
+
+**Pointer hybrid**: when a large block of data must be passed, pass a 16-bit **pointer** to the block rather than the block itself. The pointer can travel in:
+- two stack bytes (most portable)
+- zero-page pair (fastest with `(zp),Y`)
+- two registers (caller sets ZP pointer before JSR; callee dereferences via `(zp),Y`)
+
+**Recursion** is legal on the 6502 because JSR saves the return address on the stack — each call creates a fresh stack frame. The only limits are the 256-byte stack size and the requirement that working registers be preserved on the stack, not in fixed memory.
+
+> **Guideline** (Zaks): prefer registers → stack → fixed memory, in that order. Fixed-memory parameter passing is a "mailbox" convention and prevents reentrance.
 
 ---
 

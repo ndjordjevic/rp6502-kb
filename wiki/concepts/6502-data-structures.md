@@ -1,8 +1,8 @@
 ---
 type: concept
-tags: [6502, 65c02, assembly, tables, lists, queue, sort, jump-table, data-structures, array, memory-fill, binary-search]
+tags: [6502, 65c02, assembly, tables, lists, queue, sort, jump-table, data-structures, array, memory-fill, binary-search, linked-list, hashing, merge, tree, circular-list, pointer, directory]
 related: [[65c02-instruction-set]], [[6502-application-snippets]], [[6502-programming-idioms]], [[6502-subroutine-conventions]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
+sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[zaks-programming-6502]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -403,6 +403,161 @@ Non-destructive RAM test verifying that each byte can store both `$55` and `$AA`
 **Algorithm**: for each byte: save original value; write `$55`; read back and compare; write `$AA`; read back and compare; restore original. Failure returns the address of the first bad cell.
 
 **Use case**: power-on self test (POST) for 6502 systems. The RP6502-OS could use this style of test during boot to verify working RAM before running user programs.
+
+---
+
+## Pointers, linked structures, and advanced algorithms (Zaks Ch. 9)
+
+### Pointers
+
+A **pointer** is a 16-bit address stored in memory that refers to other data. The 6502 accesses pointers via indirect addressing modes:
+
+- `(zp)` — load 16-bit address from zero page; dereference it (65C02 zero-page indirect, no index)
+- `(zp,X)` — zero page + X gives the pointer location (pre-indexed indirect)
+- `(zp),Y` — zero page holds base pointer; Y is added post-fetch (post-indexed indirect)
+
+A pointer stored at `$10/$11` that points to a table is accessed as: `LDA ($10),Y` where Y is the table index. This is the fundamental pattern for all linked structures.
+
+### Directories
+
+A **directory** is a table of pointers. A two-level directory:
+1. Master directory entry → points to a user-level file directory
+2. File directory entry → points to the actual file data
+
+This pattern is extensible: each level adds a layer of indirection. Useful for command dispatch tables (name → handler address), symbol tables in assemblers (symbol → address), or file systems.
+
+### Linked list
+
+A **linked list** keeps blocks in arbitrary memory positions and establishes ordering via embedded pointers:
+
+```
+FIRSTBLOCK → [BLOCK1 | PTR1] → [BLOCK2 | PTR2] → [BLOCK3 | PTR3=NIL]
+```
+
+Each block reserves 2 bytes (one page 0 pair) for the forward pointer. `NIL` is a sentinel value (e.g. table base address, or `$FFFF`).
+
+**Insertion** between Block1 and Block2:
+1. Set `PTRX` = old value of `PTR1` (pointing to Block2)
+2. Set `PTR1` = address of new block
+3. Result: `Block1 → NewBlock → Block2` — only 2 pointer writes, O(1)
+
+**Deletion** of Block2:
+1. Set `PTR1` = value of `PTR2` (skip over Block2)
+2. Result: `Block1 → Block3` — again O(1)
+
+**6502 implementation**: use zero page pairs for `POINTR` and `TEMPTR`; use `(POINTR),Y` with Y=0 to fetch/store the pointer bytes; use `DEY`/`LDA (POINTR),Y` / `STA (TEMPTR),Y` loop to copy a block entry.
+
+### Circular list (round-robin)
+
+Last entry points back to the first. A `CURRENT` pointer advances by one position per cycle. Used for:
+- Polling loops: interrogate each peripheral in turn, wrap around
+- Fair scheduling: each task gets a time slice in rotation
+
+Implementation note: after advancing the pointer, check if it equals the base (wrap condition) and reset to base if so.
+
+### Queue (FIFO)
+
+A queue can be implemented as a linked list where:
+- New events are appended at the **tail**
+- Service is given at the **head**
+
+This guarantees first-in, first-out ordering. A two-pointer structure (`HEAD` and `TAIL`) avoids scanning the entire list on every insertion. Useful for buffering keyboard input, print queues, or event queues in interrupt handlers (see [[6502-interrupt-patterns]]).
+
+### Trees
+
+A **tree** is used when data has a natural hierarchical syntax: directory trees, expression parse trees, decision trees. Each node stores data plus one or more child pointers.
+
+Common tree operations require recursive traversal. On a 6502 with a 256-byte stack, recursion depth is limited — keep trees shallow (< ~30 levels) to avoid stack overflow.
+
+Binary search trees give O(log N) search, insert, delete when balanced. An alphabetical list with binary search achieves the same average O(log N) access without the pointer overhead of a true tree.
+
+### Doubly-linked list
+
+Adds a backward pointer to each node, allowing both forward and backward traversal:
+
+```
+← [BLOCK1 | PTR_NEXT | PTR_PREV] ↔ [BLOCK2 | PTR_NEXT | PTR_PREV] →
+```
+
+Costs an extra 2 bytes per block but allows O(1) deletion without needing to know the previous node. Useful for buffer management, undo history, or any structure where both directions of traversal are common.
+
+---
+
+## Binary search (logarithmic)
+
+For a **sorted** table of N entries, binary search finds an element in at most ⌈log₂N⌉ comparisons — much faster than linear search:
+
+| Table size | Max comparisons (binary) | Max comparisons (linear) |
+|------------|--------------------------|--------------------------|
+| 16         | 4                        | 16                       |
+| 256        | 8                        | 256                      |
+| 1024       | 10                       | 1024                     |
+
+**Algorithm** (Zaks):
+1. Set search interval = N; logical pointer = N/2
+2. Compare target against element at pointer
+3. If match → found. If target < element → search lower half; if target > element → search upper half
+4. Halve the interval; repeat
+5. When interval = 1: check CLOSE flag — if not found in two passes at interval=1, not in table
+
+**6502 implementation note**: halving the interval with `LSR A` drops the low bit into carry. Recover with `ADC #0` to round up for odd intervals, keeping the pointer centered.
+
+```asm
+DIV     LSR  A        ; interval / 2
+        ADC  #0       ; add carry back (round up if odd)
+        STA  LOGPOS   ; new middle pointer
+```
+
+---
+
+## Hashing
+
+Hashing maps arbitrary keys (e.g., symbol names) to table indices, enabling O(1) average-case lookup regardless of table size.
+
+**Zaks hash function**: XOR all bytes of the key, rotating accumulator after each byte to improve distribution.
+
+```asm
+; Key = N bytes starting at KEYPTR; hash result → A
+        LDY  #0
+        LDA  #0        ; accumulator = running hash
+HASH    EOR  (KEYPTR),Y
+        ROL  A         ; rotate to spread bits
+        INY
+        CPY  #KEYLEN
+        BNE  HASH
+; A = hash value → use as index into hash table
+```
+
+**Collision resolution**: sequential open addressing — if slot is occupied, try next slot in sequence (like flipping to the next page of an address book when the target page is full).
+
+**Capacity rule**: keep the table ≤ 80% full. Access time degrades sharply as the table fills beyond 80%:
+
+| Fullness | Average accesses |
+|----------|-----------------|
+| 50%      | ~1.5            |
+| 80%      | ~3              |
+| 90%+     | degrades rapidly |
+
+**Typical application**: assembler symbol table — key = 6-char symbol, data = 2-byte address.
+
+---
+
+## Merge algorithm
+
+Merge two **pre-sorted** tables of up to 256 bytes each into a third sorted table.
+
+```
+TABLE1 (sorted) + TABLE2 (sorted) → TABLE3 (merged & sorted)
+```
+
+**Algorithm**: maintain two running pointers PTR1, PTR2. Each iteration:
+1. Compare `TABLE1[PTR1]` vs `TABLE2[PTR2]`
+2. Copy the smaller element to TABLE3; advance that table's pointer
+3. Repeat until one table is exhausted; copy remaining elements from the other
+
+Uses `(TABLE1,X)` / `(TABLE2,Y)` indirect indexed addressing for portability. Page-0 pointers for TABLE1, TABLE2, DEST make the pointer arithmetic compact.
+
+**6502 tip**: the merge loop is a good candidate for keeping both index counters in X and Y to avoid register spills. Load the two table lengths once; decrement the appropriate counter after each copy.
 
 ---
 

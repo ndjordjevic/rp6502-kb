@@ -1,8 +1,8 @@
 ---
 type: concept
-tags: [6502, 65c02, assembly, string, ascii, code-conversion, snippets, crc, io-patterns]
+tags: [6502, 65c02, assembly, string, ascii, code-conversion, snippets, crc, io-patterns, memory-clear, parity, bracket-test, max, sum, checksum, zero-count]
 related: [[65c02-instruction-set]], [[65c02-addressing-modes]], [[6502-subroutine-conventions]], [[6502-programming-idioms]], [[6502-io-patterns]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
+sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[zaks-programming-6502]]
 created: 2026-04-18
 updated: 2026-04-18
 ---
@@ -371,6 +371,195 @@ Spaces are treated as ordinary characters — `"SPRING MAID"` < `"SPRINGMAID"` (
 **Special cases**: substring length 0 → returns 0; substring longer than string → returns 0; index 1 means substring is a prefix (useful for command abbreviation matching in BASIC interpreters).
 
 **Worst case** (string = `"AAAAAAB"`, substring = `"AAB"`): `(len_str − len_sub + 1) × (47 × (len_sub−1) + 50) + 135` cycles.
+
+---
+
+## Utility routines (Zaks Ch. 8)
+
+### Memory clear (ZEROM)
+
+Fill a region of memory with zero. The region runs from `BASE+1` to `BASE+LENGTH` (max 255 bytes). Register X counts down from LENGTH to 0.
+
+```asm
+ZEROM   LDX  #LENGTH
+        LDA  #0
+CLEAR   STA  BASE,X    ; store 0 at BASE+X
+        DEX
+        BNE  CLEAR
+        RTS
+```
+
+**Cycle trick**: loading the accumulator only once, then using absolute indexed addressing to write each location. Loop overhead is 5 cycles per byte (DEX=2, BNE=3). For a 256-byte page, put the count in a zero-page byte to allow X=0 as the exit condition cleanly.
+
+**Extension**: for a memory test (POST), follow with a read-verify pass, then write `$AA`/`$55` and verify again.
+
+---
+
+### Range test (bracket testing)
+
+Determine whether the ASCII character in A is in the range `['0','9']`. Uses C and V flags as status outputs — no branch-return needed; caller tests flags directly.
+
+```asm
+; Uses ORA #$80 to set bit 7, then compares against $B0/$B9 (ASCII with parity).
+; On return: C=0 and V=0 → digit in range; V=0, C=1 → too high; C=0, V=0 (TOOLOW branch) → too low.
+
+BRACK   LDA  #$40
+        ADC  #$40      ; force V flag — mark "too low" condition
+        LDA  LOC
+        ORA  #$80      ; set bit 7 = 1
+        CMP  #$B0      ; $B0 = ASCII '0' with parity
+        BCC  TOOLOW
+        CMP  #$B9      ; $B9 = ASCII '9' with parity
+        BEQ  OUT
+        BCS  TOOHIGH
+OUT     CLC            ; C=0, V=0 → in range [0..9]
+        CLV
+        RTS
+TOOLOW  SEC            ; C=1, V=0 → too low
+        CLV
+        RTS
+TOOHIGH RTS            ; C=1 (set by CMP), no V change → too high
+```
+
+> **Note on `CMP`**: after `CMP`, carry is SET if `A >= operand`. Reset (clear) if `A < operand`.
+
+---
+
+### Parity generation
+
+Generate even parity for a 7-bit character; install result in bit 7.
+
+```asm
+PARITY  LDX  #$07     ; count 7 data bits
+        LDA  #$00
+        STA  ONECNT   ; count of 1s
+        LDA  CHAR
+        ROL  A        ; discard existing bit 7
+NEXT    ROL  A        ; shift next bit into carry
+        BCC  ZERO     ; if carry=0, bit is 0
+        INC  ONECNT   ; bit is 1
+ZERO    DEX
+        BNE  NEXT
+        ROL  A        ; restore bit 0 to its original position
+        ROL  A        ; discard again
+        LSR  ONECNT   ; parity bit → carry (even parity: 0 if even number of 1s)
+        ROR  A        ; install carry into bit 7
+        RTS
+```
+
+---
+
+### ASCII to BCD (simple)
+
+When ASCII digits have parity bit set, their hex codes are `$B0`–`$B9`. Without parity, they are `$30`–`$39`. In both cases, masking off the upper nibble gives the BCD digit 0–9.
+
+```asm
+        LDA  CHAR
+        AND  #$0F     ; mask upper nibble → BCD digit 0-9
+        STA  BCDCHAR
+```
+
+For the reverse (BCD to ASCII): `ORA #$30` (no parity) or `ORA #$B0` (with odd parity for bit 7).
+
+**BCD to binary hint** (Zaks): for `N3 N2 N1 N0` packed BCD, the binary value is `((N3×10 + N2)×10 + N1)×10 + N0`. Multiply by 10 in 6502:
+
+```asm
+; Multiply A by 10:  ((A << 1) << 1 + A) << 1
+        ASL  A        ; ×2
+        ASL  A        ; ×4
+        ADC  ORIG     ; ×4 + ×1 = ×5 (ORIG was saved before shifts)
+        ASL  A        ; ×10
+```
+
+---
+
+### Find largest element
+
+Search a table for its maximum value. Table layout: first byte is count N, followed by N bytes of data. Pointer `BASE` in zero page uses `(BASE),Y` indirect indexed addressing to reach any table anywhere in memory.
+
+```asm
+MAX     LDY  #0
+        LDA  (BASE),Y  ; get N (count)
+        TAY
+        LDA  #0
+        STA  INDEX     ; initialize max = 0
+LOOP    CMP  (BASE),Y  ; compare current max against element Y
+        BCS  NOSWITCH  ; current max ≥ element — no update
+        LDA  (BASE),Y  ; new max found
+        STY  INDEX     ; remember its position
+NOSWITCH DEY
+        BNE  LOOP
+        RTS
+```
+
+Works for unsigned (positive) integers. **For signed integers**: initialize max to `$80` (most negative) and compare with signed branch `BGE` / `BLT`.
+
+---
+
+### 16-bit sum of table
+
+Sum all N elements; result in `SUMLO`/`SUMHI`. Uses carry propagation via `INC SUMHI` to extend naturally to 16 bits.
+
+```asm
+        LDA  #0
+        STA  SUMLO
+        STA  SUMHI
+        TAY
+        LDA  (BASE),Y  ; get N
+        TAY
+        CLC
+ADLOOP  LDA  (BASE),Y
+        ADC  SUMLO
+        STA  SUMLO
+        BCC  NOCARRY
+        INC  SUMHI
+        CLC
+NOCARRY DEY
+        BNE  ADLOOP
+        RTS
+```
+
+**Note**: after `BCC NOCARRY`, `SUMHI` is incremented by one to handle the carry out of the 8-bit `ADC`. This is a compact alternative to using `ADC #0` on SUMHI: it avoids a register load/store, but requires the explicit `CLC` after the `INC`.
+
+---
+
+### EOR checksum
+
+XOR all bytes in a table; result in A. N is stored as the first byte.
+
+```asm
+CHECKSUM LDY  #0
+         LDA  (BASE),Y  ; get N
+         TAY
+         LDA  #0        ; initialize checksum
+CHLOOP   EOR  (ADDR),Y  ; XOR next element
+         DEY
+         BNE  CHLOOP
+         RTS            ; A = checksum
+```
+
+EOR-based checksums detect any single-bit error and many multi-bit errors, but miss even numbers of identical errors on the same bit position. For stronger integrity use CRC-16 (see [[6502-io-patterns]] — Leventhal 1982 Ch. 10).
+
+---
+
+### Count zeroes
+
+Count the number of zero-valued bytes in a table. N is stored as the first byte; count returned in X.
+
+```asm
+ZEROES  LDY  #0
+        LDA  (ADDR),Y  ; get N
+        TAY
+        LDX  #0        ; zero counter
+ZLOOP   LDA  (ADDR),Y
+        BNE  NOTZ
+        INX
+NOTZ    DEY
+        BNE  ZLOOP
+        RTS            ; X = count of zeros
+```
+
+**Generalisation**: replace `BNE NOTZ` / `INX` with any test/action to count any character class (digits, spaces, letters). See also the parity generator above for a similar count-of-ones pattern.
 
 ---
 

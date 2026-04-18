@@ -25,6 +25,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[leventhal-6502-assembly]] | *6502 Assembly Language Programming, 2nd Ed.* (Leventhal, 1986): definitive 6502 programmer's reference — 65C02 enhancements (Ch.17), interrupts, subroutines, string/arithmetic/table idioms |
 | [[leventhal-subroutines]] | *6502 Assembly Language Subroutines* (Leventhal & Saville, 1982): emulating missing instructions, common errors, 16-bit arithmetic, 6522 VIA reference, subroutine library (60 routines w/ cycle counts) |
 | [[wagner-assembly-lines]] | *Assembly Lines: The Complete Book* (Wagner/Torrence, 2014): pedagogical 6502 teaching scaffold — loops, branches, addressing modes, stack, arithmetic, shift/logical operators, BCD, relocatable code, 65C02 enhancements |
+| [[zaks-programming-6502]] | *Programming the 6502* (Zaks, 4th Ed. 1983): systematic 6502 textbook — algorithm design methodology, improved multiply, subroutine parameter passing, data structures (linked list/tree/hash/merge), I/O scheduling (polling vs. interrupts) |
 | [[youtube-playlist]] | Official "Picocomputer 6502" YouTube series (22 eps, 2022–2026): hub page + episode list |
 | [[yt-ep01-8bit-retro-computer]] | Ep1: series intro, breadboard with 12 glue chips, USB/VGA working |
 | [[yt-ep02-pio-and-dma]] | Ep2: dual-Pico pivot; PIO+DMA 6502 read path; 8 MHz achieved |
@@ -102,9 +103,9 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[65c02-addressing-modes]] | W65C02S 16 addressing modes with cycle/byte counts; new `(zp)` and `(a,x)` modes vs NMOS 6502; X vs Y non-interchangeability in indirect modes (Wagner Ch.7) |
 | [[6502-interrupt-patterns]] | 6502 CPU interrupt system: IRQ/NMI/BRK/RESET vectors, ISR register save/restore, polling dispatch, RTI semantics, ISR design guidelines, 6522 VIA unbuffered interrupt I/O (PINTIO), ring-buffer buffered I/O, real-time clock/calendar (Ch. 11B/11D Leventhal 1982) |
 | [[6502-subroutine-conventions]] | JSR/RTS mechanics, four parameter-passing methods (registers / ZP pseudo-regs / inline / stack), Leventhal 1982 formal 10-field template, reentrancy, relocatability |
-| [[6502-application-snippets]] | Reusable 6502 patterns: string length, blank-skip, hex↔ASCII, BCD↔7-segment, pattern match; Leventhal 1982 Ch.4 code-conversion routines (BN2BCD/BCD2BN/BN2HEX/HEX2BN/BN2DEC/DEC2BN); Ch.8 string manipulation (STRCMP, CONCAT, POS) |
-| [[6502-programming-idioms]] | 6502 arithmetic idioms: multi-precision binary/BCD addition, 8-bit multiply/divide, 16-bit add/sub/mul/div/cmp; bit manipulation (set/clear/test/field); shift operators (ASL/LSR/ROL/ROR); logical operators (AND/ORA/EOR/BIT); BCD mode fundamentals; carry-chain rules; 14 6502 quirks quick reference |
-| [[6502-data-structures]] | 6502 data structure patterns: ordered/unordered lists, circular queues, bubble sort, jump tables (pre- and 65C02-style); Leventhal 1982 Ch.5 MFILL/BLKMOV and 1D/2D/N-dim array indexing; Ch.9 ASUM8/ASUM16, BINSCH, BUBSRT, RAMTST |
+| [[6502-application-snippets]] | Reusable 6502 patterns: string length, blank-skip, hex↔ASCII, BCD↔7-segment, pattern match; Leventhal 1982 Ch.4 code-conversion routines; Ch.8 string manipulation (STRCMP, CONCAT, POS); Zaks Ch.8 memory clear, bracket test, parity, max/sum/checksum/zero-count |
+| [[6502-programming-idioms]] | 6502 arithmetic idioms: multi-precision binary/BCD addition, 8-bit multiply/divide (incl. Zaks optimised multiply), 16-bit add/sub/mul/div/cmp; bit manipulation; shift/logical operators; BCD mode; carry-chain rules; subroutine parameter passing (3 methods); 14 6502 quirks |
+| [[6502-data-structures]] | 6502 data structure patterns: lists, queues, sort, jump tables; Leventhal 1982 array/table idioms; Zaks Ch.9 linked lists, circular list, trees, doubly-linked, binary search (O(log N)), hashing (XOR+rotate, 80% rule), merge algorithm |
 | [[6502-io-patterns]] | Terminal line I/O (RDLINE/WRLINE), parity (GEPRTY/CKPRTY), CRC-16 (IBM BSC, X¹⁶+X¹⁵+X²+1), and device-independent I/O handler (IOHDLR with I/O Control Block + device table linked list) — from Leventhal 1982 Ch. 10 |
 | [[6502-emulated-instructions]] | Emulating missing 6502 instructions: 16-bit add/sub, arithmetic shifts, multi-byte shifts, extended branches, indirect addressing, decimal operations |
 | [[6502-common-errors]] | Systematic catalogue of 6502 bugs: carry misuse, flag side effects, addressing confusion, decimal mode hazards, loop errors, ISR pitfalls |
@@ -118,7 +119,6 @@ When answering a query, read this file first to find relevant pages, then drill 
 
 | Page | Description |
 | --- | --- |
-| [[zaks-programming-6502-ingest-plan]] | Ingest plan for Zaks "Programming the 6502" (1983) — chapter list and order |
 
 ## Syntheses
 

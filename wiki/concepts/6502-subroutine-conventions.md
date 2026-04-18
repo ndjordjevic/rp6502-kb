@@ -124,6 +124,8 @@ NORTS:
 **Pros**: self-contained call — no register corruption before call, no separate setup. Used heavily in 6502 ROM routines.  
 **Cons**: complex callee code; non-reentrant unless RETADR is on the stack; harder to debug.
 
+### Method 3: Stack (push before JSR)
+
 Caller pushes parameters before `JSR`; callee reads them via `TSX` and `$01xx,X` addressing. The return address sits at `$0101,X`/`$0102,X` (after TSX), so parameters pushed before JSR are at `$0103,X` and above.
 
 ```asm
