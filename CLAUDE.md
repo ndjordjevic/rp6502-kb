@@ -32,9 +32,24 @@ wiki/inbox/      -- rough notes awaiting organization
 
 ## Directory rules
 
-- `raw/` is **immutable**: read-only. Never edit, delete, or create files here.
+- `raw/` source documents are **immutable**: never edit, delete, or create source files here. Exception: `README.md` index files in each subfolder are LLM-maintained — always keep them up to date.
 - `wiki/` is **LLM-owned**: create, update, and link pages freely.
 - Always update `wiki/index.md`, `wiki/overview.md`, and `wiki/log.md` at the end of every session.
+- **Raw folder indexes — maintenance rules**:
+  - Every `raw/` subfolder has a `README.md` index. All five must stay in sync with folder contents.
+  - When a file is **added**: add a row to the subfolder `README.md` and to the `raw/README.md` "Added sources" table.
+  - When a file is **removed**: remove its row from the subfolder `README.md`.
+  - When the **github submodule is bumped**: update the tag, commit, and date in `raw/github/README.md` and add a row to `raw/README.md`.
+  - When **new YouTube transcripts** are fetched: add rows to `raw/youtube/README.md` and update the coverage line.
+  - Subfolder conventions:
+
+  | Folder | Naming convention | Index file |
+  | --- | --- | --- |
+  | `raw/pdfs/` | Free-form (as supplied) | `raw/pdfs/README.md` — one row per PDF |
+  | `raw/discord/` | `<server>-<channel>-<YYYY-MM-DD>--<YYYY-MM-DD>.txt` | `raw/discord/README.md` — one row per export |
+  | `raw/youtube/` | `<video-id>-<sanitized-title>.md` | `raw/youtube/README.md` — one row per video |
+  | `raw/web/` | `<Page Title> — <Site Name>.md` (Obsidian Web Clipper) | `raw/web/README.md` — one row per clipped page |
+  | `raw/github/` | Git submodule — `<org>/<repo>/` folder | `raw/github/README.md` — one row per submodule |
 
 ---
 

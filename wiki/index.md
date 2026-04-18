@@ -11,6 +11,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | --- | --- |
 | [[picocomputer-intro]] | Landing page: project pitch, specs, links to all subsystems |
 | [[hardware]] | Build guide, schematic link, full BOM, parts substitution rules |
+| [[schematic-2023]] | 2023-06-07 KiCad schematic (Rev A = Rev B electrically): connectors, glue logic, VGA DAC, audio circuit |
 | [[rp6502-ria-docs]] | RIA firmware reference: monitor, PIX, XRAM, input, audio, NFC, ROM format |
 | [[rp6502-ria-w-docs]] | Wireless additions: WiFi setup, NTP, Hayes modem, BLE pairing |
 | [[rp6502-vga-docs]] | VGA module: 3-plane scanline video, 6 modes, control channel, ANSI terminal |
@@ -86,7 +87,8 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[api-opcodes]] | Complete OS call dispatch table (op-codes 0x01–0x2E) from main.c |
 | [[pio-architecture]] | PIO state machine layout for 65C02 bus interface and PIX; RP2350 overclock; DMA-DREQ integration; dynamic program generation (`pio_encode_*` composition, full JMP variants, `pio_src_dest` enum, wait_pin vs wait_gpio); SM EXEC; v0/v1 ISA encoding; v1-only additions; `pio_interrupt_source` enum; compile-time macros; MOV STATUS type; multi-SM synchronization; sticky output; RP2350B GPIO base |
 | [[pioasm]] | PIOASM assembler: complete directive reference, value/expression syntax, output pass-through, generated header structure, v0/v1 ISA opcode table |
-| [[gpio-pinout]] | GPIO pin assignments for RIA/VGA Pico confirmed from source; RP2040/RP2350 function select tables; full SDK API (pull state queries, PAD config, interrupt model, concurrency-safe gpio_put_masked, raw handler notes); 64-bit/bank-n RP2350 variants; Erratum E9 |
+| [[gpio-pinout]] | GPIO pin assignments for RIA/VGA Pico confirmed from source; RP2040/RP2350 function select tables |
+| [[board-circuits]] | Glue logic functions (WE#, IORQ, IRQ merge), VGA DAC resistors, audio filter, dual power rail, connector signals |; full SDK API (pull state queries, PAD config, interrupt model, concurrency-safe gpio_put_masked, raw handler notes); 64-bit/bank-n RP2350 variants; Erratum E9 |
 | [[hardware-irq]] | `hardware_irq` SDK: NVIC per-core semantics, IRQ number tables (RP2040 + RP2350), three handler-install patterns, priority model, user (software) IRQs |
 | [[dual-core-sio]] | Two-core ARM model, SIO FIFOs (RP2040: 8 deep, RP2350: 4 deep), lockout mechanism, doorbell API (RP2350), hardware spinlocks (32 locks, number assignment table, RP2350-E2 erratum), memory barriers, processor events, interrupt control, atomic GPIO, full `pico_multicore` + `pico_sync` SDK (critical_section, mutex, recursive_mutex, semaphore with all timeout variants) |
 | [[rp2040-memory]] | RP2040 memory types (ROM/SRAM/Flash), SRAM banking, XIP, full APB/AHB address map |

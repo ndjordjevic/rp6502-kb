@@ -7,6 +7,10 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-18] ingest | raw/pdfs/2023-06-07-rp6502.pdf | New: schematic-2023 source page + board-circuits concept (glue logic, VGA DAC, audio filter, IRQ merge, IORQ decode, dual power rail, connector pinouts)
+
+## [2026-04-18] update | picocomputer.github.io _static/ | Mouser BOM, schematic PDFs, headerless Pico build variant added to rp6502-board + hardware source
+
 ## [2026-04-18] lint | wiki | post-razemos polish
 
 **Re-check**: razemos ingest verified clean — all dates, version numbers, attributions correct.
@@ -866,6 +870,16 @@ Key facts captured:
 
 #### Deleted
 - `wiki/inbox/wagner-assembly-lines-ingest-plan.md` — all chapters complete; superseded by source page and log.md
+
+### [2026-04-18] update | picocomputer.github.io re-clip (all 6 pages) | Mode 5 affine correction + hardware page updates
+
+#### Fixed
+- `wiki/entities/rp6502-vga.md` — **Corrected error**: Mode 5 does NOT support affine transforms (only Mode 4 does). Rewrote sprite section to document Mode 4 (affine) and Mode 5 (palette, 8×8–512×512, no affine) separately.
+
+#### Updated
+- `wiki/sources/hardware.md` — Added ordering section: PCBWay Rev B link, Ko-fi US store, Mouser CSV BOM link; added "boot message no longer says COLOR" gotcha warning.
+
+---
 
 ### [2026-04-18] update | picocomputer.github.io "networking" commit | RIA-W telnet console + full modem telnet
 

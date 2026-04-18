@@ -1,6 +1,6 @@
-# RP6502 Discord Exports
+# Discord Exports — RP6502
 
-Exported from the **Rumbledethumps** Discord server using DiscordChatExporter.
+Channel exports from the Rumbledethumps Discord server, produced by DiscordChatExporter.
 
 ## Naming convention
 
@@ -15,6 +15,8 @@ server-<channel-name>-<YYYY-MM-DD>--<YYYY-MM-DD>.txt
 - Subsequent exports start from the day after the previous file's last date
 
 ## Files
+
+After adding a new export, add a row here and update `raw/README.md`.
 
 | File | Channel | Date range | Messages |
 | ---- | ------- | ---------- | -------- |

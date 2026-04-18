@@ -4,7 +4,7 @@ tags: [rp6502, hardware, build, source]
 related: [[rp6502-board]], [[w65c02s]], [[w65c22s]]
 sources: [picocomputer.github.io/hardware]
 created: 2026-04-15
-updated: 2026-04-15
+updated: 2026-04-18
 ---
 
 # Source — Hardware (build guide)
@@ -37,6 +37,29 @@ Raw: [Hardware](<../../raw/web/picocomputer.github.io/Hardware — Picocomputer 
 | U6 | TI **CD74AC00E** | Quad NAND |
 | U7 | TI **CD74AC02E** | Quad NOR |
 | U8 | TI **CD74HC30E** | 8-input NAND |
+
+## Ordering
+
+- **PCBs**: order Rev B from [PCBWay](https://www.pcbway.com/project/shareproject/Picocomputer_6502_RP6502_Rev_B_1f41cb0b.html) or download the gerbers (zip) from the docs and submit to any fab.
+- **Assembled boards**: PCBWay offers assembly (min qty 1); request with BOM+notes+photos zip, let them source parts.
+- **ICs**: can be ordered from Mouser individually. See [[rp6502-board]] for the full table with Mouser part numbers.
+- **Ko-fi store** (`ko-fi.com/rumbledethumps`): pre-made boards, US shipping only. US import tariffs not an issue (ships from USA).
+
+## Static files on docs site (`_static/`)
+
+| File | Purpose |
+| --- | --- |
+| `rp6502-revb-full.csv` | Complete BOM — all passives, connectors, ICs, sockets, feet with Mouser # |
+| `rp6502-revb-active.csv` | Active ICs only (8 parts + bumpers) with Mouser # |
+| `rp6502-revb-picos.csv` | Headerless Pico build variant — SC1631/SC1633 + separate 20-pin headers |
+| `rp6502-revb-gerbers.zip` | Gerber files for Rev B PCB fabrication |
+| `rp6502-revb-assembly.zip` | Assembly files for Rev B (for fab with assembly service) |
+| `rp6502-reva-gerbers.zip` | Gerber files for Rev A (older, electrically identical) |
+| `rp6502-reva-assembly.zip` | Assembly files for Rev A |
+| `2026-01-26-rp6502.pdf` | Schematic — current Rev B |
+| `2023-06-07-rp6502.pdf` | Schematic — original Rev A |
+
+> **Gotcha for people following old YouTube videos**: "The boot message does not say COLOR anymore. Do not assume your device will behave exactly the same as an old YouTube video." (@picocomputer docs, 2026-04-18)
 
 ## Substitution rules (gotchas)
 

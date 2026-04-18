@@ -1,4 +1,12 @@
-# PDFs in this folder
+# PDFs — RP6502
+
+Reference books and datasheets relevant to the RP6502 Picocomputer project.
+
+## Naming convention
+
+Free-form — files are named as downloaded or supplied. Add one row per file to the ## Files table below.
+
+## Files
 
 | File | Brief context |
 |------|---------------|
@@ -11,3 +19,4 @@
 | `RP-008373-DS-2-rp2350-datasheet.pdf` | Official RP2350 datasheet — the chip used on Pi Pico 2 / RP6502-VGA board. Covers cores, peripherals, PIO, and pinout. |
 | `RP-009085-KB-1-raspberry-pi-pico-c-sdk (1).pdf` | Official Raspberry Pi Pico C/C++ SDK reference. API docs for hardware access, PIO programming, and multicore — directly relevant to RIA firmware. |
 | `w65c02s.pdf` | WDC W65C02S datasheet — the CPU at the heart of the RP6502 Picocomputer. Covers instruction set, timing, pinout, and electrical specs. |
+| `2023-06-07-rp6502.pdf` | Official RP6502 schematic (Rev A, electrically identical to Rev B). Single-page KiCad export: all 8 ICs, glue logic, VGA DAC, audio filter, connector pinouts. Also available as `2026-01-26-rp6502.pdf` (Rev B, minor cosmetic change). |

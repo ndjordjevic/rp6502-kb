@@ -4,7 +4,7 @@ tags: [rp6502, vga, video, firmware, pico2, hstx, dvi, tmds]
 related: [[rp6502-ria]], [[pix-bus]], [[xreg]], [[xram]], [[sdk-architecture]], [[hstx]]
 sources: [[rp6502-vga-docs]], [[pico-c-sdk]], [[rp2350-datasheet]], [[youtube-playlist]]
 created: 2026-04-15
-updated: 2026-04-17
+updated: 2026-04-18
 ---
 
 # RP6502-VGA
@@ -119,13 +119,9 @@ Console mode (mode 0) was upgraded to **16-bit color** (256-color ANSI palette).
 
 ### Sprite capabilities (from Ep15)
 
-Mode 4 and Mode 5 sprites support **affine transforms**:
-- Scale (zoom in/out)
-- Rotation (arbitrary angle)
-- Translation (position)
-- Occlusion (sprites layer correctly over other sprites and planes)
+**Mode 4** sprites support **affine transforms** (3×2 signed 8.8 fixed-point matrix): scale, rotation, translation, occlusion. Up to 24 sprites at 128×128 px; more with smaller sizes.
 
-Up to 24 sprites at 128×128 px; more sprites possible with smaller sizes.
+**Mode 5** sprites do **not** support affine transforms. They use a simpler `(x_pos, y_pos, xram_ptr, palette_ptr)` config and support 1/2/4/8-bit palette color. Sizes: 8×8 to 512×512. You can layer all three planes — e.g. plane 0 = mode 4 affine explosions, plane 1 = mode 5 enemy sprites, plane 2 = mode 5 bullets.
 
 ## Related pages
 

@@ -1,15 +1,20 @@
-# YouTube Video Index
+# YouTube Transcripts — RP6502
 
-Human-maintained index of RP6502-related YouTube videos. One row per video.
-The LLM reads this as the entry point for the YouTube source set.
+Auto-caption transcripts of the official Picocomputer 6502 YouTube series, fetched via `yt-dlp` and converted from VTT to markdown.
 
-Transcripts are in `raw/youtube/<video-id>-<sanitized-title>.md` (auto-generated via `yt-dlp`, cleaned VTT → markdown).
+## Naming convention
+
+```
+<video-id>-<sanitized-title>.md
+```
+
+Example: `GOEI2OpMncY-RP6502 Ep2 - 6502 reads Raspberry Pi Pico @ 8 MHz - PIO and DMA.md`
+
+## Files
 
 Source playlist: **[Picocomputer 6502](https://www.youtube.com/playlist?list=PLvCRDUYedILfHDoD57Yj8BAXNmNJLVM2r)** (rumbledethumps / Rumbledethumps).
 
 Retrieved: 2026-04-17.
-
-## Videos
 
 | # | Title | Video ID | URL | Transcript |
 | --- | --- | --- | --- | --- |
@@ -40,7 +45,7 @@ Retrieved: 2026-04-17.
 
 ## Refresh procedure
 
-To refresh transcripts (e.g. after new episodes are published):
+To fetch transcripts for new episodes:
 
 ```bash
 cd raw/youtube
@@ -52,3 +57,5 @@ python3 /tmp/vtt_to_md.py   # cleans VTT -> markdown, removes .vtt files
 ```
 
 Preference order for caption language variant: `en-US` (manual) > `en` > `en-orig` > `en-en` > `en-en-US`.
+
+After fetching, add new rows to the ## Files table above and update `raw/README.md`.
