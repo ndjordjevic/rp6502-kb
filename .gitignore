@@ -8,4 +8,5 @@ all_pages.txt
 linked_pages.txt
 
 # Raw GitHub clones — plain clones, not submodules; untracked by parent repo
-raw/github/
+raw/github/*
+!raw/github/README.md

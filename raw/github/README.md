@@ -24,6 +24,7 @@ Example: `picocomputer/rp6502/`
 | `picocomputer/vscode-cc65/` | [github.com/picocomputer/vscode-cc65](https://github.com/picocomputer/vscode-cc65) | *(no tags)* | `794a6f2` | 2026-04-18 |
 | `picocomputer/vscode-llvm-mos/` | [github.com/picocomputer/vscode-llvm-mos](https://github.com/picocomputer/vscode-llvm-mos) | *(no tags)* | `17af418` | 2026-04-18 |
 | `picocomputer/adventure/` | [github.com/picocomputer/adventure](https://github.com/picocomputer/adventure) | `v20260225` | `6ac165f` | 2026-04-18 |
+| `WojciechGw/cc65-rp6502os/` | [github.com/WojciechGw/cc65-rp6502os](https://github.com/WojciechGw/cc65-rp6502os) | *(no tags)* | `782ff15` | 2026-04-19 |
 
 Nested submodules inside `rp6502`: `src/littlefs`, `src/tinyusb` (per upstream — init separately if needed).
 
@@ -43,6 +44,9 @@ git clone https://github.com/picocomputer/pico-extras.git
 git clone https://github.com/picocomputer/vscode-cc65.git
 git clone https://github.com/picocomputer/vscode-llvm-mos.git
 git clone https://github.com/picocomputer/adventure.git
+
+cd ../WojciechGw
+git clone https://github.com/WojciechGw/cc65-rp6502os.git
 ```
 
 To pull a repo to the latest commit:

@@ -7,6 +7,27 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-19] ingest | WojciechGw/cc65-rp6502os (razemOS + HASS) | new source page, new HASS entity, razemos updated
+
+Cloned `WojciechGw/cc65-rp6502os` at commit `782ff15` (2026-04-19) to `raw/github/WojciechGw/cc65-rp6502os/`. Updated `raw/github/README.md`.
+
+New: `wiki/sources/razemos-repo.md` — full source page covering razemOS shell architecture, all 20+ internal commands, ROM commands (dir/hex/pack/peek/roms/view/etc.), three program formats (.com/.exe/.rp6502), Intel HEX UART file transfer protocol (CRC32), extension command system via MSC0:/SHELL/, `razemOScmd.py` build tool.
+
+New: `wiki/entities/hass.md` — complete HASS assembler reference: invocation, all 16 `@` interactive commands, @TRACE built-in W65C02S software emulator (single-step + run mode + cycle counting), directives (.ORG/.EQU/.BYTE/.WORD/.ASCII/.ASCIZ/.INCLUDE), full addressing mode table, complete 65C02+WDC instruction set listing, limits table (512 lines / 16 KB / 128 symbols).
+
+Updated: `wiki/entities/razemos.md` — greatly expanded: full memory layout ($8000–$FCFF ~31 KB for user programs), three program formats, extension command system, UART file transfer protocol, HASS assembler summary, keyboard shortcuts, version history updated to commit 782ff15 (2026-04-19).
+
+Updated: `wiki/index.md` — added [[razemos-repo]] source entry, [[hass]] entity entry; [[razemos]] description improved.
+
+Key facts:
+- razemOS user programs run at `$8000–$FCFF` (~31 KB)
+- `.com` commands in `MSC0:/SHELL/` override ROM commands without rebuilding
+- HASS has a **built-in W65C02S software emulator** (`@TRACE`) with single-step, run mode, and cycle counting
+- File transfer uses Intel HEX over UART with CRC32
+- Actively developed — commits as of 2026-04-19
+
+---
+
 ## [2026-04-19] lint | wiki-wide | Obsidian frontmatter fix + contradiction fix + cross-ref + log formatting
 
 - **Obsidian invalid properties fixed (134 files)**: `related:` and `sources:` frontmatter fields converted from inline `[[wikilinks]], [[wikilinks]]` (invalid YAML) to proper YAML list format (`- "[[wikilink]]"`). All wiki pages now render without "Invalid properties" in Obsidian Reading view.

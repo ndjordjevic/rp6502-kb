@@ -93,6 +93,7 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 - ✅ New topic pages: [[hardware-build-guide]], [[roadmap]]
 - ✅ Add [[wiki/syntheses/trng]] — hardware TRNG, `randomize()`, `lrand()`, entropy sources
 - ✅ Ingest **6502.org tutorials** (raw/web/6502.org/, 8 pages) — 4 new concept pages ([[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-overflow-flag]], [[6502org-tutorials]] source); 4 pages updated ([[6502-interrupt-patterns]], [[65c02-instruction-set]], [[6502-stack-and-subroutines]], [[6502-programming-idioms]]). Key additions: N XOR V signed comparison, WAI I=1 inline interrupt, BRK/IRQ B-flag disambiguation (correct stack-read vs wrong PHP), decimal flag validity per CPU, BIT immediate exception, undocumented NOP skip technique, NMOS ZP wrap-around
+- ✅ Clone + ingest **WojciechGw/cc65-rp6502os** (razemOS community shell, commit 782ff15, 2026-04-19) — New: [[razemos-repo]] source, [[hass]] entity; Updated: [[razemos]] entity (full shell commands, memory layout, UART protocol, version history). Key findings: HASS has built-in W65C02S software emulator (@TRACE); user programs run $8000–$FCFF; .com extension commands override ROM commands via MSC0:/SHELL/
 
 ---
 
@@ -100,13 +101,13 @@ One source at a time. Each session follows the 9-step ingest workflow in `CLAUDE
 
 | Category | Count |
 |---|---|
-| Sources | **50** (+ 6502org-tutorials) |
-| Entities | **15** |
+| Sources | **52** (+ razemos-repo) |
+| Entities | **16** (+ hass) |
 | Concepts | **54** (+ 6502-compare-instructions, 6502-decimal-mode, 6502-overflow-flag) |
 | Topics | **9** |
 | Syntheses | **5** |
 | Inbox | **0** — all ingest plans complete 🎉 |
-| **Total pages** | **~136** |
+| **Total pages** | **~139** |
 
 ---
 

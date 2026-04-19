@@ -59,6 +59,7 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[yt-ep20-bbs]] | Ep20: Pi Pico 2 upgrade; WiFi BBS access; NTP+DST |
 | [[yt-ep21-ai-programming]] | Ep21: GitHub Copilot demos; "AI loves ignoring the docs" |
 | [[yt-ep22-graphics-sound-demos]] | Ep22: community demos; OPL2 FM synth origin story; music tracker |
+| [[razemos-repo]] | WojciechGw/cc65-rp6502os (commit 782ff15, 2026-04-19): razemOS community shell + HASS assembler — full command tables, .com extension system, Intel HEX UART transfer, program formats |
 
 ## Entities
 
@@ -80,7 +81,8 @@ When answering a query, read this file first to find relevant pages, then drill 
 | [[ezpsg]] | ezpsg library: high-level tracker + polyphonic scheduler on top of the 8-channel RIA PSG |
 | [[ehbasic]] | EhBASIC 2.22p5: BASIC interpreter for RP6502 — LOAD/SAVE via OS, ACIA simulation I/O, SET BOOT |
 | [[rptracker]] | Native OPL2 music tracker: 9 channels, 256 patches, effects (arpeggio, portamento, vibrato, delay), CP437, save/load |
-| [[razemos]] | razemOS — community 65C02 native OS by voidas_pl; kernel below $8000, HASS assembler, multitasking roadmap |
+| [[razemos]] | razemOS — community 65C02 native OS by voidas_pl; full shell with 20+ commands, extensible .com extensions, UART file transfer, Wi-Fi/NTP |
+| [[hass]] | HASS — Handy ASSembler for W65C02S: native on-device two-pass assembler bundled with razemOS; interactive editing, @TRACE emulator, cycle counting |
 
 ## Concepts
 
