@@ -1,8 +1,16 @@
 ---
 type: entity
 tags: [rp6502, hardware, pcb]
-related: [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[w65c02s]], [[w65c22s]]
-sources: [[hardware]], [[picocomputer-intro]], [[schematic-2023]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-vga]]"
+  - "[[w65c02s]]"
+  - "[[w65c22s]]"
+sources:
+  - "[[hardware]]"
+  - "[[picocomputer-intro]]"
+  - "[[schematic-2023]]"
 created: 2026-04-15
 updated: 2026-04-18
 ---

@@ -1,7 +1,10 @@
 ---
 type: source
 tags: [rp6502, hardware, build, source]
-related: [[rp6502-board]], [[w65c02s]], [[w65c22s]]
+related:
+  - "[[rp6502-board]]"
+  - "[[w65c02s]]"
+  - "[[w65c22s]]"
 sources: [picocomputer.github.io/hardware]
 created: 2026-04-15
 updated: 2026-04-18

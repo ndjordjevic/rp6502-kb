@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, beginner, registers, status-flags, loops, branches, addressing-modes]
-related: [[65c02-instruction-set]], [[65c02-addressing-modes]], [[6502-stack-and-subroutines]], [[6502-programming-idioms]], [[6502-subroutine-conventions]]
-sources: [[wagner-assembly-lines]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[65c02-addressing-modes]]"
+  - "[[6502-stack-and-subroutines]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-subroutine-conventions]]"
+sources:
+  - "[[wagner-assembly-lines]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

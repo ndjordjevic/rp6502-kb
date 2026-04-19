@@ -1,7 +1,15 @@
 ---
 type: source
 tags: [6502, assembly, subroutines, leventhal, 1982, reference]
-related: [[6502-emulated-instructions]], [[6502-common-errors]], [[6502-subroutine-conventions]], [[6502-programming-idioms]], [[6502-interrupt-patterns]], [[6502-application-snippets]], [[6502-data-structures]], [[6522-via]]
+related:
+  - "[[6502-emulated-instructions]]"
+  - "[[6502-common-errors]]"
+  - "[[6502-subroutine-conventions]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-interrupt-patterns]]"
+  - "[[6502-application-snippets]]"
+  - "[[6502-data-structures]]"
+  - "[[6522-via]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

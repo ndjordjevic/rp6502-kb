@@ -1,7 +1,11 @@
 ---
 type: source
 tags: [rp6502, vga, video, source]
-related: [[rp6502-vga]], [[pix-bus]], [[xreg]], [[xram]]
+related:
+  - "[[rp6502-vga]]"
+  - "[[pix-bus]]"
+  - "[[xreg]]"
+  - "[[xram]]"
 sources: [picocomputer.github.io/vga]
 created: 2026-04-15
 updated: 2026-04-15

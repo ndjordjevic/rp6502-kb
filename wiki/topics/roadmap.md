@@ -1,8 +1,17 @@
 ---
 type: topic
 tags: [rp6502, roadmap, future, plans, releases]
-related: [[version-history]], [[release-notes]], [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[rp6502-os]], [[known-issues]]
-sources: [[release-notes]], [[rumbledethumps-discord]]
+related:
+  - "[[version-history]]"
+  - "[[release-notes]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-os]]"
+  - "[[known-issues]]"
+sources:
+  - "[[release-notes]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

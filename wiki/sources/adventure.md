@@ -1,7 +1,12 @@
 ---
 type: source
 tags: [rp6502, cc65, rom, adventure, game, porting]
-related: [[rom-file-format]], [[toolchain-setup]], [[cc65]], [[rp6502-os]], [[examples]]
+related:
+  - "[[rom-file-format]]"
+  - "[[toolchain-setup]]"
+  - "[[cc65]]"
+  - "[[rp6502-os]]"
+  - "[[examples]]"
 sources: []
 created: 2026-04-18
 updated: 2026-04-18

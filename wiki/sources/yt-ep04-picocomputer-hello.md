@@ -1,8 +1,15 @@
 ---
 type: source
 tags: [rp6502, youtube, assembly, monitor, abi, ria, bootstrap, fast-load]
-related: [[development-history]], [[rp6502-abi]], [[ria-registers]], [[pio-architecture]], [[memory-map]], [[youtube-playlist]]
-sources: [[youtube-playlist]]
+related:
+  - "[[development-history]]"
+  - "[[rp6502-abi]]"
+  - "[[ria-registers]]"
+  - "[[pio-architecture]]"
+  - "[[memory-map]]"
+  - "[[youtube-playlist]]"
+sources:
+  - "[[youtube-playlist]]"
 video_id: uL8BL7ZDdlk
 episode: 4
 approx_date: 2023-01

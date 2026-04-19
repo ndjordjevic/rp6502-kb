@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [rp6502, rom, file-format]
-related: [[rp6502-ria]], [[rp6502-os]], [[xram]], [[adventure]]
-sources: [[rp6502-ria-docs]], [[release-notes]], [[youtube-playlist]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-os]]"
+  - "[[xram]]"
+  - "[[adventure]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[release-notes]]"
+  - "[[youtube-playlist]]"
 created: 2026-04-15
 updated: 2026-04-18
 ---

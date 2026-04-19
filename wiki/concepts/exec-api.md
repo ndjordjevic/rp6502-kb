@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [rp6502, exec, process, os, api, argv]
-related: [[rp6502-os]], [[fatfs]], [[rp6502-abi]], [[examples]]
-sources: [[rp6502-os-docs]], [[examples]]
+related:
+  - "[[rp6502-os]]"
+  - "[[fatfs]]"
+  - "[[rp6502-abi]]"
+  - "[[examples]]"
+sources:
+  - "[[rp6502-os-docs]]"
+  - "[[examples]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

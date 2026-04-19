@@ -1,8 +1,16 @@
 ---
 type: source
 tags: [rp6502, youtube, pio, dma, hardware, glue-logic, chip-select, ac-chips, 6522]
-related: [[development-history]], [[pio-architecture]], [[memory-map]], [[ria-registers]], [[known-issues]], [[rp6502-board]], [[youtube-playlist]]
-sources: [[youtube-playlist]]
+related:
+  - "[[development-history]]"
+  - "[[pio-architecture]]"
+  - "[[memory-map]]"
+  - "[[ria-registers]]"
+  - "[[known-issues]]"
+  - "[[rp6502-board]]"
+  - "[[youtube-playlist]]"
+sources:
+  - "[[youtube-playlist]]"
 video_id: wxV6x5BUMH4
 episode: 3
 approx_date: 2023-01

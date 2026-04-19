@@ -1,8 +1,15 @@
 ---
 type: source
 tags: [rp6502, youtube, vga, pix-bus, ddr, pio, dma]
-related: [[pix-bus]], [[rp6502-vga]], [[rp6502-ria]], [[pio-architecture]], [[dma-controller]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[pix-bus]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-ria]]"
+  - "[[pio-architecture]]"
+  - "[[dma-controller]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

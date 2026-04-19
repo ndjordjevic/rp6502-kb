@@ -1,8 +1,15 @@
 ---
 type: entity
 tags: [rp6502, ria, wireless, wifi, bluetooth, pico2w]
-related: [[rp6502-ria]], [[rp6502-board]], [[dual-core-sio]]
-sources: [[rp6502-ria-w-docs]], [[release-notes]], [[fairhead-pico-c]], [[youtube-playlist]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-board]]"
+  - "[[dual-core-sio]]"
+sources:
+  - "[[rp6502-ria-w-docs]]"
+  - "[[release-notes]]"
+  - "[[fairhead-pico-c]]"
+  - "[[youtube-playlist]]"
 created: 2026-04-15
 updated: 2026-04-18
 ---

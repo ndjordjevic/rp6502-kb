@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [rp6502, nfc, ndef, device, filesystem, ria]
-related: [[rp6502-ria]], [[rp6502-ria-w]], [[fatfs]], [[examples]]
-sources: [[rp6502-ria-docs]], [[examples]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[fatfs]]"
+  - "[[examples]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[examples]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

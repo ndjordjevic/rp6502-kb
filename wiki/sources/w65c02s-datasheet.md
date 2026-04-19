@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [w65c02s, 65c02, cpu, wdc, datasheet]
-related: [[w65c02s]], [[65c02-instruction-set]], [[65c02-addressing-modes]], [[memory-map]], [[reset-model]]
-sources: [[w65c02s-datasheet]]
+related:
+  - "[[w65c02s]]"
+  - "[[65c02-instruction-set]]"
+  - "[[65c02-addressing-modes]]"
+  - "[[memory-map]]"
+  - "[[reset-model]]"
+sources:
+  - "[[w65c02s-datasheet]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

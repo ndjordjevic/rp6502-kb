@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, cc65, toolchain, vscode, cmake, template]
-related: [[cc65]], [[rp6502-abi]], [[rom-file-format]], [[toolchain-setup]]
-sources: [[yt-ep09-c-programming-setup]], [[rp6502-github-repo]]
+related:
+  - "[[cc65]]"
+  - "[[rp6502-abi]]"
+  - "[[rom-file-format]]"
+  - "[[toolchain-setup]]"
+sources:
+  - "[[yt-ep09-c-programming-setup]]"
+  - "[[rp6502-github-repo]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

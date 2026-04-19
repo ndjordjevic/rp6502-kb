@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [w65c02s, 65c02, addressing-modes, assembly]
-related: [[w65c02s]], [[65c02-instruction-set]], [[memory-map]], [[learning-6502-assembly]], [[6502-relocatable-and-self-modifying]]
-sources: [[w65c02s-datasheet]], [[wagner-assembly-lines]]
+related:
+  - "[[w65c02s]]"
+  - "[[65c02-instruction-set]]"
+  - "[[memory-map]]"
+  - "[[learning-6502-assembly]]"
+  - "[[6502-relocatable-and-self-modifying]]"
+sources:
+  - "[[w65c02s-datasheet]]"
+  - "[[wagner-assembly-lines]]"
 created: 2026-04-17
 updated: 2026-04-18
 ---

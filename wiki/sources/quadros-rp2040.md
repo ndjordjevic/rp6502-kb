@@ -1,7 +1,18 @@
 ---
 type: source
 tags: [rp2040, rp2350, pio, gpio, dma, usb, uart, spi, interrupts, multicore]
-related: [[pio-architecture]], [[gpio-pinout]], [[dual-core-sio]], [[rp2040-clocks]], [[rp2040-uart]], [[rp2040-spi]], [[rp2040-memory]], [[dma-controller]], [[usb-controller]], [[rp6502-ria]], [[rp6502-os]]
+related:
+  - "[[pio-architecture]]"
+  - "[[gpio-pinout]]"
+  - "[[dual-core-sio]]"
+  - "[[rp2040-clocks]]"
+  - "[[rp2040-uart]]"
+  - "[[rp2040-spi]]"
+  - "[[rp2040-memory]]"
+  - "[[dma-controller]]"
+  - "[[usb-controller]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-os]]"
 sources: []
 created: 2026-04-16
 updated: 2026-04-16 (all chapters ingested)

@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, youtube, demos, graphics, sound, opl2, psg, community]
-related: [[opl2-fm-synth]], [[programmable-sound-generator]], [[rp6502-vga]], [[rp6502-ria]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[opl2-fm-synth]]"
+  - "[[programmable-sound-generator]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-ria]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

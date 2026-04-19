@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, youtube, pio, dma, hardware, phi2, memory-map, dual-pico]
-related: [[development-history]], [[pio-architecture]], [[memory-map]], [[ria-registers]], [[youtube-playlist]]
-sources: [[youtube-playlist]]
+related:
+  - "[[development-history]]"
+  - "[[pio-architecture]]"
+  - "[[memory-map]]"
+  - "[[ria-registers]]"
+  - "[[youtube-playlist]]"
+sources:
+  - "[[youtube-playlist]]"
 video_id: GOEI2OpMncY
 episode: 2
 approx_date: 2022-12

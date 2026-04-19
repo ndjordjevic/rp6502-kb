@@ -1,8 +1,23 @@
 ---
 type: topic
 tags: [rp6502, history, hardware, development, prototype, dual-pico, pio, dma, ac-chips]
-related: [[rp6502-board]], [[rp6502-ria]], [[rp6502-vga]], [[pio-architecture]], [[pix-bus]], [[known-issues]], [[rp6502-os]], [[version-history]], [[youtube-playlist]], [[cc65]], [[llvm-mos]], [[programmable-sound-generator]], [[opl2-fm-synth]], [[code-pages]]
-sources: [[youtube-playlist]]
+related:
+  - "[[rp6502-board]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[pio-architecture]]"
+  - "[[pix-bus]]"
+  - "[[known-issues]]"
+  - "[[rp6502-os]]"
+  - "[[version-history]]"
+  - "[[youtube-playlist]]"
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+  - "[[programmable-sound-generator]]"
+  - "[[opl2-fm-synth]]"
+  - "[[code-pages]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

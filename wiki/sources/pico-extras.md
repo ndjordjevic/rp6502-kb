@@ -1,8 +1,12 @@
 ---
 type: source
 tags: [rp6502, vga, scanvideo, pico-extras, firmware, dependency, mode-change]
-related: [[rp6502-vga]], [[vga-display-modes]], [[hstx]]
-sources: [[rp6502-github-repo]]
+related:
+  - "[[rp6502-vga]]"
+  - "[[vga-display-modes]]"
+  - "[[hstx]]"
+sources:
+  - "[[rp6502-github-repo]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

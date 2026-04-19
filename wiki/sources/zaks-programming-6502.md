@@ -1,7 +1,14 @@
 ---
 type: source
 tags: [6502, assembly, programming, textbook, bcd, data-structures, subroutines, io, hashing, sorting, merging]
-related: [[65c02-instruction-set]], [[65c02-addressing-modes]], [[6502-programming-idioms]], [[6502-application-snippets]], [[6502-data-structures]], [[6502-interrupt-patterns]], [[6502-subroutine-conventions]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[65c02-addressing-modes]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-application-snippets]]"
+  - "[[6502-data-structures]]"
+  - "[[6502-interrupt-patterns]]"
+  - "[[6502-subroutine-conventions]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

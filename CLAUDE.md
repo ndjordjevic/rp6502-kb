@@ -62,8 +62,12 @@ Every wiki page must begin with YAML frontmatter followed by a summary line:
 ---
 type: source | entity | concept | synthesis | topic
 tags: [rp6502, ria, hardware, ...]
-related: [[page-name]], [[other-page]]
-sources: [[source-name]], [[other-source]]
+related:
+  - "[[page-name]]"
+  - "[[other-page]]"
+sources:
+  - "[[source-name]]"
+  - "[[other-source]]"
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 ---

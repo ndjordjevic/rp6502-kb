@@ -1,8 +1,11 @@
 ---
 type: source
 tags: [rp6502, youtube, bbs, wifi, rp2350, pico2w, ntp, telnet]
-related: [[rp6502-ria-w]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[rp6502-ria-w]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

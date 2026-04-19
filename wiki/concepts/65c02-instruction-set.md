@@ -1,8 +1,26 @@
 ---
 type: concept
 tags: [w65c02s, 65c02, instruction-set, opcodes, assembly]
-related: [[w65c02s]], [[65c02-addressing-modes]], [[rp6502-abi]], [[cc65]], [[llvm-mos]], [[6502-subroutine-conventions]], [[6502-data-structures]], [[6502-relocatable-and-self-modifying]], [[6502-stack-and-subroutines]], [[learning-6502-assembly]], [[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-overflow-flag]], [[6502-interrupt-patterns]]
-sources: [[w65c02s-datasheet]], [[leventhal-6502-assembly]], [[wagner-assembly-lines]], [[6502org-tutorials]]
+related:
+  - "[[w65c02s]]"
+  - "[[65c02-addressing-modes]]"
+  - "[[rp6502-abi]]"
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+  - "[[6502-subroutine-conventions]]"
+  - "[[6502-data-structures]]"
+  - "[[6502-relocatable-and-self-modifying]]"
+  - "[[6502-stack-and-subroutines]]"
+  - "[[learning-6502-assembly]]"
+  - "[[6502-compare-instructions]]"
+  - "[[6502-decimal-mode]]"
+  - "[[6502-overflow-flag]]"
+  - "[[6502-interrupt-patterns]]"
+sources:
+  - "[[w65c02s-datasheet]]"
+  - "[[leventhal-6502-assembly]]"
+  - "[[wagner-assembly-lines]]"
+  - "[[6502org-tutorials]]"
 created: 2026-04-17
 updated: 2026-04-18
 ---

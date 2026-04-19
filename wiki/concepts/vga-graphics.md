@@ -1,8 +1,13 @@
 ---
 type: concept
 tags: [rp6502, vga, sprites, affine, blit, dual-port, bgar5515, graphics]
-related: [[vga-display-modes]], [[xram]], [[rp6502-vga]], [[examples]]
-sources: [[examples]]
+related:
+  - "[[vga-display-modes]]"
+  - "[[xram]]"
+  - "[[rp6502-vga]]"
+  - "[[examples]]"
+sources:
+  - "[[examples]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

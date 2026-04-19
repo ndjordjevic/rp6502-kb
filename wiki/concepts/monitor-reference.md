@@ -1,8 +1,17 @@
 ---
 type: concept
 tags: [rp6502, monitor, shell, commands, setup, uefi]
-related: [[rp6502-ria]], [[rp6502-ria-w]], [[rom-file-format]], [[launcher]], [[reset-model]], [[known-issues]]
-sources: [[rp6502-ria-docs]], [[rp6502-ria-w-docs]], [[release-notes]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[rom-file-format]]"
+  - "[[launcher]]"
+  - "[[reset-model]]"
+  - "[[known-issues]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[rp6502-ria-w-docs]]"
+  - "[[release-notes]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

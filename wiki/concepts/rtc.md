@@ -1,8 +1,13 @@
 ---
 type: concept
 tags: [rp6502, rtc, time, posix, clock]
-related: [[rp6502-ria]], [[rp6502-ria-w]], [[examples]]
-sources: [[rp6502-ria-docs]], [[examples]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[examples]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[examples]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

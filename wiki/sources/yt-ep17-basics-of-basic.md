@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, youtube, basic, ehbasic, boot, reset, reboot]
-related: [[launcher]], [[reset-model]], [[rp6502-os]], [[known-issues]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[launcher]]"
+  - "[[reset-model]]"
+  - "[[rp6502-os]]"
+  - "[[known-issues]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

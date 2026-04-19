@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [rp2040, usb, hid, cdc, tinyusb, ria, keyboard, gamepad]
-related: [[rp6502-ria]], [[gpio-pinout]], [[dual-core-sio]], [[ria-registers]]
-sources: [[quadros-rp2040]], [[rp2350-datasheet]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[gpio-pinout]]"
+  - "[[dual-core-sio]]"
+  - "[[ria-registers]]"
+sources:
+  - "[[quadros-rp2040]]"
+  - "[[rp2350-datasheet]]"
 created: 2026-04-16
 updated: 2026-04-17
 ---

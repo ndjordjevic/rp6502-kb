@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [rp2040, rp2350, memory, sram, flash, rom, xip, address-map]
-related: [[dma-controller]], [[pio-architecture]], [[rp6502-ria]], [[xram]], [[rp2350]]
-sources: [[quadros-rp2040]], [[rp2350-datasheet]]
+related:
+  - "[[dma-controller]]"
+  - "[[pio-architecture]]"
+  - "[[rp6502-ria]]"
+  - "[[xram]]"
+  - "[[rp2350]]"
+sources:
+  - "[[quadros-rp2040]]"
+  - "[[rp2350-datasheet]]"
 created: 2026-04-16
 updated: 2026-04-17
 ---

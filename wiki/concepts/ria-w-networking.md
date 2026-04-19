@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [rp6502, networking, wifi, ble, hayes, modem, telnet, rp6502-ria-w]
-related: [[rp6502-ria-w]], [[rp6502-ria]], [[rp6502-os]]
-sources: [[rp6502-ria-w-docs]], [[release-notes]], [[rumbledethumps-discord]]
+related:
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-os]]"
+sources:
+  - "[[rp6502-ria-w-docs]]"
+  - "[[release-notes]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

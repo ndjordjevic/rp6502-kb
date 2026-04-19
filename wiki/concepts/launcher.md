@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [rp6502, os, process, launcher]
-related: [[rp6502-os]], [[rp6502-ria]], [[rom-file-format]]
-sources: [[rp6502-os-docs]], [[release-notes]], [[youtube-playlist]]
+related:
+  - "[[rp6502-os]]"
+  - "[[rp6502-ria]]"
+  - "[[rom-file-format]]"
+sources:
+  - "[[rp6502-os-docs]]"
+  - "[[release-notes]]"
+  - "[[youtube-playlist]]"
 created: 2026-04-15
 updated: 2026-04-16
 ---

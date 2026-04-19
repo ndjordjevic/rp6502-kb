@@ -1,8 +1,12 @@
 ---
 type: source
 tags: [rp6502, youtube, audio, psg, sound, pwm, adsr, waveforms]
-related: [[programmable-sound-generator]], [[rp6502-ria]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[programmable-sound-generator]]"
+  - "[[rp6502-ria]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

@@ -1,8 +1,19 @@
 ---
 type: entity
 tags: [rp6502, vga, video, firmware, pico2, hstx, dvi, tmds]
-related: [[rp6502-ria]], [[pix-bus]], [[xreg]], [[xram]], [[sdk-architecture]], [[hstx]]
-sources: [[rp6502-vga-docs]], [[pico-c-sdk]], [[rp2350-datasheet]], [[youtube-playlist]], [[pico-extras]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[pix-bus]]"
+  - "[[xreg]]"
+  - "[[xram]]"
+  - "[[sdk-architecture]]"
+  - "[[hstx]]"
+sources:
+  - "[[rp6502-vga-docs]]"
+  - "[[pico-c-sdk]]"
+  - "[[rp2350-datasheet]]"
+  - "[[youtube-playlist]]"
+  - "[[pico-extras]]"
 created: 2026-04-15
 updated: 2026-04-18
 ---

@@ -1,8 +1,18 @@
 ---
 type: concept
 tags: [rp6502, memory, address-space, rp2350]
-related: [[w65c02s]], [[w65c22s]], [[rp6502-ria]], [[xram]], [[rp2350]], [[rp2040-memory]], [[pio-architecture]], [[hstx]]
-sources: [[rp6502-os-docs]], [[rp2350-datasheet]]
+related:
+  - "[[w65c02s]]"
+  - "[[w65c22s]]"
+  - "[[rp6502-ria]]"
+  - "[[xram]]"
+  - "[[rp2350]]"
+  - "[[rp2040-memory]]"
+  - "[[pio-architecture]]"
+  - "[[hstx]]"
+sources:
+  - "[[rp6502-os-docs]]"
+  - "[[rp2350-datasheet]]"
 created: 2026-04-15
 updated: 2026-04-17
 ---

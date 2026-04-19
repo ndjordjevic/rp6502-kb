@@ -1,7 +1,12 @@
 ---
 type: source
 tags: [rp6502, os, api, abi, source]
-related: [[rp6502-os]], [[rp6502-abi]], [[memory-map]], [[xram]], [[launcher]]
+related:
+  - "[[rp6502-os]]"
+  - "[[rp6502-abi]]"
+  - "[[memory-map]]"
+  - "[[xram]]"
+  - "[[launcher]]"
 sources: [picocomputer.github.io/os]
 created: 2026-04-15
 updated: 2026-04-15

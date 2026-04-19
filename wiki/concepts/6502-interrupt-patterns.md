@@ -1,8 +1,19 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, interrupts, irq, nmi, isr, rp6502, via, ring-buffer, real-time-clock]
-related: [[65c02-instruction-set]], [[hardware-irq]], [[rp6502-abi]], [[w65c02s]], [[w65c22s]], [[6522-via]], [[6502-stack-and-subroutines]], [[6502-overflow-flag]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[6502org-tutorials]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[hardware-irq]]"
+  - "[[rp6502-abi]]"
+  - "[[w65c02s]]"
+  - "[[w65c22s]]"
+  - "[[6522-via]]"
+  - "[[6502-stack-and-subroutines]]"
+  - "[[6502-overflow-flag]]"
+sources:
+  - "[[leventhal-6502-assembly]]"
+  - "[[leventhal-subroutines]]"
+  - "[[6502org-tutorials]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

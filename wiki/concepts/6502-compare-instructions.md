@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, compare, cmp, cpx, cpy, signed, unsigned, multi-byte, flags]
-related: [[65c02-instruction-set]], [[6502-programming-idioms]], [[learning-6502-assembly]], [[6502-overflow-flag]], [[6502-common-errors]], [[6502-emulated-instructions]]
-sources: [[6502org-tutorials]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[6502-programming-idioms]]"
+  - "[[learning-6502-assembly]]"
+  - "[[6502-overflow-flag]]"
+  - "[[6502-common-errors]]"
+  - "[[6502-emulated-instructions]]"
+sources:
+  - "[[6502org-tutorials]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

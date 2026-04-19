@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [rp6502, abi, os, fastcall, assembly]
-related: [[rp6502-os]], [[rp6502-ria]], [[xram]], [[memory-map]]
-sources: [[rp6502-os-docs]], [[rp6502-github-repo]], [[youtube-playlist]]
+related:
+  - "[[rp6502-os]]"
+  - "[[rp6502-ria]]"
+  - "[[xram]]"
+  - "[[memory-map]]"
+sources:
+  - "[[rp6502-os-docs]]"
+  - "[[rp6502-github-repo]]"
+  - "[[youtube-playlist]]"
 created: 2026-04-15
 updated: 2026-04-17
 ---

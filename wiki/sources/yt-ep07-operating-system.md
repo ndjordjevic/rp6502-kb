@@ -1,8 +1,16 @@
 ---
 type: source
 tags: [rp6502, youtube, os, posix, memory, xram, protected-mode, colossal-cave]
-related: [[development-history]], [[rp6502-os]], [[xram]], [[rp6502-abi]], [[memory-map]], [[pix-bus]], [[youtube-playlist]]
-sources: [[youtube-playlist]]
+related:
+  - "[[development-history]]"
+  - "[[rp6502-os]]"
+  - "[[xram]]"
+  - "[[rp6502-abi]]"
+  - "[[memory-map]]"
+  - "[[pix-bus]]"
+  - "[[youtube-playlist]]"
+sources:
+  - "[[youtube-playlist]]"
 video_id: kf-mvyL70bc
 episode: 7
 approx_date: 2023-06

@@ -1,8 +1,18 @@
 ---
 type: synthesis
 tags: [rp6502, ria, os, abi, xram, synthesis]
-related: [[rp6502-ria]], [[rp6502-os]], [[rp6502-abi]], [[ria-registers]], [[xram]], [[memory-map]], [[xreg]], [[pix-bus]]
-sources: [[rp6502-ria-docs]], [[rp6502-github-repo]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-os]]"
+  - "[[rp6502-abi]]"
+  - "[[ria-registers]]"
+  - "[[xram]]"
+  - "[[memory-map]]"
+  - "[[xreg]]"
+  - "[[pix-bus]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[rp6502-github-repo]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

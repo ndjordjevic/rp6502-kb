@@ -1,8 +1,15 @@
 ---
 type: topic
 tags: [rp6502, history, versions, changelog]
-related: [[release-notes]], [[known-issues]], [[rp6502-ria]], [[rp6502-vga]], [[rp6502-os]]
-sources: [[release-notes]], [[rumbledethumps-discord]]
+related:
+  - "[[release-notes]]"
+  - "[[known-issues]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-os]]"
+sources:
+  - "[[release-notes]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-16
 updated: 2026-04-18
 ---

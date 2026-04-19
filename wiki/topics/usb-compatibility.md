@@ -1,8 +1,14 @@
 ---
 type: topic
 tags: [rp6502, usb, ble, gamepad, compatibility, xinput, dinput, tinyusb]
-related: [[gamepad-input]], [[rp6502-ria]], [[rp6502-ria-w]], [[usb-controller]]
-sources: [[community-wiki]], [[rumbledethumps-discord]]
+related:
+  - "[[gamepad-input]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[usb-controller]]"
+sources:
+  - "[[community-wiki]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

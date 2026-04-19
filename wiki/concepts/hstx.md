@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [rp2350, hstx, dvi, tmds, vga, serial, output, pio]
-related: [[rp6502-vga]], [[pio-architecture]], [[rp2040-clocks]], [[dma-controller]], [[rp2350]]
-sources: [[rp2350-datasheet]]
+related:
+  - "[[rp6502-vga]]"
+  - "[[pio-architecture]]"
+  - "[[rp2040-clocks]]"
+  - "[[dma-controller]]"
+  - "[[rp2350]]"
+sources:
+  - "[[rp2350-datasheet]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

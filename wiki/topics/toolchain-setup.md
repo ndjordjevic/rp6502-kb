@@ -1,8 +1,15 @@
 ---
 type: topic
 tags: [rp6502, cc65, llvm-mos, toolchain, vscode, cmake, setup, windows, linux]
-related: [[cc65]], [[llvm-mos]], [[rom-file-format]], [[rp6502-abi]], [[vscode-cc65]]
-sources: [[vscode-cc65]], [[vscode-llvm-mos]]
+related:
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+  - "[[rom-file-format]]"
+  - "[[rp6502-abi]]"
+  - "[[vscode-cc65]]"
+sources:
+  - "[[vscode-cc65]]"
+  - "[[vscode-llvm-mos]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

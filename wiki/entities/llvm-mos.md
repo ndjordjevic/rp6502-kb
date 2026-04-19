@@ -1,8 +1,16 @@
 ---
 type: entity
 tags: [rp6502, llvm-mos, toolchain, compiler, 6502, c, cpp]
-related: [[cc65]], [[rp6502-abi]], [[rp6502-os]]
-sources: [[yt-ep18-llvm-mos]], [[rp6502-abi]], [[release-notes]], [[rumbledethumps-discord]], [[vscode-llvm-mos]]
+related:
+  - "[[cc65]]"
+  - "[[rp6502-abi]]"
+  - "[[rp6502-os]]"
+sources:
+  - "[[yt-ep18-llvm-mos]]"
+  - "[[rp6502-abi]]"
+  - "[[release-notes]]"
+  - "[[rumbledethumps-discord]]"
+  - "[[vscode-llvm-mos]]"
 created: 2026-04-17
 updated: 2026-04-18
 ---

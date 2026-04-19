@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [rp6502, via, timer, interrupt, gpio, 6522, w65c22s]
-related: [[6522-via]], [[w65c22s]], [[6502-interrupt-patterns]], [[memory-map]], [[rp6502-abi]]
-sources: [[rp6502-ria-docs]], [[leventhal-subroutines]]
+related:
+  - "[[6522-via]]"
+  - "[[w65c22s]]"
+  - "[[6502-interrupt-patterns]]"
+  - "[[memory-map]]"
+  - "[[rp6502-abi]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[leventhal-subroutines]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

@@ -1,7 +1,11 @@
 ---
 type: source
 tags: [rp6502, basic, ehbasic, interpreter, cc65]
-related: [[ehbasic]], [[rp6502-abi]], [[ria-registers]], [[cc65]]
+related:
+  - "[[ehbasic]]"
+  - "[[rp6502-abi]]"
+  - "[[ria-registers]]"
+  - "[[cc65]]"
 sources: []
 created: 2026-04-18
 updated: 2026-04-18

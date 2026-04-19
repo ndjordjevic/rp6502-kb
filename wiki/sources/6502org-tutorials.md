@@ -1,7 +1,16 @@
 ---
 type: source
 tags: [6502, 65c02, assembly, opcodes, arithmetic, compare, decimal, bcd, interrupts, overflow, stack, nmos]
-related: [[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-overflow-flag]], [[65c02-instruction-set]], [[6502-interrupt-patterns]], [[6502-stack-and-subroutines]], [[6502-programming-idioms]], [[6502-common-errors]], [[learning-6502-assembly]]
+related:
+  - "[[6502-compare-instructions]]"
+  - "[[6502-decimal-mode]]"
+  - "[[6502-overflow-flag]]"
+  - "[[65c02-instruction-set]]"
+  - "[[6502-interrupt-patterns]]"
+  - "[[6502-stack-and-subroutines]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-common-errors]]"
+  - "[[learning-6502-assembly]]"
 sources:
 created: 2026-04-18
 updated: 2026-04-18

@@ -1,8 +1,20 @@
 ---
 type: synthesis
 tags: [rp6502, getting-started, setup, synthesis, tutorial]
-related: [[rp6502-board]], [[rp6502-ria]], [[rp6502-vga]], [[toolchain-setup]], [[cc65]], [[llvm-mos]], [[rom-file-format]], [[known-issues]]
-sources: [[hardware]], [[vscode-cc65]], [[rp6502-ria-docs]], [[release-notes]]
+related:
+  - "[[rp6502-board]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[toolchain-setup]]"
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+  - "[[rom-file-format]]"
+  - "[[known-issues]]"
+sources:
+  - "[[hardware]]"
+  - "[[vscode-cc65]]"
+  - "[[rp6502-ria-docs]]"
+  - "[[release-notes]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

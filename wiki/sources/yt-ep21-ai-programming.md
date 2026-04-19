@@ -1,8 +1,12 @@
 ---
 type: source
 tags: [rp6502, youtube, ai, copilot, cc65, programming-demo]
-related: [[cc65]], [[rp6502-abi]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[cc65]]"
+  - "[[rp6502-abi]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

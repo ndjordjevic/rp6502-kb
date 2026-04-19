@@ -1,8 +1,14 @@
 ---
 type: entity
 tags: [rp6502, community, os, native, 65c02, razemos]
-related: [[rp6502-os]], [[rp6502-abi]], [[cc65]], [[launcher]], [[community-projects]]
-sources: [[rumbledethumps-discord]]
+related:
+  - "[[rp6502-os]]"
+  - "[[rp6502-abi]]"
+  - "[[cc65]]"
+  - "[[launcher]]"
+  - "[[community-projects]]"
+sources:
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

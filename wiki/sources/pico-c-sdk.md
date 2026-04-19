@@ -1,7 +1,15 @@
 ---
 type: source
 tags: [rp2350, rp2040, pio, gpio, dma, clocks, spi, uart, multicore, sdk]
-related: [[sdk-architecture]], [[pio-architecture]], [[gpio-pinout]], [[dma-controller]], [[rp2040-clocks]], [[dual-core-sio]], [[rp6502-ria]], [[rp6502-vga]]
+related:
+  - "[[sdk-architecture]]"
+  - "[[pio-architecture]]"
+  - "[[gpio-pinout]]"
+  - "[[dma-controller]]"
+  - "[[rp2040-clocks]]"
+  - "[[dual-core-sio]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
 sources: []
 created: 2026-04-17
 updated: 2026-04-17

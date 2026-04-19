@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [rp6502, gamepad, input, hid, usb, controller]
-related: [[rp6502-ria]], [[xram]], [[rp6502-ria-w]], [[examples]]
-sources: [[rp6502-ria-docs]], [[examples]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[xram]]"
+  - "[[rp6502-ria-w]]"
+  - "[[examples]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[examples]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

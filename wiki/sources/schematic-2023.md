@@ -1,7 +1,12 @@
 ---
 type: source
 tags: [rp6502, hardware, schematic, pcb, glue-logic, vga-dac, audio]
-related: [[rp6502-board]], [[board-circuits]], [[gpio-pinout]], [[pix-bus]], [[w65c22s]]
+related:
+  - "[[rp6502-board]]"
+  - "[[board-circuits]]"
+  - "[[gpio-pinout]]"
+  - "[[pix-bus]]"
+  - "[[w65c22s]]"
 sources: [raw/pdfs/2023-06-07-rp6502.pdf]
 created: 2026-04-18
 updated: 2026-04-18

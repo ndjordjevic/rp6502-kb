@@ -1,8 +1,16 @@
 ---
 type: concept
 tags: [rp6502, filesystem, fatfs, usb, storage, fat32, exfat]
-related: [[rp6502-os]], [[usb-controller]], [[code-pages]], [[xram]], [[rp6502-github-repo]]
-sources: [[rp6502-os-docs]], [[yt-ep06-roms-filesystem]], [[rp6502-github-repo]]
+related:
+  - "[[rp6502-os]]"
+  - "[[usb-controller]]"
+  - "[[code-pages]]"
+  - "[[xram]]"
+  - "[[rp6502-github-repo]]"
+sources:
+  - "[[rp6502-os-docs]]"
+  - "[[yt-ep06-roms-filesystem]]"
+  - "[[rp6502-github-repo]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

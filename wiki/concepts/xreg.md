@@ -1,8 +1,18 @@
 ---
 type: concept
 tags: [rp6502, xreg, pix, configuration]
-related: [[pix-bus]], [[xram]], [[rp6502-ria]], [[rp6502-vga]], [[rp6502-os]], [[programmable-sound-generator]], [[opl2-fm-synth]]
-sources: [[rp6502-ria-docs]], [[rp6502-vga-docs]], [[rp6502-os-docs]]
+related:
+  - "[[pix-bus]]"
+  - "[[xram]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-os]]"
+  - "[[programmable-sound-generator]]"
+  - "[[opl2-fm-synth]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[rp6502-vga-docs]]"
+  - "[[rp6502-os-docs]]"
 created: 2026-04-15
 updated: 2026-04-15
 ---

@@ -1,8 +1,17 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, debugging, errors, carry, flags, addressing, decimal-mode]
-related: [[65c02-instruction-set]], [[6502-programming-idioms]], [[6502-emulated-instructions]], [[6502-subroutine-conventions]], [[6502-interrupt-patterns]], [[6502-decimal-mode]], [[6502-compare-instructions]], [[6502-overflow-flag]]
-sources: [[leventhal-subroutines]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-emulated-instructions]]"
+  - "[[6502-subroutine-conventions]]"
+  - "[[6502-interrupt-patterns]]"
+  - "[[6502-decimal-mode]]"
+  - "[[6502-compare-instructions]]"
+  - "[[6502-overflow-flag]]"
+sources:
+  - "[[leventhal-subroutines]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

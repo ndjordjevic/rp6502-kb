@@ -1,7 +1,16 @@
 ---
 type: source
 tags: [rp6502, releases, history, changelog]
-related: [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[rp6502-os]], [[version-history]], [[known-issues]], [[cc65]], [[opl2-fm-synth]], [[programmable-sound-generator]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-os]]"
+  - "[[version-history]]"
+  - "[[known-issues]]"
+  - "[[cc65]]"
+  - "[[opl2-fm-synth]]"
+  - "[[programmable-sound-generator]]"
 sources: []
 created: 2026-04-16
 updated: 2026-04-16

@@ -1,8 +1,12 @@
 ---
 type: source
 tags: [rp6502, youtube, game-of-life, graphics, bitmap, programming-demo]
-related: [[rp6502-vga]], [[xram]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[rp6502-vga]]"
+  - "[[xram]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

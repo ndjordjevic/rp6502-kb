@@ -1,8 +1,12 @@
 ---
 type: concept
 tags: [rp2040, rp2350, pio, pioasm, toolchain, sdk]
-related: [[pio-architecture]], [[sdk-architecture]], [[pico-c-sdk]]
-sources: [[pico-c-sdk]]
+related:
+  - "[[pio-architecture]]"
+  - "[[sdk-architecture]]"
+  - "[[pico-c-sdk]]"
+sources:
+  - "[[pico-c-sdk]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

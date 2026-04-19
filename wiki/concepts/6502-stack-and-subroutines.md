@@ -1,8 +1,16 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, stack, subroutines, pha, pla, jsr, rts]
-related: [[learning-6502-assembly]], [[6502-subroutine-conventions]], [[65c02-instruction-set]], [[6502-programming-idioms]], [[6502-interrupt-patterns]]
-sources: [[wagner-assembly-lines]], [[leventhal-subroutines]], [[6502org-tutorials]]
+related:
+  - "[[learning-6502-assembly]]"
+  - "[[6502-subroutine-conventions]]"
+  - "[[65c02-instruction-set]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-interrupt-patterns]]"
+sources:
+  - "[[wagner-assembly-lines]]"
+  - "[[leventhal-subroutines]]"
+  - "[[6502org-tutorials]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

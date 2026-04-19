@@ -1,8 +1,17 @@
 ---
 type: concept
 tags: [rp2040, rp2350, clocks, pll, xosc, rosc, lposc, hstx, timer, watchdog, rtc, rp6502-ria]
-related: [[pio-architecture]], [[gpio-pinout]], [[rp6502-ria]], [[dma-controller]], [[dual-core-sio]], [[hstx]]
-sources: [[quadros-rp2040]], [[pico-c-sdk]], [[rp2350-datasheet]]
+related:
+  - "[[pio-architecture]]"
+  - "[[gpio-pinout]]"
+  - "[[rp6502-ria]]"
+  - "[[dma-controller]]"
+  - "[[dual-core-sio]]"
+  - "[[hstx]]"
+sources:
+  - "[[quadros-rp2040]]"
+  - "[[pico-c-sdk]]"
+  - "[[rp2350-datasheet]]"
 created: 2026-04-16
 updated: 2026-04-18
 ---

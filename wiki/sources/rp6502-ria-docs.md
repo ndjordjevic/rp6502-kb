@@ -1,7 +1,13 @@
 ---
 type: source
 tags: [rp6502, ria, source]
-related: [[rp6502-ria]], [[pix-bus]], [[xram]], [[xreg]], [[rom-file-format]], [[reset-model]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[pix-bus]]"
+  - "[[xram]]"
+  - "[[xreg]]"
+  - "[[rom-file-format]]"
+  - "[[reset-model]]"
 sources: [picocomputer.github.io/ria]
 created: 2026-04-15
 updated: 2026-04-15

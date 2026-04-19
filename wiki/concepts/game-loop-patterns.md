@@ -1,8 +1,17 @@
 ---
 type: concept
 tags: [rp6502, vga, vsync, game-loop, interrupt, timing, animation]
-related: [[vga-display-modes]], [[rp6502-vga]], [[xram]], [[6502-interrupt-patterns]], [[via-programming]], [[rp6502-abi]]
-sources: [[rp6502-vga-docs]], [[rp6502-ria-docs]], [[rp6502-github-repo]]
+related:
+  - "[[vga-display-modes]]"
+  - "[[rp6502-vga]]"
+  - "[[xram]]"
+  - "[[6502-interrupt-patterns]]"
+  - "[[via-programming]]"
+  - "[[rp6502-abi]]"
+sources:
+  - "[[rp6502-vga-docs]]"
+  - "[[rp6502-ria-docs]]"
+  - "[[rp6502-github-repo]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

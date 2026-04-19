@@ -1,8 +1,24 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, arithmetic, bcd, multiply, divide, multi-precision, bit-manipulation, shift, logical, asl, lsr, rol, ror, and, ora, eor, bit, subroutine-parameters]
-related: [[65c02-instruction-set]], [[6502-application-snippets]], [[6502-data-structures]], [[6502-emulated-instructions]], [[6502-common-errors]], [[6522-via]], [[learning-6502-assembly]], [[6502-subroutine-conventions]], [[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-overflow-flag]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[wagner-assembly-lines]], [[zaks-programming-6502]], [[6502org-tutorials]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[6502-application-snippets]]"
+  - "[[6502-data-structures]]"
+  - "[[6502-emulated-instructions]]"
+  - "[[6502-common-errors]]"
+  - "[[6522-via]]"
+  - "[[learning-6502-assembly]]"
+  - "[[6502-subroutine-conventions]]"
+  - "[[6502-compare-instructions]]"
+  - "[[6502-decimal-mode]]"
+  - "[[6502-overflow-flag]]"
+sources:
+  - "[[leventhal-6502-assembly]]"
+  - "[[leventhal-subroutines]]"
+  - "[[wagner-assembly-lines]]"
+  - "[[zaks-programming-6502]]"
+  - "[[6502org-tutorials]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

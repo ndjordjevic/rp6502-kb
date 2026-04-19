@@ -1,8 +1,16 @@
 ---
 type: concept
 tags: [rp2040, rp2350, uart, serial, rp6502-ria]
-related: [[gpio-pinout]], [[rp6502-ria]], [[rp2040-clocks]], [[dma-controller]]
-sources: [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
+related:
+  - "[[gpio-pinout]]"
+  - "[[rp6502-ria]]"
+  - "[[rp2040-clocks]]"
+  - "[[dma-controller]]"
+sources:
+  - "[[quadros-rp2040]]"
+  - "[[fairhead-pico-c]]"
+  - "[[pico-c-sdk]]"
+  - "[[rp2350-datasheet]]"
 created: 2026-04-16
 updated: 2026-04-18
 ---

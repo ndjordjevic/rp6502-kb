@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [rp6502, os, api, opcodes, abi]
-related: [[ria-registers]], [[rp6502-abi]], [[rp6502-os]], [[rp6502-ria]], [[cc65]], [[llvm-mos]]
-sources: [[rp6502-github-repo]]
+related:
+  - "[[ria-registers]]"
+  - "[[rp6502-abi]]"
+  - "[[rp6502-os]]"
+  - "[[rp6502-ria]]"
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+sources:
+  - "[[rp6502-github-repo]]"
 created: 2026-04-16
 updated: 2026-04-16
 ---

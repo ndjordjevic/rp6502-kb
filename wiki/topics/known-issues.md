@@ -1,8 +1,19 @@
 ---
 type: topic
 tags: [rp6502, bugs, workarounds, known-issues, rp2350, errata, hardware]
-related: [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[release-notes]], [[dma-controller]], [[usb-controller]], [[rp6502-board]]
-sources: [[release-notes]], [[rp2350-datasheet]], [[youtube-playlist]], [[rumbledethumps-discord]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-vga]]"
+  - "[[release-notes]]"
+  - "[[dma-controller]]"
+  - "[[usb-controller]]"
+  - "[[rp6502-board]]"
+sources:
+  - "[[release-notes]]"
+  - "[[rp2350-datasheet]]"
+  - "[[youtube-playlist]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-16
 updated: 2026-04-18
 ---

@@ -1,8 +1,18 @@
 ---
 type: concept
 tags: [rp6502, pix, bus, protocol]
-related: [[rp6502-ria]], [[rp6502-vga]], [[xram]], [[xreg]], [[pio-architecture]]
-sources: [[rp6502-ria-docs]], [[rp6502-vga-docs]], [[rp6502-github-repo]], [[youtube-playlist]], [[rumbledethumps-discord]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[xram]]"
+  - "[[xreg]]"
+  - "[[pio-architecture]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[rp6502-vga-docs]]"
+  - "[[rp6502-github-repo]]"
+  - "[[youtube-playlist]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-15
 updated: 2026-04-18
 ---

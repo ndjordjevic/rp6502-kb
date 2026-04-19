@@ -1,8 +1,17 @@
 ---
 type: concept
 tags: [rp6502, hardware, glue-logic, vga-dac, audio, irq, iorq, schematic]
-related: [[rp6502-board]], [[schematic-2023]], [[w65c02s]], [[w65c22s]], [[rp6502-ria]], [[rp6502-vga]], [[gpio-pinout]], [[pix-bus]]
-sources: [[schematic-2023]]
+related:
+  - "[[rp6502-board]]"
+  - "[[schematic-2023]]"
+  - "[[w65c02s]]"
+  - "[[w65c22s]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[gpio-pinout]]"
+  - "[[pix-bus]]"
+sources:
+  - "[[schematic-2023]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

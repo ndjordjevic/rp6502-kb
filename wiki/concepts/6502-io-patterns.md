@@ -1,8 +1,13 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, io, terminal, parity, crc, device-table, rdline]
-related: [[6502-application-snippets]], [[6502-interrupt-patterns]], [[6502-subroutine-conventions]], [[6522-via]]
-sources: [[leventhal-subroutines]]
+related:
+  - "[[6502-application-snippets]]"
+  - "[[6502-interrupt-patterns]]"
+  - "[[6502-subroutine-conventions]]"
+  - "[[6522-via]]"
+sources:
+  - "[[leventhal-subroutines]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

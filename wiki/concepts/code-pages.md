@@ -1,8 +1,13 @@
 ---
 type: concept
 tags: [rp6502, code-pages, fat, filesystem, fonts, unicode]
-related: [[rp6502-os]], [[rom-file-format]], [[rp6502-vga]]
-sources: [[yt-ep12-fonts-vsync]], [[rp6502-ria-docs]]
+related:
+  - "[[rp6502-os]]"
+  - "[[rom-file-format]]"
+  - "[[rp6502-vga]]"
+sources:
+  - "[[yt-ep12-fonts-vsync]]"
+  - "[[rp6502-ria-docs]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

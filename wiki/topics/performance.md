@@ -1,8 +1,14 @@
 ---
 type: topic
 tags: [rp6502, performance, benchmark, storage, throughput, phi2]
-related: [[fatfs]], [[xram]], [[rp6502-abi]], [[examples]]
-sources: [[examples], [release-notes]]
+related:
+  - "[[fatfs]]"
+  - "[[xram]]"
+  - "[[rp6502-abi]]"
+  - "[[examples]]"
+sources:
+  - "[[examples]"
+  - "[release-notes]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

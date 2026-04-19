@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, decimal, bcd, flags, arithmetic, 65816]
-related: [[65c02-instruction-set]], [[6502-programming-idioms]], [[6502-compare-instructions]], [[6502-overflow-flag]], [[6502-common-errors]], [[6502-interrupt-patterns]]
-sources: [[6502org-tutorials]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-compare-instructions]]"
+  - "[[6502-overflow-flag]]"
+  - "[[6502-common-errors]]"
+  - "[[6502-interrupt-patterns]]"
+sources:
+  - "[[6502org-tutorials]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

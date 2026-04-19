@@ -1,8 +1,16 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, string, ascii, code-conversion, snippets, crc, io-patterns, memory-clear, parity, bracket-test, max, sum, checksum, zero-count]
-related: [[65c02-instruction-set]], [[65c02-addressing-modes]], [[6502-subroutine-conventions]], [[6502-programming-idioms]], [[6502-io-patterns]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[zaks-programming-6502]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[65c02-addressing-modes]]"
+  - "[[6502-subroutine-conventions]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-io-patterns]]"
+sources:
+  - "[[leventhal-6502-assembly]]"
+  - "[[leventhal-subroutines]]"
+  - "[[zaks-programming-6502]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

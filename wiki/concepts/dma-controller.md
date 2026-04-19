@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [rp2040, rp2350, dma, pio2, xram, pio, peripheral, errata]
-related: [[rp2040-memory]], [[pio-architecture]], [[xram]], [[rp6502-ria]]
-sources: [[quadros-rp2040]], [[pico-c-sdk]], [[rp2350-datasheet]]
+related:
+  - "[[rp2040-memory]]"
+  - "[[pio-architecture]]"
+  - "[[xram]]"
+  - "[[rp6502-ria]]"
+sources:
+  - "[[quadros-rp2040]]"
+  - "[[pico-c-sdk]]"
+  - "[[rp2350-datasheet]]"
 created: 2026-04-16
 updated: 2026-04-17 (S5 ingest: RP2350 DREQ table, encoded_transfer_count, self-trigger/endless DMA, new functions, errata IDs)
 ---

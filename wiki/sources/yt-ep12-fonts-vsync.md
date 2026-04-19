@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, youtube, fonts, vsync, code-pages, versioning, fat]
-related: [[code-pages]], [[pix-bus]], [[rp6502-vga]], [[rp6502-ria]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[code-pages]]"
+  - "[[pix-bus]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-ria]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

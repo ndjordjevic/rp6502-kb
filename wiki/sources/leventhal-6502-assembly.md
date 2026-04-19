@@ -1,7 +1,15 @@
 ---
 type: source
 tags: [6502, 65c02, assembly, leventhal, programming, reference]
-related: [[w65c02s]], [[65c02-instruction-set]], [[65c02-addressing-modes]], [[6502-interrupt-patterns]], [[6502-subroutine-conventions]], [[6502-application-snippets]], [[6502-programming-idioms]], [[6502-data-structures]]
+related:
+  - "[[w65c02s]]"
+  - "[[65c02-instruction-set]]"
+  - "[[65c02-addressing-modes]]"
+  - "[[6502-interrupt-patterns]]"
+  - "[[6502-subroutine-conventions]]"
+  - "[[6502-application-snippets]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-data-structures]]"
 sources: []
 created: 2026-04-18
 updated: 2026-04-18

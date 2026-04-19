@@ -1,8 +1,21 @@
 ---
 type: concept
 tags: [rp6502, ria, vga, pio, rp2350, hardware, firmware]
-related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[gpio-pinout]], [[reset-model]], [[pioasm]], [[hardware-irq]]
-sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]], [[youtube-playlist]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[pix-bus]]"
+  - "[[gpio-pinout]]"
+  - "[[reset-model]]"
+  - "[[pioasm]]"
+  - "[[hardware-irq]]"
+sources:
+  - "[[rp6502-github-repo]]"
+  - "[[quadros-rp2040]]"
+  - "[[fairhead-pico-c]]"
+  - "[[pico-c-sdk]]"
+  - "[[rp2350-datasheet]]"
+  - "[[youtube-playlist]]"
 created: 2026-04-16
 updated: 2026-04-17
 

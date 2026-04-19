@@ -1,7 +1,19 @@
 ---
 type: source
 tags: [rp2350, hardware, datasheet, reference, pio, gpio, clocks, dma, usb, spi, uart, hstx, errata]
-related: [[rp2350]], [[pio-architecture]], [[gpio-pinout]], [[dual-core-sio]], [[rp2040-clocks]], [[dma-controller]], [[usb-controller]], [[rp2040-spi]], [[rp2040-uart]], [[rp6502-vga]], [[known-issues]], [[hstx]]
+related:
+  - "[[rp2350]]"
+  - "[[pio-architecture]]"
+  - "[[gpio-pinout]]"
+  - "[[dual-core-sio]]"
+  - "[[rp2040-clocks]]"
+  - "[[dma-controller]]"
+  - "[[usb-controller]]"
+  - "[[rp2040-spi]]"
+  - "[[rp2040-uart]]"
+  - "[[rp6502-vga]]"
+  - "[[known-issues]]"
+  - "[[hstx]]"
 sources: []
 created: 2026-04-17
 updated: 2026-04-17

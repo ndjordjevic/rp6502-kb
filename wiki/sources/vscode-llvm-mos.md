@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, llvm-mos, toolchain, vscode, cmake, template]
-related: [[llvm-mos]], [[rp6502-abi]], [[rom-file-format]], [[toolchain-setup]]
-sources: [[yt-ep18-llvm-mos]], [[rp6502-github-repo]]
+related:
+  - "[[llvm-mos]]"
+  - "[[rp6502-abi]]"
+  - "[[rom-file-format]]"
+  - "[[toolchain-setup]]"
+sources:
+  - "[[yt-ep18-llvm-mos]]"
+  - "[[rp6502-github-repo]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

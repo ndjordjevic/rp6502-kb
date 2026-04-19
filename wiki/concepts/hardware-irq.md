@@ -1,8 +1,14 @@
 ---
 type: concept
 tags: [rp6502, ria, rp2040, rp2350, hardware, firmware, irq, nvic]
-related: [[pio-architecture]], [[gpio-pinout]], [[dma-controller]], [[dual-core-sio]], [[rp2040-clocks]]
-sources: [[pico-c-sdk]]
+related:
+  - "[[pio-architecture]]"
+  - "[[gpio-pinout]]"
+  - "[[dma-controller]]"
+  - "[[dual-core-sio]]"
+  - "[[rp2040-clocks]]"
+sources:
+  - "[[pico-c-sdk]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

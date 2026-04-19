@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, flags, overflow, signed, arithmetic, so-pin, bit, adc, sbc]
-related: [[65c02-instruction-set]], [[6502-programming-idioms]], [[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-common-errors]], [[learning-6502-assembly]]
-sources: [[6502org-tutorials]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-compare-instructions]]"
+  - "[[6502-decimal-mode]]"
+  - "[[6502-common-errors]]"
+  - "[[learning-6502-assembly]]"
+sources:
+  - "[[6502org-tutorials]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

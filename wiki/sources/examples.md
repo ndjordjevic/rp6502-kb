@@ -1,7 +1,13 @@
 ---
 type: source
 tags: [rp6502, examples, vga, audio, psg, gamepad, nfc, fatfs, exec]
-related: [[rp6502-vga]], [[programmable-sound-generator]], [[fatfs]], [[xram]], [[xreg]], [[rp6502-ria]]
+related:
+  - "[[rp6502-vga]]"
+  - "[[programmable-sound-generator]]"
+  - "[[fatfs]]"
+  - "[[xram]]"
+  - "[[xreg]]"
+  - "[[rp6502-ria]]"
 sources: []
 created: 2026-04-18
 updated: 2026-04-18

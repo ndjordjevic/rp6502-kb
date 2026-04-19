@@ -1,7 +1,13 @@
 ---
 type: source
 tags: [6502, 65c02, assembly, beginner, pedagogy, bcd, relocatable, apple-ii, wagner]
-related: [[learning-6502-assembly]], [[6502-stack-and-subroutines]], [[6502-programming-idioms]], [[65c02-addressing-modes]], [[65c02-instruction-set]], [[6502-relocatable-and-self-modifying]]
+related:
+  - "[[learning-6502-assembly]]"
+  - "[[6502-stack-and-subroutines]]"
+  - "[[6502-programming-idioms]]"
+  - "[[65c02-addressing-modes]]"
+  - "[[65c02-instruction-set]]"
+  - "[[6502-relocatable-and-self-modifying]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

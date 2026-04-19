@@ -1,8 +1,16 @@
 ---
 type: concept
 tags: [rp6502, audio, opl2, fm, synthesis, ym3812]
-related: [[rp6502-ria]], [[programmable-sound-generator]], [[xreg]], [[xram]], [[pix-bus]]
-sources: [[yt-ep22-graphics-sound-demos]], [[release-notes]], [[rumbledethumps-discord]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[programmable-sound-generator]]"
+  - "[[xreg]]"
+  - "[[xram]]"
+  - "[[pix-bus]]"
+sources:
+  - "[[yt-ep22-graphics-sound-demos]]"
+  - "[[release-notes]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-17
 updated: 2026-04-18
 ---

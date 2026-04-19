@@ -1,7 +1,15 @@
 ---
 type: source
 tags: [rp2040, rp2350, pio, gpio, spi, uart, multicore, wifi, sdk]
-related: [[pio-architecture]], [[gpio-pinout]], [[rp6502-ria]], [[rp6502-ria-w]], [[dual-core-sio]], [[rp2040-spi]], [[rp2040-uart]], [[rp2040-clocks]]
+related:
+  - "[[pio-architecture]]"
+  - "[[gpio-pinout]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[dual-core-sio]]"
+  - "[[rp2040-spi]]"
+  - "[[rp2040-uart]]"
+  - "[[rp2040-clocks]]"
 sources: []
 created: 2026-04-16
 updated: 2026-04-16

@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, youtube, assets, cmake, sprites, rom, graphics]
-related: [[rom-file-format]], [[rp6502-vga]], [[xram]], [[rp6502-abi]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[rom-file-format]]"
+  - "[[rp6502-vga]]"
+  - "[[xram]]"
+  - "[[rp6502-abi]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

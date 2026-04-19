@@ -1,8 +1,18 @@
 ---
 type: concept
 tags: [rp6502, ria, vga, hardware, gpio, pinout, rp2350, hstx]
-related: [[rp6502-ria]], [[rp6502-vga]], [[pix-bus]], [[pio-architecture]], [[rp6502-board]]
-sources: [[rp6502-github-repo]], [[quadros-rp2040]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[pix-bus]]"
+  - "[[pio-architecture]]"
+  - "[[rp6502-board]]"
+sources:
+  - "[[rp6502-github-repo]]"
+  - "[[quadros-rp2040]]"
+  - "[[fairhead-pico-c]]"
+  - "[[pico-c-sdk]]"
+  - "[[rp2350-datasheet]]"
 created: 2026-04-16
 updated: 2026-04-17
 ---

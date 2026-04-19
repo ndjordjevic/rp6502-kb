@@ -1,8 +1,18 @@
 ---
 type: concept
 tags: [rp6502, ria, registers, abi, hardware]
-related: [[rp6502-ria]], [[rp6502-abi]], [[api-opcodes]], [[memory-map]], [[xram]], [[cc65]], [[llvm-mos]]
-sources: [[rp6502-ria-docs]], [[rp6502-github-repo]], [[rumbledethumps-discord]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-abi]]"
+  - "[[api-opcodes]]"
+  - "[[memory-map]]"
+  - "[[xram]]"
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[rp6502-github-repo]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-16
 updated: 2026-04-18
 ---

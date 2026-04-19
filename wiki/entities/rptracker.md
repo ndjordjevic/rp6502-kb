@@ -1,8 +1,14 @@
 ---
 type: entity
 tags: [rp6502, community, music, opl2, tracker, audio]
-related: [[opl2-fm-synth]], [[rp6502-vga]], [[rp6502-abi]], [[cc65]], [[community-projects]]
-sources: [[rumbledethumps-discord]]
+related:
+  - "[[opl2-fm-synth]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-abi]]"
+  - "[[cc65]]"
+  - "[[community-projects]]"
+sources:
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

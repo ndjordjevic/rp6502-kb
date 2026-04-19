@@ -1,7 +1,11 @@
 ---
 type: source
 tags: [rp6502, overview, source]
-related: [[rp6502-board]], [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]]
+related:
+  - "[[rp6502-board]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-vga]]"
 sources: [picocomputer.github.io/index]
 created: 2026-04-15
 updated: 2026-04-15

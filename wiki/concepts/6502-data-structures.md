@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, tables, lists, queue, sort, jump-table, data-structures, array, memory-fill, binary-search, linked-list, hashing, merge, tree, circular-list, pointer, directory]
-related: [[65c02-instruction-set]], [[6502-application-snippets]], [[6502-programming-idioms]], [[6502-subroutine-conventions]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]], [[zaks-programming-6502]]
+related:
+  - "[[65c02-instruction-set]]"
+  - "[[6502-application-snippets]]"
+  - "[[6502-programming-idioms]]"
+  - "[[6502-subroutine-conventions]]"
+sources:
+  - "[[leventhal-6502-assembly]]"
+  - "[[leventhal-subroutines]]"
+  - "[[zaks-programming-6502]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

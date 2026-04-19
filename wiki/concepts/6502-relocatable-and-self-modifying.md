@@ -1,8 +1,13 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, relocatable, self-modifying, indirect-jump, jsr-simulation, advanced]
-related: [[learning-6502-assembly]], [[65c02-instruction-set]], [[6502-stack-and-subroutines]], [[6502-subroutine-conventions]]
-sources: [[wagner-assembly-lines]]
+related:
+  - "[[learning-6502-assembly]]"
+  - "[[65c02-instruction-set]]"
+  - "[[6502-stack-and-subroutines]]"
+  - "[[6502-subroutine-conventions]]"
+sources:
+  - "[[wagner-assembly-lines]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

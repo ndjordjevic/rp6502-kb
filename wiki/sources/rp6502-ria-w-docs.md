@@ -1,7 +1,9 @@
 ---
 type: source
 tags: [rp6502, ria, wireless, bluetooth, wifi, source]
-related: [[rp6502-ria-w]], [[rp6502-ria]]
+related:
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-ria]]"
 sources: [picocomputer.github.io/ria_w]
 created: 2026-04-15
 updated: 2026-04-18

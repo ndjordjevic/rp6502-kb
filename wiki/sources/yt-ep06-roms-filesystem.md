@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, youtube, filesystem, fatfs, littlefs, usb, rom, storage]
-related: [[development-history]], [[rp6502-os]], [[rom-file-format]], [[launcher]], [[youtube-playlist]]
-sources: [[youtube-playlist]]
+related:
+  - "[[development-history]]"
+  - "[[rp6502-os]]"
+  - "[[rom-file-format]]"
+  - "[[launcher]]"
+  - "[[youtube-playlist]]"
+sources:
+  - "[[youtube-playlist]]"
 video_id: 9u82Uy_458E
 episode: 6
 approx_date: 2023-04

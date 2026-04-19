@@ -1,8 +1,13 @@
 ---
 type: source
 tags: [rp6502, cc65, toolchain, memory-layout, platform]
-related: [[cc65]], [[memory-map]], [[rp6502-abi]], [[rom-file-format]]
-sources: [[cc65-rp6502-platform]]
+related:
+  - "[[cc65]]"
+  - "[[memory-map]]"
+  - "[[rp6502-abi]]"
+  - "[[rom-file-format]]"
+sources:
+  - "[[cc65-rp6502-platform]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

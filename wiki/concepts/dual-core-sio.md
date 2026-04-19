@@ -1,8 +1,19 @@
 ---
 type: concept
 tags: [rp6502, ria, rp2040, rp2350, multicore, sio, firmware, tmds, interpolator]
-related: [[rp6502-ria]], [[pio-architecture]], [[reset-model]], [[xram]], [[rp2350]], [[hstx]]
-sources: [[quadros-rp2040]], [[rp6502-github-repo]], [[fairhead-pico-c]], [[pico-c-sdk]], [[rp2350-datasheet]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[pio-architecture]]"
+  - "[[reset-model]]"
+  - "[[xram]]"
+  - "[[rp2350]]"
+  - "[[hstx]]"
+sources:
+  - "[[quadros-rp2040]]"
+  - "[[rp6502-github-repo]]"
+  - "[[fairhead-pico-c]]"
+  - "[[pico-c-sdk]]"
+  - "[[rp2350-datasheet]]"
 created: 2026-04-16
 updated: 2026-04-17
 ---

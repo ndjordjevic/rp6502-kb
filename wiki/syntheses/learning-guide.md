@@ -1,7 +1,14 @@
 ---
 type: synthesis
 tags: [rp6502, 6502, learning, guide]
-related: [[overview]], [[learning-6502-assembly]], [[toolchain-setup]], [[rp6502-os]], [[6502-compare-instructions]], [[6502-decimal-mode]], [[6502-overflow-flag]]
+related:
+  - "[[overview]]"
+  - "[[learning-6502-assembly]]"
+  - "[[toolchain-setup]]"
+  - "[[rp6502-os]]"
+  - "[[6502-compare-instructions]]"
+  - "[[6502-decimal-mode]]"
+  - "[[6502-overflow-flag]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

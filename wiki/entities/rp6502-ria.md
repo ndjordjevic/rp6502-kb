@@ -1,8 +1,22 @@
 ---
 type: entity
 tags: [rp6502, ria, firmware, rp2350, pico2]
-related: [[rp6502-ria-w]], [[rp6502-vga]], [[rp6502-os]], [[pix-bus]], [[xram]], [[xreg]], [[memory-map]], [[reset-model]], [[rom-file-format]], [[sdk-architecture]]
-sources: [[rp6502-ria-docs]], [[picocomputer-intro]], [[rp6502-github-repo]], [[pico-c-sdk]]
+related:
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-os]]"
+  - "[[pix-bus]]"
+  - "[[xram]]"
+  - "[[xreg]]"
+  - "[[memory-map]]"
+  - "[[reset-model]]"
+  - "[[rom-file-format]]"
+  - "[[sdk-architecture]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[picocomputer-intro]]"
+  - "[[rp6502-github-repo]]"
+  - "[[pico-c-sdk]]"
 created: 2026-04-15
 updated: 2026-04-17
 ---

@@ -1,8 +1,15 @@
 ---
 type: source
 tags: [rp6502, youtube, hardware, vga, usb, monitor, prototype]
-related: [[development-history]], [[rp6502-board]], [[rp6502-ria]], [[rp6502-vga]], [[memory-map]], [[youtube-playlist]]
-sources: [[youtube-playlist]]
+related:
+  - "[[development-history]]"
+  - "[[rp6502-board]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[memory-map]]"
+  - "[[youtube-playlist]]"
+sources:
+  - "[[youtube-playlist]]"
 video_id: SVZaSRUhIjo
 episode: 1
 approx_date: 2022-11

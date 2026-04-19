@@ -1,7 +1,9 @@
 ---
 type: source
 tags: [rp6502, youtube, playlist]
-related: [[development-history]], [[overview]]
+related:
+  - "[[development-history]]"
+  - "[[overview]]"
 sources: []
 created: 2026-04-17
 updated: 2026-04-17

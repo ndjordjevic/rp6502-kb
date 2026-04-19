@@ -1,8 +1,16 @@
 ---
 type: concept
 tags: [rp2350, rp2040, sdk, cmake, build-system, pico]
-related: [[pio-architecture]], [[gpio-pinout]], [[dma-controller]], [[rp2040-clocks]], [[dual-core-sio]], [[rp6502-ria]], [[rp6502-vga]]
-sources: [[pico-c-sdk]]
+related:
+  - "[[pio-architecture]]"
+  - "[[gpio-pinout]]"
+  - "[[dma-controller]]"
+  - "[[rp2040-clocks]]"
+  - "[[dual-core-sio]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+sources:
+  - "[[pico-c-sdk]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

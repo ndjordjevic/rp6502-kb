@@ -1,8 +1,13 @@
 ---
 type: source
 tags: [rp6502, youtube, llvm-mos, cc65, toolchain, compiler, comparison]
-related: [[cc65]], [[llvm-mos]], [[rp6502-abi]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+  - "[[rp6502-abi]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

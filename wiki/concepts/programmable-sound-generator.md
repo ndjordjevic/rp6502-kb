@@ -1,8 +1,15 @@
 ---
 type: concept
 tags: [rp6502, audio, psg, sound, pwm, adsr, waveforms]
-related: [[rp6502-ria]], [[opl2-fm-synth]], [[xreg]], [[xram]]
-sources: [[yt-ep16-psg-intro]], [[yt-ep22-graphics-sound-demos]], [[release-notes]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[opl2-fm-synth]]"
+  - "[[xreg]]"
+  - "[[xram]]"
+sources:
+  - "[[yt-ep16-psg-intro]]"
+  - "[[yt-ep22-graphics-sound-demos]]"
+  - "[[release-notes]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

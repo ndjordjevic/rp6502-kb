@@ -1,8 +1,20 @@
 ---
 type: topic
 tags: [rp6502, hardware, build, assembly, bom, pcb, setup]
-related: [[rp6502-board]], [[rp6502-ria]], [[rp6502-ria-w]], [[rp6502-vga]], [[w65c02s]], [[w65c22s]], [[getting-started]], [[known-issues]]
-sources: [[hardware]], [[picocomputer-intro]], [[yt-ep10-diy-build]], [[yt-ep11-no-soldering]]
+related:
+  - "[[rp6502-board]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-ria-w]]"
+  - "[[rp6502-vga]]"
+  - "[[w65c02s]]"
+  - "[[w65c22s]]"
+  - "[[getting-started]]"
+  - "[[known-issues]]"
+sources:
+  - "[[hardware]]"
+  - "[[picocomputer-intro]]"
+  - "[[yt-ep10-diy-build]]"
+  - "[[yt-ep11-no-soldering]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

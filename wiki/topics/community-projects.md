@@ -1,8 +1,16 @@
 ---
 type: topic
 tags: [rp6502, community, projects, demos, games, tools, tracker, razemos, native-os]
-related: [[rp6502-ria]], [[rp6502-vga]], [[opl2-fm-synth]], [[pix-bus]], [[cc65]], [[llvm-mos]]
-sources: [[rumbledethumps-discord]], [[community-wiki]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[opl2-fm-synth]]"
+  - "[[pix-bus]]"
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+sources:
+  - "[[rumbledethumps-discord]]"
+  - "[[community-wiki]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

@@ -1,8 +1,12 @@
 ---
 type: entity
 tags: [rp6502, audio, psg, library, tracker, ezpsg]
-related: [[programmable-sound-generator]], [[xram]], [[xreg]]
-sources: [[examples]]
+related:
+  - "[[programmable-sound-generator]]"
+  - "[[xram]]"
+  - "[[xreg]]"
+sources:
+  - "[[examples]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

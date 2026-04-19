@@ -1,8 +1,13 @@
 ---
 type: concept
 tags: [rp6502, reset, control]
-related: [[rp6502-ria]], [[w65c02s]], [[rp6502-board]]
-sources: [[rp6502-ria-docs]], [[youtube-playlist]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[w65c02s]]"
+  - "[[rp6502-board]]"
+sources:
+  - "[[rp6502-ria-docs]]"
+  - "[[youtube-playlist]]"
 created: 2026-04-15
 updated: 2026-04-15
 ---

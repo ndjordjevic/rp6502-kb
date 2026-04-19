@@ -1,8 +1,13 @@
 ---
 type: source
 tags: [rp6502, youtube, cc65, vscode, sdk, cmake]
-related: [[cc65]], [[rp6502-abi]], [[rom-file-format]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[cc65]]"
+  - "[[rp6502-abi]]"
+  - "[[rom-file-format]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

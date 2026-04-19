@@ -1,8 +1,13 @@
 ---
 type: source
 tags: [rp6502, youtube, graphics, vga, bitmap, xreg, xram, planes, scanlines]
-related: [[rp6502-vga]], [[xreg]], [[xram]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[rp6502-vga]]"
+  - "[[xreg]]"
+  - "[[xram]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

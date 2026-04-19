@@ -1,8 +1,18 @@
 ---
 type: synthesis
 tags: [rp6502, cc65, llvm-mos, toolchain, comparison, synthesis]
-related: [[cc65]], [[llvm-mos]], [[rp6502-abi]], [[toolchain-setup]], [[rom-file-format]]
-sources: [[yt-ep18-llvm-mos]], [[rp6502-abi]], [[vscode-cc65]], [[vscode-llvm-mos]], [[rumbledethumps-discord]]
+related:
+  - "[[cc65]]"
+  - "[[llvm-mos]]"
+  - "[[rp6502-abi]]"
+  - "[[toolchain-setup]]"
+  - "[[rom-file-format]]"
+sources:
+  - "[[yt-ep18-llvm-mos]]"
+  - "[[rp6502-abi]]"
+  - "[[vscode-cc65]]"
+  - "[[vscode-llvm-mos]]"
+  - "[[rumbledethumps-discord]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

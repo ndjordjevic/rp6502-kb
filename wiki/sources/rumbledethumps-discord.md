@@ -1,7 +1,14 @@
 ---
 type: source
 tags: [rp6502, discord, community, hardware, firmware, opl2, usb, cc65, llvm-mos, nfc, telnet, razemos, native-os]
-related: [[rp6502-ria]], [[rp6502-vga]], [[known-issues]], [[version-history]], [[opl2-fm-synth]], [[community-projects]], [[release-notes]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[known-issues]]"
+  - "[[version-history]]"
+  - "[[opl2-fm-synth]]"
+  - "[[community-projects]]"
+  - "[[release-notes]]"
 sources: []
 created: 2026-04-18
 updated: 2026-04-18

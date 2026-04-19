@@ -1,7 +1,10 @@
 ---
 type: source
 tags: [rp6502, community, projects, usb, gamepad, compatibility]
-related: [[community-projects]], [[usb-compatibility]], [[gamepad-input]]
+related:
+  - "[[community-projects]]"
+  - "[[usb-compatibility]]"
+  - "[[gamepad-input]]"
 sources: []
 created: 2026-04-18
 updated: 2026-04-18

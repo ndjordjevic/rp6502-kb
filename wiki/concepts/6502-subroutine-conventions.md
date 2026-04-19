@@ -1,8 +1,16 @@
 ---
 type: concept
 tags: [6502, 65c02, assembly, subroutines, abi, calling-convention, stack]
-related: [[rp6502-abi]], [[65c02-instruction-set]], [[65c02-addressing-modes]], [[memory-map]], [[6502-common-errors]], [[6502-stack-and-subroutines]]
-sources: [[leventhal-6502-assembly]], [[leventhal-subroutines]]
+related:
+  - "[[rp6502-abi]]"
+  - "[[65c02-instruction-set]]"
+  - "[[65c02-addressing-modes]]"
+  - "[[memory-map]]"
+  - "[[6502-common-errors]]"
+  - "[[6502-stack-and-subroutines]]"
+sources:
+  - "[[leventhal-6502-assembly]]"
+  - "[[leventhal-subroutines]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

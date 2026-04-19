@@ -1,7 +1,11 @@
 ---
 type: source
 tags: [via, 6522, wdc, w65c22s, hardware, datasheet]
-related: [[w65c22s]], [[6522-via]], [[via-programming]], [[6502-interrupt-patterns]]
+related:
+  - "[[w65c22s]]"
+  - "[[6522-via]]"
+  - "[[via-programming]]"
+  - "[[6502-interrupt-patterns]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---

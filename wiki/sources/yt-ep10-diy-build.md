@@ -1,8 +1,14 @@
 ---
 type: source
 tags: [rp6502, youtube, hardware, soldering, assembly, board]
-related: [[rp6502-board]], [[rp6502-ria]], [[rp6502-vga]], [[known-issues]], [[development-history]]
-sources: [[youtube-playlist]]
+related:
+  - "[[rp6502-board]]"
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[known-issues]]"
+  - "[[development-history]]"
+sources:
+  - "[[youtube-playlist]]"
 created: 2026-04-17
 updated: 2026-04-17
 ---

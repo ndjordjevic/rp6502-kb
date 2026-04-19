@@ -1,7 +1,14 @@
 ---
 type: source
 tags: [rp6502, firmware, source, ria, vga, pio, api]
-related: [[rp6502-ria]], [[rp6502-vga]], [[rp6502-os]], [[ria-registers]], [[api-opcodes]], [[pio-architecture]], [[gpio-pinout]]
+related:
+  - "[[rp6502-ria]]"
+  - "[[rp6502-vga]]"
+  - "[[rp6502-os]]"
+  - "[[ria-registers]]"
+  - "[[api-opcodes]]"
+  - "[[pio-architecture]]"
+  - "[[gpio-pinout]]"
 sources: []
 created: 2026-04-16
 updated: 2026-04-16

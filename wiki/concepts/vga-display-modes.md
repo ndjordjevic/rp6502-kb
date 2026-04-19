@@ -1,8 +1,17 @@
 ---
 type: concept
 tags: [rp6502, vga, display, modes, xram, xreg, canvas, vsync]
-related: [[rp6502-vga]], [[xram]], [[xreg]], [[pix-bus]], [[vga-graphics]], [[programmable-sound-generator]]
-sources: [[rp6502-vga-docs]], [[examples]], [[pico-extras]]
+related:
+  - "[[rp6502-vga]]"
+  - "[[xram]]"
+  - "[[xreg]]"
+  - "[[pix-bus]]"
+  - "[[vga-graphics]]"
+  - "[[programmable-sound-generator]]"
+sources:
+  - "[[rp6502-vga-docs]]"
+  - "[[examples]]"
+  - "[[pico-extras]]"
 created: 2026-04-18
 updated: 2026-04-18
 ---
