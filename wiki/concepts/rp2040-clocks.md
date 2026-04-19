@@ -48,7 +48,7 @@ PLL constraints:
 - VCO (FOUTVCO) must be in 750–1600 MHz
 - FBDIV (feedback divider) must be in 16–320
 - POSTDIV1 and POSTDIV2 each in 1–7
-- System PLL max output: **150 MHz** (RP2350); USB PLL: **48 MHz**
+- System PLL official max output: **150 MHz** (RP2350 rated spec); USB PLL: **48 MHz**. The RIA firmware overclocks `clk_sys` to 256 MHz (VCO 1536 MHz / 3 / 2) — within the PLL's arithmetic range but beyond the rated max; see [[pio-architecture]].
 
 For example, 256 MHz = VCO 1536 MHz / (3 × 2). The SDK function `check_sys_clock_hz()` validates a target and returns the three PLL parameters if attainable. Use `vcocalc.py` (`pico-sdk/src/rp2_common/hardware_clocks/scripts/vcocalc.py`) for parameter search.
 

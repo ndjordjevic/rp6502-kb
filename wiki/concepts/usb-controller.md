@@ -9,6 +9,7 @@ related:
 sources:
   - "[[quadros-rp2040]]"
   - "[[rp2350-datasheet]]"
+  - "[[pico-c-sdk]]"
 created: 2026-04-16
 updated: 2026-04-17
 ---
@@ -235,4 +236,5 @@ The [[rp6502-ria-w]] additionally supports Bluetooth HID pairing (`ble pair` com
 - [[gpio-pinout]] — DP/DM pin assignments on the Pico 2
 - [[dual-core-sio]] — interrupt table (USBCTRL_IRQ = IRQ 5)
 - [[xram]] — where HID device state is written for 6502 programs
+- [[pico-c-sdk]] — TinyUSB and hardware_usb SDK documentation
 - [[xreg]] — how to configure keyboard/mouse/gamepad XRAM addresses

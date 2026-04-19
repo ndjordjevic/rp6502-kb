@@ -197,6 +197,29 @@ Out of scope: general Pico/RP2040 topics not specific to RP6502 (covered better 
 
 ---
 
+## Log entry format
+
+Every `wiki/log.md` entry must follow this structure exactly:
+
+```markdown
+## [YYYY-MM-DD] <operation> | <source or topic> | <short title — one line, under ~80 chars>
+
+Body paragraphs with details. Use bullet points or prose.
+Keep the heading SHORT — move all detail into the body.
+
+New: `wiki/path/to/new-page.md` — description
+Updated: `wiki/path/to/page.md` — what changed
+Key facts / Key finding: ...
+```
+
+Rules:
+- **Heading line must be short** — do not stuff `New:`, `Updated:`, or `Key facts:` into the `## ` line. Those go in the body.
+- **Separate every entry with `---`** — one blank line, `---`, one blank line before the next `##`.
+- **Most recent entry at the top** — prepend, never append.
+- Operations: `ingest`, `query`, `lint`, `setup`, `synthesis`, `update`, `research`.
+
+---
+
 ## Source priority
 
 When facts conflict, trust sources in this order:

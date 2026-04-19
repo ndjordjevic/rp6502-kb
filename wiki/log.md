@@ -7,6 +7,17 @@ Operations: `ingest`, `query`, `lint`, `setup`
 
 ---
 
+## [2026-04-19] lint | wiki-wide | Obsidian frontmatter fix + contradiction fix + cross-ref + log formatting
+
+- **Obsidian invalid properties fixed (134 files)**: `related:` and `sources:` frontmatter fields converted from inline `[[wikilinks]], [[wikilinks]]` (invalid YAML) to proper YAML list format (`- "[[wikilink]]"`). All wiki pages now render without "Invalid properties" in Obsidian Reading view.
+- **CLAUDE.md updated**: Page format template updated to match new YAML list format for `related` and `sources`.
+- **Contradiction fixed**: `wiki/concepts/rp2040-clocks.md` line 51 — clarified "System PLL official max output: 150 MHz (RP2350 rated spec)" vs RIA overclock to 256 MHz; added cross-ref to [[pio-architecture]].
+- **Cross-reference added**: `wiki/concepts/usb-controller.md` — added `[[pico-c-sdk]]` to sources frontmatter and Related pages footer.
+- **Log formatting fixed**: Added missing `---` separators between all log entries (1049 → 1189 lines).
+- **raw/github/README.md updated**: `picocomputer/rp6502/` row corrected from `v0.23` / `368ed8e` → `v0.24` / `1f924cf` (2026-04-19).
+
+---
+
 ## [2026-04-18] synthesis | hardware TRNG | new page wiki/syntheses/trng.md
 
 New: `wiki/syntheses/trng.md` — RP2350 hardware TRNG mechanics (`get_rand_64()` via Pico SDK), `RIA_ATTR_LRAND` (0x04) attribute, cc65 `_randomize()` + `rand()` PRNG seeding pattern, llvm-mos `lrand()` true-random-per-call pattern, 65C02 assembly access, comparison table, and EhBASIC RND pitfall.
@@ -24,6 +35,8 @@ Updated: `raw/pdfs/README.md` and `wiki/index.md` — added datasheet entry.
 
 Key facts not previously in wiki: IRQB is totem-pole (cannot wire-OR), T1 fires at N+1.5/N+2 cycles, T2 rolls over to $FFFF after timeout, RESB does not clear T1/T2/SR, no output current limiting on PA/PB.
 
+---
+
 ## [2026-04-18] lint + guide update | wiki-wide lint + learning-guide revision | 3 fixes, guide updated with Phase 4 pages
 
 - **Factual error fixed**: `game-loop-patterns.md` had wrong VSYNC register address (`$FFF8` → `$FFE3`). Confirmed from source: `REGS(0xFFE3) = vga_vsync_frame` (ria/sys/vga.c:91) + `if (i != 3) // Skip VSYNC` (api/api.c:105).
@@ -31,6 +44,8 @@ Key facts not previously in wiki: IRQB is totem-pole (cannot wire-OR), T1 fires 
 - **Broken wikilink fixed**: `razemos.md` had `[[hass]]` linking to non-existent page. Replaced with plain text "HASS assembler (native 65C02 on-device assembler)".
 - **Learning guide updated** (`wiki/syntheses/learning-guide.md`): added all Phase 4 pages — `cc65-rp6502-platform` (D3), `monitor-reference` (C2), `via-programming` (D11), `game-loop-patterns` (D10), `ria-w-networking` (C19), `hardware-build-guide` (B3), `razemos`/`rptracker` (community section); added three orientation syntheses section; expanded Track B to 11 steps, Track C to 20, Track D to 21; added wireless learning sub-path.
 - **Lint findings summary**: 1 broken wikilink (`[[hass]]`), 2 factual errors (VSYNC address + $FFE3 description). All fixed. Pages with low inbound links are now referenced from the updated learning guide.
+
+---
 
 ## [2026-04-18] research + gap-fill | online research session | v0.24 update + 11 new pages
 
@@ -59,23 +74,75 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/topics/hardware-build-guide.md` — PCB sourcing, BOM, assembly sequence, firmware flashing, first-boot verification
 - `wiki/topics/roadmap.md` — planned features, community wishes, design philosophy
 
-## [2026-04-18] ingest | picocomputer/adventure (git clone, commit 6ac165f) | New: 1 page (sources/adventure); Updated: raw/github/README.md (added adventure row), wiki/index.md, PROGRESS.md; Key facts: named ROM asset pattern (DATADIR "ROM:", 4 advent*.txt files), porting pattern for existing C programs, tools/ is identical to vscode-cc65 template, BIG ROM commit (2026-02-26) converted to v0.18 named-asset format
+---
 
-## [2026-04-18] ingest | picocomputer/vscode-llvm-mos (git clone, commit 17af418) | New: 1 page (sources/vscode-llvm-mos); Updated: topics/toolchain-setup (llvm-mos section + full cc65 vs llvm-mos comparison table), entities/llvm-mos (VSCode setup section added); Key facts: PATH conflict fix via cmake.environment, CMake kit = [Unspecified], DATA file RESET file addresses; Ingest plan deleted
+## [2026-04-18] ingest | picocomputer/adventure (git clone, commit 6ac165f) | new source page
 
-## [2026-04-18] ingest | picocomputer/vscode-cc65 (git clone, commit 794a6f2) | New: 2 pages (sources/vscode-cc65, topics/toolchain-setup); Updated: entities/cc65 (VSCode section rewritten with template details, rp6502.py, toolchain cmake); Key facts: no pyserial needed since Jan 2026, rp6502_asset() must precede rp6502_executable(), IntelliSense shim in cc65.cmake; Ingest plan deleted
+New: `wiki/sources/adventure.md`
+Updated: `raw/github/README.md` (added adventure row), `wiki/index.md`, `PROGRESS.md`
+Key facts: named ROM asset pattern (DATADIR "ROM:", 4 advent*.txt files), porting pattern for existing C programs, tools/ is identical to vscode-cc65 template, BIG ROM commit (2026-02-26) converted to v0.18 named-asset format
 
-## [2026-04-18] ingest | picocomputer/pico-extras (git clone, commit 7f48b3f) | New: 1 page (sources/pico-extras); Updated: entities/rp6502-vga (pico-extras dependency section), concepts/vga-display-modes (mode-switching note + [[pico-extras]] link); Key finding: only 2 rumbledethumps commits in fork — memory leak fix + debug printf fix in scanvideo_setup_with_timing(); Ingest plan deleted
+---
 
-## [2026-04-18] ingest | picocomputer/ehbasic (git clone, commit acd5deb) | New: 2 pages (sources/ehbasic, entities/ehbasic); Updated: concepts/ria-registers (ACIA simulation section + V_INPT/V_OUTP patterns); Key finding: no RP6502-specific BASIC extensions — port is pure OS I/O glue; Ingest plan deleted
+## [2026-04-18] ingest | picocomputer/vscode-llvm-mos (git clone, commit 17af418) | new source page; ingest plan deleted
 
-## [2026-04-18] ingest | picocomputer/community wiki (commit 348180a) | New: 3 pages (sources/community-wiki, topics/usb-compatibility, community-projects expanded with wiki Home content); Updated: concepts/gamepad-input (USB compatibility section → [[usb-compatibility]]); Ingest plan deleted
+New: `wiki/sources/vscode-llvm-mos.md`
+Updated: `wiki/topics/toolchain-setup.md` (llvm-mos section + full cc65 vs llvm-mos comparison table), `wiki/entities/llvm-mos.md` (VSCode setup section added)
+Key facts: PATH conflict fix via cmake.environment, CMake kit = [Unspecified], DATA file and RESET file addresses
 
-## [2026-04-18] ingest | picocomputer/examples (git submodule, commit 95965c6) | New: 9 pages (sources/examples, concepts/vga-display-modes, concepts/vga-graphics, concepts/gamepad-input, concepts/rtc, concepts/nfc, concepts/exec-api, entities/ezpsg, topics/performance); Updated: concepts/programmable-sound-generator (ezpsg section), concepts/fatfs (directory API); All 8 ingest plan groups complete; plan file deleted
+---
 
-## [2026-04-18] ingest | raw/pdfs/2023-06-07-rp6502.pdf | New: schematic-2023 source page + board-circuits concept (glue logic, VGA DAC, audio filter, IRQ merge, IORQ decode, dual power rail, connector pinouts)
+## [2026-04-18] ingest | picocomputer/vscode-cc65 (git clone, commit 794a6f2) | 2 new pages; ingest plan deleted
 
-## [2026-04-18] update | picocomputer.github.io _static/ | Mouser BOM, schematic PDFs, headerless Pico build variant added to rp6502-board + hardware source
+New: `wiki/sources/vscode-cc65.md`, `wiki/topics/toolchain-setup.md`
+Updated: `wiki/entities/cc65.md` (VSCode section rewritten with template details, rp6502.py, toolchain cmake)
+Key facts: no pyserial needed since Jan 2026, rp6502_asset() must precede rp6502_executable(), IntelliSense shim in cc65.cmake
+
+---
+
+## [2026-04-18] ingest | picocomputer/pico-extras (git clone, commit 7f48b3f) | new source page; ingest plan deleted
+
+New: `wiki/sources/pico-extras.md`
+Updated: `wiki/entities/rp6502-vga.md` (pico-extras dependency section), `wiki/concepts/vga-display-modes.md` (mode-switching note + [[pico-extras]] link)
+Key finding: only 2 rumbledethumps commits in fork — memory leak fix + debug printf fix in scanvideo_setup_with_timing()
+
+---
+
+## [2026-04-18] ingest | picocomputer/ehbasic (git clone, commit acd5deb) | 2 new pages; ingest plan deleted
+
+New: `wiki/sources/ehbasic.md`, `wiki/entities/ehbasic.md`
+Updated: `wiki/concepts/ria-registers.md` (ACIA simulation section + V_INPT/V_OUTP patterns)
+Key finding: no RP6502-specific BASIC extensions — port is pure OS I/O glue
+
+---
+
+## [2026-04-18] ingest | picocomputer/community wiki (commit 348180a) | 3 new/updated pages; ingest plan deleted
+
+New: `wiki/sources/community-wiki.md`, `wiki/topics/usb-compatibility.md`
+Updated: `wiki/topics/community-projects.md` (expanded with wiki Home content), `wiki/concepts/gamepad-input.md` (USB compatibility section → [[usb-compatibility]])
+
+---
+
+## [2026-04-18] ingest | picocomputer/examples (git submodule, commit 95965c6) | 9 new pages; all 8 ingest groups complete; plan deleted
+
+New: `wiki/sources/examples.md`, `wiki/concepts/vga-display-modes.md`, `wiki/concepts/vga-graphics.md`, `wiki/concepts/gamepad-input.md`, `wiki/concepts/rtc.md`, `wiki/concepts/nfc.md`, `wiki/concepts/exec-api.md`, `wiki/entities/ezpsg.md`, `wiki/topics/performance.md`
+Updated: `wiki/concepts/programmable-sound-generator.md` (ezpsg section), `wiki/concepts/fatfs.md` (directory API)
+
+---
+
+## [2026-04-18] ingest | raw/pdfs/2023-06-07-rp6502.pdf | 2 new pages
+
+New: `wiki/sources/schematic-2023.md`, `wiki/concepts/board-circuits.md`
+Key facts: glue logic, VGA DAC, audio filter, IRQ merge, IORQ decode, dual power rail, connector pinouts
+
+---
+
+## [2026-04-18] update | picocomputer.github.io _static/ | rp6502-board + hardware source updated
+
+Updated: `wiki/entities/rp6502-board.md`, `wiki/sources/hardware.md`
+Added: Mouser BOM, schematic PDFs, headerless Pico build variant
+
+---
 
 ## [2026-04-18] lint | wiki | post-razemos polish
 
@@ -198,6 +265,8 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/inbox/leventhal-subroutines-ingest-plan.md`: Pass 1 chapters marked `[x]` (plan retained — Passes 2 and 3 pending)
 - `PROGRESS.md`: wiki size updated; Pass 1 progress noted
 
+---
+
 ## [2026-04-18] ingest | leventhal-6502-assembly | Leventhal 2nd Ed. Ch.6-10, 12, 17
 
 - `wiki/sources/leventhal-6502-assembly.md`: CREATED — source page with full Scope table (Ch.1–17), key facts, key takeaways for all ingested chapters (65C02 enhancements, interrupt system, subroutine conventions, string/arithmetic/table idioms)
@@ -214,6 +283,8 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/inbox/leventhal-6502-assembly-ingest-plan.md`: DELETED (all planned chapters ingested)
 - `PROGRESS.md`: Leventhal ingest flipped 👉 → ✅; wiki size updated
 
+---
+
 ## [2026-04-17] ingest | w65c02s-datasheet | full PDF (32 pp., WDC Feb 2024)
 
 - `wiki/sources/w65c02s-datasheet.md`: CREATED — source page with Scope table (Ch.1–7, 10 ingested; Ch.8/9 hard-core/RTL skipped), key facts, NMOS-vs-CMOS caveats summary, pin-function highlights, packages
@@ -224,11 +295,15 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/overview.md`: added W65C02S to hub pages; updated open-question #1 (WAI/STP) with datasheet-confirmed behavior
 - `PROGRESS.md`: W65C02S datasheet flipped 👉 → ✅; wiki size updated
 
+---
+
 ## [2026-04-17] ingest | rp2350-datasheet S14 | Appendix C+E: revision history + errata (PDF pp.1354–1376)
 
 - `wiki/topics/known-issues.md`: added full **RP2350 silicon errata** section — all 28 errata (E1–E28) with summaries, affected revisions, and workarounds; grouped into: critical (E12, E5, E8), SIO/interpolator (E1, E2), CPU errata (E6, E7), XIP (E11), OTP (E17), bootrom-fixed (E3, E9, E10, E13–E15, E18–E23), security (E16, E20, E21, E24–E28); updated frontmatter tags/related/sources
 - `wiki/sources/rp2350-datasheet.md`: S14 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S14 → `[x]`
+
+---
 
 ## [2026-04-17] ingest | rp2350-datasheet S13 | §12.11 HSTX (PDF pp.1202–1211)
 
@@ -237,11 +312,15 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/sources/rp2350-datasheet.md`: S13 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S13 → `[x]`
 
+---
+
 ## [2026-04-17] ingest | rp2350-datasheet S12 | §12.7 USB (PDF pp.1141–1158)
 
 - `wiki/concepts/usb-controller.md`: added RP2350 Changes section — PHY_ISO startup requirement; RP2350-E12 clk_sys > 48 MHz; DPRAM base address 0x50100000; list of RP2040 USB errata fixed; new features (GPIO DP/DM, NAK-stop); updated `sources:` frontmatter
 - `wiki/sources/rp2350-datasheet.md`: S12 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S12 → `[x]`
+
+---
 
 ## [2026-04-17] ingest | rp2350-datasheet S11 | §12.6 DMA (PDF pp.1094–1111)
 
@@ -249,11 +328,15 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/sources/rp2350-datasheet.md`: S11 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S11 → `[x]`
 
+---
+
 ## [2026-04-17] ingest | rp2350-datasheet S10 | §12.3 SPI (PDF pp.1046–1059)
 
 - `wiki/concepts/rp2040-spi.md`: added RP2350 nSSPOE automatic tristate change note; added peak bit rate at 150 MHz (master 70.5 Mb/s, slave 12.5 Mb/s); updated `sources:` frontmatter
 - `wiki/sources/rp2350-datasheet.md`: S10 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S10 → `[x]`
+
+---
 
 ## [2026-04-17] ingest | rp2350-datasheet S9 | §12.1 UART (PDF pp.961–971)
 
@@ -261,11 +344,15 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/sources/rp2350-datasheet.md`: S9 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S9 → `[x]`
 
+---
+
 ## [2026-04-17] ingest | rp2350-datasheet S8 | §11.6 PIO examples (PDF pp.915–938)
 
 - `wiki/concepts/pio-architecture.md`: added `pio_claim_free_sm_and_add_program_for_gpio_range()` to setup section with example and note about RP2350B GPIO range selection
 - `wiki/sources/rp2350-datasheet.md`: S8 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S8 → `[x]`
+
+---
 
 ## [2026-04-17] ingest | rp2350-datasheet S7 | §11.4.8–11.5 PIO pt.2 (PDF pp.896–914)
 
@@ -273,11 +360,15 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/sources/rp2350-datasheet.md`: S7 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S7 → `[x]`
 
+---
+
 ## [2026-04-17] ingest | rp2350-datasheet S6 | §11.1–11.4.6 PIO pt.1 (PDF pp.876–895)
 
 - `wiki/concepts/pio-architecture.md`: expanded v1 ISA additions section with new pioasm directives (.fifo txput/txget/putget, .mov_status irq); added RP2350-specific registers table (DBG_CFGINFO.VERSION, GPIOBASE, CTRL.NEXT_PIO_MASK, IN_COUNT, RXF0_PUTGET0); updated IRQ routing note to mention v1 exposes all 8 flags
 - `wiki/sources/rp2350-datasheet.md`: S6 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S6 → `[x]`
+
+---
 
 ## [2026-04-17] ingest | rp2350-datasheet S5 | §9.1–9.10 GPIO (PDF pp.587–603)
 
@@ -285,11 +376,15 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/sources/rp2350-datasheet.md`: S5 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S5 → `[x]`
 
+---
+
 ## [2026-04-17] ingest | rp2350-datasheet S4 | §8.2–8.6 XOSC/ROSC/LPOSC/Tick/PLL (PDF pp.554–583)
 
 - `wiki/concepts/rp2040-clocks.md`: expanded PLL section with full formula and constraints; added XOSC detail section (1–50 MHz range, DORMANT, startup delay); added ROSC detail section (8-stage architecture, A3 randomization change, RNG, COUNT); added LPOSC detail section (trim accuracy, external clock option); added Tick Generators section (TICKS_BASE, 1 µs tick configuration)
 - `wiki/sources/rp2350-datasheet.md`: S4 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S4 → `[x]`
+
+---
 
 ## [2026-04-17] ingest | rp2350-datasheet S3 | §8.1 Clocks overview (PDF pp.513–528)
 
@@ -297,10 +392,14 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/sources/rp2350-datasheet.md`: S3 → `[x] ingested`
 - `wiki/inbox/rp2350-datasheet-ingest-plan.md`: S3 → `[x]`
 
+---
+
 ## [2026-04-17] ingest | rp2350-datasheet S2 | §3.1 SIO programmer's model (PDF pp.36–53)
 
 - `wiki/concepts/dual-core-sio.md`: corrected SIO overview table (integer divider absent on RP2350; added TMDS encoder, RISC-V timer, updated FIFO/Doorbell IRQ numbers); added SIO Secure/Non-secure banking note to CPUID section; updated FIFO IRQ numbers (SIO_IRQ_FIFO=25, NS=27); updated Doorbell IRQ numbers (SIO_IRQ_BELL=26, NS=28); added **TMDS encoder** section (DVI 1.0 TMDS encoding, TMDS_CTRL/WDATA/PEEK_SINGLE/POP_SINGLE, security assignment); added **Interpolators** section (INTERP0 blend mode, INTERP1 clamp mode, 3-result outputs, use cases); added **RISC-V platform timer** section (MTIME/MTIMECMP, SIO_IRQ_MTIMECMP); updated RIA connections table
 - `wiki/sources/rp2350-datasheet.md`: S2 row → `[x] ingested`
+
+---
 
 ## [2026-04-17] ingest | rp2350-datasheet S1 | Ch.1 Introduction + §2.1–2.2 bus fabric/address map (PDF pp.13–34)
 
@@ -310,17 +409,23 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/concepts/rp2040-memory.md`: added **RP2350 SRAM** section — 10-bank layout, striping model, non-striped SRAM8–9, power domains, note on RP2040 vs RP2350 striped region differences; updated frontmatter
 - `wiki/concepts/gpio-pinout.md`: added **GPIO Bank 1** section — USB DP/DM and QSPI pin function table from datasheet §1.2.4; note that Erratum E9 does not affect Bank 1
 
+---
+
 ## [2026-04-17] ingest | pico-c-sdk S14 | §5.2.13 pico_time (PDF pp.412–433)
 
 - `wiki/concepts/rp2040-clocks.md`: replaced brief pico_time section with full reference — `absolute_time_t` type note (SDK 2.0+ defaults to uint64_t; `PICO_OPAQUE_ABSOLUTE_TIME_T=1` for type-checked mode); `at_the_end_of_time`/`nil_time` sentinels; full timestamp API (14 functions); sleep API with WFE/alarm-pool requirement + `best_effort_wfe_or_timeout()`; busy_wait variants; default pool config macros (`PICO_TIME_DEFAULT_ALARM_POOL_DISABLED`, `_HARDWARE_ALARM_NUM=3`, `_MAX_TIMERS=16`); `alarm_callback_t` return-value semantics (<0=reschedule from prev target, >0=reschedule from now, 0=cancel); `alarm_id_t` note; full pool management (create/destroy/query); `alarm_pool_add_alarm_at_force_in_context()`; default-pool convenience wrappers; repeating_timer API with delay sign convention (+ve=gap, -ve=fixed-rate)
 - `wiki/sources/pico-c-sdk.md`: S14 row → `[x] ingested — S14`
 - `wiki/inbox/pico-c-sdk-ingest-plan.md`: all 14 sessions `[x]` — **plan file deleted**
 
+---
+
 ## [2026-04-17] ingest | pico-c-sdk S13 | §5.2.7 pico_multicore + §5.2.12 pico_sync (PDF pp.397–412)
 
 - `wiki/concepts/dual-core-sio.md`: corrected core-launch section (removed non-existent `_with_config`, added `multicore_launch_core1_with_stack` + `multicore_launch_core1_raw` with full signatures); expanded FIFO section (RP2350 depth=4 vs RP2040 depth=8, SDK "precious resource" caution, full 11-function FIFO table incl. `rvalid/wready/clear_irq/get_status`, `SIO_FIFO_IRQ_NUM(core)` macro); added **Doorbell API** section (RP2350-only, 9 functions + `DOORBELL_IRQ_NUM` macro); added **Lockout API** section (7 functions); expanded pico_sync into full reference: `critical_section` (5 functions incl. `_with_lock_num`, `_deinit`, `_is_initialized`), `lock_core` internal model, `mutex` full API (12 functions + `auto_init_mutex`), `recursive_mutex` full API (8 functions + `auto_init_recursive_mutex`), `semaphore` full API (9 functions); updated RIA connections table (`SIO_FIFO_IRQ_NUM` replaces old RP2040-specific IRQ names)
 - `wiki/sources/pico-c-sdk.md`: S13 row → `[x] ingested — S13`
 - `wiki/inbox/pico-c-sdk-ingest-plan.md`: S13 checkbox → `[x]` (S14 still `[ ]`)
+
+---
 
 ## [2026-04-17] ingest | pico-c-sdk S12 | §5.1.29 hardware_timer + §5.1.30 hardware_uart (PDF pp.349–397)
 
@@ -329,6 +434,8 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/sources/pico-c-sdk.md`: S12 row → `[x] ingested — S12`
 - `wiki/inbox/pico-c-sdk-ingest-plan.md`: S12 checkbox → `[x]`
 
+---
+
 ## [2026-04-17] ingest | pico-c-sdk S11 | §5.1.25 hardware_spi + §5.1.27 hardware_sync (PDF pp.329–349)
 
 - `wiki/concepts/rp2040-spi.md`: added `spi_deinit`, `spi_get_baudrate`, `spi_get_index` to SDK table; added DMA compile-time macros table (`SPI_DREQ_NUM`, `SPI_NUM`, `SPI_INSTANCE`); updated sources to include `pico-c-sdk`
@@ -336,12 +443,16 @@ Deep online research (12+ web searches), v0.24 release verified, 11 new pages wr
 - `wiki/sources/pico-c-sdk.md`: S11 row → `[x] ingested — S11`
 - `wiki/inbox/pico-c-sdk-ingest-plan.md`: S11 checkbox → `[x]`
 
+---
+
 ## [2026-04-17] ingest | pico-c-sdk S10 | §5.1.16 hardware_pio end + §5.1.17 hardware_pll (PDF pp.254–264)
 
 - `wiki/concepts/pio-architecture.md`: expanded `pio_encode_*` section — composition helpers (`pio_encode_delay`/`sideset`/`sideset_opt` return ORable bits, not instructions), complete JMP variant table (8 variants), `wait_pin` vs `wait_gpio` addressing distinction, `pio_src_dest` enum reference table
 - `wiki/concepts/rp2040-clocks.md`: added `hardware_pll` SDK functions section — `pll_init`, `pll_deinit`, `PLL_RESET_NUM` macro, `pll_sys`/`pll_usb` handles; caution re `pll_deinit` not checking if PLL is in use
 - `wiki/sources/pico-c-sdk.md`: S10 row → `[x] ingested — S10`
 - `wiki/inbox/pico-c-sdk-ingest-plan.md`: S10 checkbox → `[x]`
+
+---
 
 ## [2026-04-17] ingest | pico-c-sdk S9 | §5.1.16 hardware_pio pt.2 (PDF pp.236–254)
 
@@ -355,6 +466,8 @@ Updated `wiki/concepts/pio-architecture.md`. No new pages created.
 5. **Default SM config table** — all `pio_get_default_sm_config` defaults documented; warning about `wrap=31` default.
 6. **RP2350B GPIO base** — `pio_set_gpio_base(pio, 0|16)` for 48-pin RP2350B; 64-bit pin variants (`pio_sm_set_pindirs_with_mask64`, etc.).
 
+---
+
 ## [2026-04-17] ingest | pico-c-sdk S8 | §5.1.15 hardware_irq + §5.1.16 hardware_pio pt.1 (PDF pp.216–236)
 
 Created `wiki/concepts/hardware-irq.md` (new page). Updated `wiki/concepts/pio-architecture.md`.
@@ -362,6 +475,8 @@ Created `wiki/concepts/hardware-irq.md` (new page). Updated `wiki/concepts/pio-a
 **New content:**
 1. **hardware-irq.md (new)** — NVIC per-core architecture; IRQ number tables for RP2040 (0–25) and RP2350 (0–51); three handler installation patterns (`irq_set_exclusive_handler`, `irq_add_shared_handler`, static symbol); full API function table; priority model (0–255 inverted, default 0x80; RP2040 top 2 bits, RP2350 top 4 bits); shared `order_priority` (higher = called first, opposite of IRQ priority); vector table dual-core caveat; user IRQs (`irq_set_pending`, core-local, claim/unclaim); `irq_clear` hardware-IRQ limitation.
 2. **pio-architecture.md** — added `pio_interrupt_source` enum table (pis_interrupt0-3, pis_smN_tx_fifo_not_full, pis_smN_rx_fifo_not_empty); `pio_set_irqn_source_enabled` generic variant; `pio_mov_status_type` enum (STATUS_TX_LESSTHAN, STATUS_RX_LESSTHAN); compile-time macros section (PIO_NUM, PIO_INSTANCE, PIO_FUNCSEL_NUM, PIO_DREQ_NUM, PIO_IRQ_NUM); added [[hardware-irq]] to related pages.
+
+---
 
 ## [2026-04-17] ingest | pico-c-sdk S7 | §5.1.11 hardware_gpio pt.2 (PDF pp.170–186)
 
@@ -377,6 +492,8 @@ Updated `wiki/concepts/gpio-pinout.md` with SDK-authoritative content. No new pa
 7. **`gpio_remove_raw_irq_handler_masked` same-mask requirement** — must use same `gpio_mask` as when adding the handler.
 8. **`gpio_set_irqover`** — added to GPIO overrides section (can invert/force IRQ signal).
 9. **`gpio_is_dir_out`** — clarified description in basic API.
+
+---
 
 ## [2026-04-17] ingest | pico-c-sdk S6 | §5.1.11 hardware_gpio pt.1 (PDF pp.155–170)
 
@@ -396,6 +513,8 @@ Updated `wiki/concepts/gpio-pinout.md` with SDK-authoritative content. No new pa
 11. **Order-priority raw handler variants** — `gpio_add_raw_irq_handler_with_order_priority[_masked][64]()`.
 12. **`gpio_remove_raw_irq_handler*()` variants** — clean up raw handler registrations.
 13. **IRQ latch behavior** — level events not latched; edge events stored in INTR register, must be cleared.
+
+---
 
 ## [2026-04-17] ingest | pico-c-sdk S5 | §5.1.8 hardware_dma (PDF pp.122–147)
 
@@ -472,6 +591,8 @@ Created `wiki/sources/pico-c-sdk.md` (source summary with full 14-session scope 
 
 Key finding: ingest plan incorrectly stated "RIA uses RP2040" — both RIA and VGA run on **RP2350** (Pi Pico 2). The `rp2350-arm-s` platform applies to both firmwares. This is now correctly reflected in `sdk-architecture.md` and `pico-c-sdk.md`.
 
+---
+
 ## [2026-04-17] lint | full wiki audit | 8 fixes across 5 files
 
 Full lint pass across all 40 wiki pages, cross-checked against raw firmware source (api.h, cpu.h, ria.h, mem.h, main.c, sys.c, ria.c). Findings and fixes:
@@ -504,26 +625,36 @@ Full lint pass across all 40 wiki pages, cross-checked against raw firmware sour
 - Updated `wiki/index.md` — removed ingest-plan entry; updated fairhead-pico-c description to "all planned chapters ingested".
 - Updated `wiki/overview.md` — added `[[fairhead-pico-c]]` to sources hub.
 
+---
+
 ## [2026-04-16] ingest | Fairhead Ch.9 – Getting Started With The SPI Bus | CS timing quirk added to rp2040-spi
 
 - Updated `wiki/concepts/rp2040-spi.md` — added "## CS Timing Quirk" section (0.7 µs pre-deassert hazard, half-period delay fix); added `[[fairhead-pico-c]]` to sources.
 - Updated `wiki/sources/fairhead-pico-c.md` — marked Ch.9 `[x]`, added key facts section (note: RIA uses USB MSC, not SPI, for storage).
+
+---
 
 ## [2026-04-16] ingest | Fairhead Ch.18 – Multicore and FreeRTOS | race conditions and FreeRTOS model added to dual-core-sio
 
 - Updated `wiki/concepts/dual-core-sio.md` — added "Race conditions and memory atomicity" section (tearing, update loss, 32-bit atomicity table), "FreeRTOS SMP overview" section (task model, why RIA avoids RTOS, WiFi+FreeRTOS integration notes, synchronization comparison table, xQueue producer-consumer pattern).
 - Updated `wiki/sources/fairhead-pico-c.md` — marked Ch.18 `[x]`.
 
+---
+
 ## [2026-04-16] ingest | Fairhead Ch.17 – Direct To The Hardware | SIO GPIO registers and GPIO coprocessor added to dual-core-sio
 
 - Updated `wiki/concepts/dual-core-sio.md` — added SIO GPIO register offset table (Pico vs Pico 2 diff), SIO speed benchmark (4 ns at 50 MHz), GPIO coprocessor (RP2350 inline asm), GPIO event register format (4 bits per GPIO), per-core IRQ control register.
 - Updated `wiki/sources/fairhead-pico-c.md` — marked Ch.17 `[x]`.
+
+---
 
 ## [2026-04-16] ingest | Fairhead Ch.13 – DHT22 Custom Protocol | PIO design patterns added to pio-architecture
 
 - Updated `wiki/concepts/pio-architecture.md` — added "Custom protocol design patterns" subsection: sampling vs counting, parameterized PIO startup via TX FIFO, bidirectional/open-collector pin pattern, `jmp pin` usage.
 - Updated `wiki/sources/fairhead-pico-c.md` — added Ch.13 key facts section; marked `[x]` ingested.
 - Marked Ch.13 `[x]` in ingestion plan.
+
+---
 
 ## [2026-04-16] ingest | Fairhead "Programming the Raspberry Pi Pico/W in C" Ch.12 | new source page + SDK patterns added to pio-architecture
 
@@ -544,6 +675,8 @@ Fixes:
 - [[dma-controller]]: corrected `DREQ_PWM_WRAP8` → `DREQ_PWM_WRAP7` (Quadros book typo on page 44; RP2040 has PWM slices 0–7). Added `> **Conflict:**` note citing the book error.
 
 Everything else verified correct: op-code table, PIX bus protocol, memory map, VGA modes, ABI rules, PIO layout, GPIO pinout, reset model, all Quadros-derived concept pages.
+
+---
 
 ## [2026-04-16] lint | full wiki | second lint pass (9 sources, 40 pages)
 
@@ -575,29 +708,43 @@ Pages modified (6): dma-controller.md, gpio-pinout.md, overview.md, quadros-rp20
 
 Also fixed: log.md formatting — 5 recent entries reformatted from single-line headings to heading + body style.
 
+---
+
 ## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Communication Using SPI (PDF 184–193) — FINAL CHAPTER
 
 New page: [[rp2040-spi]] (SPI basics, CPOL/CPHA modes, 8-entry FIFOs, two-stage clock divider from clk_peri, manual SS in master mode, GPIO pin tables, full SDK API; correction: RIA uses USB MSC not SPI for storage). Updated: [[quadros-rp2040]] scope + SPI facts section, [[index]] (all chapters ingested), [[overview]]. Deleted ingest plan from wiki/inbox — all chapters complete.
+
+---
 
 ## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Asynchronous Serial Communication: the UARTs (PDF 172–183)
 
 New page: [[rp2040-uart]] (framing, TX/RX FIFOs + error flags, fractional baud rate from clk_peri, 5 interrupt sources, RTS/CTS flow control, GPIO pin options, full SDK API, RIA UART1/GPIO4-5/115200 8N1). Updated: [[quadros-rp2040]] scope + UART facts section, [[index]] (9/10 chapters done), ingest plan.
 
+---
+
 ## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Clock Generation, Timer, Watchdog and RTC (PDF 68–88)
 
 New page: [[rp2040-clocks]] (ROSC/XOSC/PLLs, 10 clock domains, mux architecture, 256 MHz System PLL overclock, 64-bit Timer + alarm pools + pico_time, Watchdog + scratch registers, RTC + repeating alarm). Updated: [[quadros-rp2040]] scope + clock facts section, [[index]], ingest plan (8/10 chapters done).
+
+---
 
 ## [2026-04-16] ingest | Quadros "Knowing the RP2040" — USB Controller (PDF 200–232)
 
 New pages: [[usb-controller]] (USB 1.1 PHY, TinyUSB host/device API, HID boot protocol keyboard/mouse/gamepad, CDC VCP, RP6502-RIA USB host usage table). Updated: [[quadros-rp2040]] scope + USB key facts section, [[rp6502-ria]] related links, [[index]], [[overview]].
 
+---
+
 ## [2026-04-16] ingest | Quadros "Knowing the RP2040" — Memory, Addresses and DMA (PDF 42–67)
 
 New pages: [[rp2040-memory]] (ROM/SRAM banking/Flash/XIP/full address map), [[dma-controller]] (12 channels, DREQ table, control blocks, chaining, CRC sniffing, SDK API). Updated: [[xram]] (DMA section added), [[quadros-rp2040]] scope, [[index]].
 
+---
+
 ## [2026-04-16] setup | Git: `picocomputer/rp6502` as submodule | vendored tree → submodule at v0.23
 
 Replaced the vendored copy under `raw/github/picocomputer/rp6502/` with a **Git submodule** pointing at [picocomputer/rp6502](https://github.com/picocomputer/rp6502), checked out at tag **v0.23** (commit `368ed8e`, same pin as before). Added root `.gitmodules`; nested upstream submodules (`src/littlefs`, `src/tinyusb`) initialized locally. Updated `raw/README.md` with clone (`--recurse-submodules` / `git submodule update --init --recursive`) and bump instructions for future releases.
+
+---
 
 ## [2026-04-16] ingest | Knowing the RP2040 (Quadros) — session 4 | Cortex-M0+ Processor Cores chapter
 
@@ -623,6 +770,8 @@ Key additions:
 
 Remaining chapters: 5 (Memory/DMA, Clock, UART, SPI, USB)
 
+---
+
 ## [2026-04-16] ingest | Knowing the RP2040 (Quadros) — session 3 | Reset, Interrupts and Power Control chapter
 
 Chapter ingested: Reset, Interrupts and Power Control (PDF 27–41).
@@ -640,6 +789,8 @@ Key additions:
 - Power control (SLEEP/DORMANT) ingested but not extracted — not relevant to RIA
 
 Remaining chapters: 6 (Cortex, Memory/DMA, Clock, UART, SPI, USB)
+
+---
 
 ## [2026-04-16] ingest | Knowing the RP2040 (Quadros) — session 2 | GPIO, Pad and PWM chapter
 
@@ -659,6 +810,8 @@ Key additions:
 PWM section (printed pp. 109-126): 16 slices, 8.4 fractional divider — not relevant to RP6502 (no PWM-based audio or bus signals). Ingested but not extracted to wiki.
 
 Remaining chapters: 7 (Cortex, Reset/Interrupts, Memory/DMA, Clock, UART, SPI, USB)
+
+---
 
 ## [2026-04-16] ingest | Knowing the RP2040 (Quadros) — session 1 | 2 of 10 chapters ingested
 
@@ -680,9 +833,15 @@ Key additions:
 
 Remaining chapters: 8 (Cortex, Reset/Interrupts, Memory/DMA, Clock, GPIO, UART, SPI, USB)
 
+---
+
 ## [2026-04-16] plan | Programming the Raspberry Pi Pico/W in C (Fairhead, 3rd ed.) | created ingestion plan in wiki/inbox/fairhead-pico-c-ingest-plan.md — 11 of 19 chapters marked for ingest, 8 skipped; includes Quadros comparison table
 
+---
+
 ## [2026-04-16] plan | Knowing the RP2040 (Quadros) | created ingestion plan in wiki/inbox/quadros-rp2040-ingest-plan.md — 10 of 17 chapters marked for ingest, 7 skipped
+
+---
 
 ## [2026-04-16] lint | full wiki | first lint pass (3 sources ingested)
 
@@ -709,6 +868,8 @@ Findings:
 
 Pages modified (5): ria-registers.md, launcher.md, reset-model.md, rp6502-ria-w.md, version-history.md
 
+---
+
 ## [2026-04-16] ingest | picocomputer/rp6502 release notes (v0.1–v0.23) | 23 releases
 
 Pages created (3 total):
@@ -730,6 +891,8 @@ Key findings:
 - **Errno history**: `oserror`/`mappederrno` system existed before v0.14 (now completely replaced)
 - **ROM asset filesystem**: named assets in `.rp6502` added v0.18 (not in original design)
 - **Launcher + Alt-F4**: v0.21 (launcher mechanism), v0.23 (Alt-F4 keystroke)
+
+---
 
 ## [2026-04-16] ingest | picocomputer/rp6502 monorepo (commit 368ed8e) | firmware source ingest
 
@@ -757,6 +920,8 @@ Notes / open questions surfaced:
 - Release notes not yet ingested — each release documents new OS calls and behavioral changes.
 - `cc65` and `llvm-mos` still have no entity pages; both are deeply integrated (separate lseek op-codes, separate errno-opt).
 
+---
+
 ## [2026-04-15] ingest | picocomputer.github.io (6 clipped pages) | first content ingest
 
 Sources ingested:
@@ -781,7 +946,11 @@ Notes / open questions surfaced:
 - `[[cc65]]` and `[[llvm-mos]]` referenced repeatedly but no entity pages yet — gap to fill from the GitHub repo or upstream docs.
 - The OS source contains many more API entries than were summarized; only a representative sampling was lifted to keep this session focused. A future ingest pass should walk the rest of the file (Process control, Time, full file/dir API, attributes table, errno table) and expand `[[rp6502-os-docs]]`.
 
+---
+
 ## [2026-04-15] setup | initial scaffold | created directory structure, CLAUDE.md, wiki stubs
+
+---
 
 ## [2026-04-17] ingest | YouTube playlist — Sessions 0 + 1 | Ep1–Ep4 ingested; scaffolding created
 
@@ -812,6 +981,8 @@ Key facts captured:
 - RIA name coined in Ep3.
 - Fast-load (`RIA_SPIN`) prototype described in Ep4; 6502 startup garbage (first 7 cycles) quirk documented.
 
+---
+
 ## [2026-04-17] ingest | YouTube playlist — Session 2 | Ep6–Ep7 ingested (Era B)
 
 ### Session 2 — Era B: Storage and OS emergence (Ep6, Ep7, 2023)
@@ -834,6 +1005,8 @@ Key facts captured:
 - XRAM shared by userland/kernel/video/audio (first explicit statement, Ep7)
 - At Ep7, RP2040/Cortex-M0+ was the hardware; migrated to RP2350 at v0.10
 - PIX bus not yet working at Ep7; VGA = ANSI terminal only
+
+---
 
 ## [2026-04-17] lint | full wiki lint pass | cross-ref gaps closed
 
@@ -861,12 +1034,16 @@ Key facts captured:
 - `youtube-playlist.md` body table reuses cc65/llvm-mos/PIX bus/PIO terms across many rows; episode source pages already link them where they're discussed in depth.
 - `quadros-rp2040.md`, `fairhead-pico-c.md`, `pico-c-sdk.md` use HSTX/PIX bus/XRAM in scope-listing context; no new fact would be reached by adding more links.
 
+---
+
 ## [2026-04-17] lint | post-YouTube polish pass | audio section + small fixes
 
 - `wiki/overview.md` — added "## Audio" section (PSG + OPL2 coexistence, v0.6 / v0.16 anchors, XREG+XRAM pathway); removed duplicate "Topics" line at EOF
 - `wiki/sources/yt-ep19-game-of-life.md` — added `[[development-history]]` to related
 - `wiki/sources/yt-ep21-ai-programming.md` — added `[[development-history]]` to related
 - Broken-link scan: 0 broken wikilinks across 76 pages (only `[[pia-registers]]` in this log, which is a historical record of a past typo fix)
+
+---
 
 ## [2026-04-17] ingest | YouTube playlist Sessions 3–9 | Eps 8–22 fully ingested
 
@@ -971,6 +1148,8 @@ Key facts captured:
 - `wiki/index.md` — added rumbledethumps-discord source row; updated known-issues and version-history descriptions; added community-projects topic row
 - `PROGRESS.md` — Discord ingest flipped 👉 → ✅; next item promoted; wiki size table updated
 
+---
+
 ## [2026-04-18] lint | deep wiki health check | 118 pages scanned
 
 ### Contradictions fixed
@@ -1002,6 +1181,8 @@ Key facts captured:
 ### PROGRESS.md updated
 - Wiki size table corrected: Sources 48, Concepts 47, Topics 7, Total ~118
 
+---
+
 ## [2026-04-18] ingest | 6502.org tutorials (8 pages) | 4 new pages + 4 pages updated
 
 **Source**: `raw/web/6502.org/` — 8 Obsidian Web Clipper exports, primary author Bruce Clark; other authors anonymous/John Pickens.
@@ -1021,6 +1202,8 @@ Key facts captured:
 **No conflicts found**: 6502.org facts align with existing content from Leventhal/Wagner/Zaks. BRK/IRQ disambiguation clarification agrees with Leventhal (uses PLA/PHA correctly).
 
 **Index/overview/PROGRESS updated**: 4 new index entries, overview §6502-assembly extended with 3 new concept bullets, PROGRESS wiki size updated (Sources 50, Concepts 54, Total ~136).
+
+---
 
 ## [2026-04-18] lint | deep wiki health check (post-6502.org ingest) | 12 fixes applied
 
